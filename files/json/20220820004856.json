@@ -1,0 +1,804 @@
+[
+  {
+    "number": "$0",
+    "path": "/security/lv_check",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Content-Length": "56",
+      "Cache-Control": "no-cache",
+      "Upgrade-Insecure-Requests": "1",
+      "Origin": "http://cloud.sales-staging.liweijia.com",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+      "Referer": "http://cloud.sales-staging.liweijia.com/security/auth/login?returnUrl=http%3A%2F%2Fcloud.sales-staging.liweijia.com%2F%23%2Fdashboard",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; laravel_session=yUzVWR0Ot19odhRe7NhUGIHuaqQVk1oDVQv46gm8; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811424665; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5",
+      "Pragma": "no-cache"
+    },
+    "params": {
+      "type": "normal",
+      "returnUrl": "http://cloud.sales-staging.liweijia.com/#/dashboard"
+    },
+    "json_body": "body",
+    "data": {
+      "lv_username": "admin@liweijia.com",
+      "lv_password": "liweijia666"
+    },
+    "check": {
+      "code": 302
+    }
+  },
+  {
+    "number": "$1",
+    "path": "/",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Cache-Control": "no-cache",
+      "Upgrade-Insecure-Requests": "1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+      "Referer": "http://cloud.sales-staging.liweijia.com/security/auth/login?returnUrl=http%3A%2F%2Fcloud.sales-staging.liweijia.com%2F%23%2Fdashboard",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; laravel_session=yUzVWR0Ot19odhRe7NhUGIHuaqQVk1oDVQv46gm8; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811424665; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5",
+      "Pragma": "no-cache"
+    },
+    "params": {},
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$2",
+    "path": "/services/ums/isLogin",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Accept": "application/json, text/plain, */*",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; laravel_session=yUzVWR0Ot19odhRe7NhUGIHuaqQVk1oDVQv46gm8; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; dd_cookie_test_44da88da-7704-4c2d-a303-58c7d90f1994=test; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811465443",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {},
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$3",
+    "path": "/services/designProperties/isBinging",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Accept": "application/json, text/plain, */*",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; laravel_session=yUzVWR0Ot19odhRe7NhUGIHuaqQVk1oDVQv46gm8; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; dd_cookie_test_44da88da-7704-4c2d-a303-58c7d90f1994=test; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811465443",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {},
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$4",
+    "path": "/services/userTenant/authInfo",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Accept": "application/json, text/plain, */*",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; laravel_session=yUzVWR0Ot19odhRe7NhUGIHuaqQVk1oDVQv46gm8; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; dd_cookie_test_44da88da-7704-4c2d-a303-58c7d90f1994=test; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811465443",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {},
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$5",
+    "path": "/services/userTenant/currentTenant",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Accept": "application/json, text/plain, */*",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; laravel_session=yUzVWR0Ot19odhRe7NhUGIHuaqQVk1oDVQv46gm8; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; dd_cookie_test_44da88da-7704-4c2d-a303-58c7d90f1994=test; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811465443",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {},
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$6",
+    "path": "/services/tenant/copyright/currentCopyRight",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Accept": "application/json, text/plain, */*",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; laravel_session=yUzVWR0Ot19odhRe7NhUGIHuaqQVk1oDVQv46gm8; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811465443",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {
+      "tenantId": "$2.result.extend.tenantId"
+    },
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$7",
+    "path": "/services/menus/listSwitch",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Accept": "application/json, text/plain, */*",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; laravel_session=yUzVWR0Ot19odhRe7NhUGIHuaqQVk1oDVQv46gm8; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811465443",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {},
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$8",
+    "path": "/services/ums/isLogin",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Accept": "application/json, text/plain, */*",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; laravel_session=yUzVWR0Ot19odhRe7NhUGIHuaqQVk1oDVQv46gm8; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811465443",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {},
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$9",
+    "path": "/services/resource/ui/list",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Content-Length": "2",
+      "Accept": "application/json, text/plain, */*",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Content-Type": "application/json;charset=UTF-8",
+      "Origin": "http://cloud.sales-staging.liweijia.com",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; laravel_session=yUzVWR0Ot19odhRe7NhUGIHuaqQVk1oDVQv46gm8; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811465443",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {},
+    "json_body": "json",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$10",
+    "path": "/services/financial/financialAccount/tenantAccount",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Accept": "application/json, text/plain, */*",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; laravel_session=yUzVWR0Ot19odhRe7NhUGIHuaqQVk1oDVQv46gm8; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811465443",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {},
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$11",
+    "path": "/services/designProperties/isBinging",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Accept": "application/json, text/plain, */*",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; laravel_session=yUzVWR0Ot19odhRe7NhUGIHuaqQVk1oDVQv46gm8; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811465443",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {},
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$12",
+    "path": "/services/menus/listSwitch",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Accept": "application/json, text/plain, */*",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; laravel_session=yUzVWR0Ot19odhRe7NhUGIHuaqQVk1oDVQv46gm8; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811465443",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {},
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$13",
+    "path": "/services/userTenant/currentTenant",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Accept": "application/json, text/plain, */*",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; laravel_session=yUzVWR0Ot19odhRe7NhUGIHuaqQVk1oDVQv46gm8; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811465443",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {},
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$14",
+    "path": "/services/tenant/copyright/currentCopyRight",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Accept": "application/json, text/plain, */*",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; laravel_session=yUzVWR0Ot19odhRe7NhUGIHuaqQVk1oDVQv46gm8; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811465443",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {
+      "tenantId": "$2.result.extend.tenantId"
+    },
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$15",
+    "path": "/api/admin/commodity/config/all",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Accept": "application/json, text/plain, */*",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "user_is_login=true; user_is_login=false; MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; laravel_session=yUzVWR0Ot19odhRe7NhUGIHuaqQVk1oDVQv46gm8; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811465443",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {},
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$16",
+    "path": "/api/admin/site/getAll",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Accept": "application/json, text/plain, */*",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "user_is_login=false; MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811465443; laravel_session=XjK6VYDiowDM5nRNraKjGe7T1mvQYxAjxzVYTtUE",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {},
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$17",
+    "path": "/api/special/coupon/liweijia",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Upgrade-Insecure-Requests": "1",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "user_is_login=false; MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; laravel_session=XjK6VYDiowDM5nRNraKjGe7T1mvQYxAjxzVYTtUE; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811720883",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {},
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$18",
+    "path": "/api/admin/coupon/list/20/1/createTime/desc",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Site-key": "liweijia",
+      "Accept": "application/json, text/plain, */*",
+      "SUMBIT-SITE-KEY": "liweijia",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "user_is_login=false; MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; laravel_session=XjK6VYDiowDM5nRNraKjGe7T1mvQYxAjxzVYTtUE; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811724292",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {
+      "flag": "1"
+    },
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$19",
+    "path": "/api/admin/coupon/list/20/1/createTime/desc",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Site-key": "liweijia",
+      "Accept": "application/json, text/plain, */*",
+      "SUMBIT-SITE-KEY": "liweijia",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "user_is_login=false; MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; laravel_session=XjK6VYDiowDM5nRNraKjGe7T1mvQYxAjxzVYTtUE; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811755648",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {
+      "bindType": "$19.list.0.bindType",
+      "sendType": "$19.list.0.sendType",
+      "discountType": "$19.list.0.discountType",
+      "flag": "1"
+    },
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$20",
+    "path": "/api/admin/coupon/list/20/1/createTime/desc",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Site-key": "liweijia",
+      "Accept": "application/json, text/plain, */*",
+      "SUMBIT-SITE-KEY": "liweijia",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "user_is_login=false; MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; laravel_session=XjK6VYDiowDM5nRNraKjGe7T1mvQYxAjxzVYTtUE; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811827032",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {
+      "bindType": "$19.list.0.bindType",
+      "sendType": "$19.list.0.sendType",
+      "discountType": "$19.list.0.discountType",
+      "flag": "1"
+    },
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$21",
+    "path": "/api/admin/coupon/list/20/1/createTime/desc",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Site-key": "liweijia",
+      "Accept": "application/json, text/plain, */*",
+      "SUMBIT-SITE-KEY": "liweijia",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "user_is_login=false; MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; laravel_session=XjK6VYDiowDM5nRNraKjGe7T1mvQYxAjxzVYTtUE; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811877005",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {
+      "bindType": "$19.list.0.bindType",
+      "sendType": "$19.list.0.sendType",
+      "discountType": "$19.list.0.discountType",
+      "flag": "1"
+    },
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$22",
+    "path": "/api/admin/coupon/list/20/1/createTime/desc",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Site-key": "liweijia",
+      "Accept": "application/json, text/plain, */*",
+      "SUMBIT-SITE-KEY": "liweijia",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "user_is_login=false; MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; laravel_session=XjK6VYDiowDM5nRNraKjGe7T1mvQYxAjxzVYTtUE; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811958798",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {
+      "bindType": "$19.list.0.bindType",
+      "sendType": "$19.list.0.sendType",
+      "discountType": "$19.list.0.discountType",
+      "flag": "1"
+    },
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$23",
+    "path": "/api/admin/coupon/list/20/1/createTime/desc",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Site-key": "liweijia",
+      "Accept": "application/json, text/plain, */*",
+      "SUMBIT-SITE-KEY": "liweijia",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "user_is_login=false; MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; laravel_session=XjK6VYDiowDM5nRNraKjGe7T1mvQYxAjxzVYTtUE; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660811980220",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {
+      "bindType": "$19.list.0.bindType",
+      "sendType": "$19.list.0.sendType",
+      "discountType": "$19.list.0.discountType",
+      "flag": "1"
+    },
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$24",
+    "path": "/api/admin/coupon/list/20/1/createTime/desc",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Site-key": "liweijia",
+      "Accept": "application/json, text/plain, */*",
+      "SUMBIT-SITE-KEY": "liweijia",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "user_is_login=false; MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; laravel_session=XjK6VYDiowDM5nRNraKjGe7T1mvQYxAjxzVYTtUE; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660812005693",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {
+      "name": "$5.result.name",
+      "flag": "1"
+    },
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$25",
+    "path": "/api/admin/coupon/list/20/1/createTime/desc",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Site-key": "liweijia",
+      "Accept": "application/json, text/plain, */*",
+      "SUMBIT-SITE-KEY": "liweijia",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "user_is_login=false; MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; laravel_session=XjK6VYDiowDM5nRNraKjGe7T1mvQYxAjxzVYTtUE; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660812010169",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {
+      "status": "$19.list.0.status",
+      "flag": "1"
+    },
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$26",
+    "path": "/api/admin/coupon/list/20/1/createTime/desc",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Site-key": "liweijia",
+      "Accept": "application/json, text/plain, */*",
+      "SUMBIT-SITE-KEY": "liweijia",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "user_is_login=false; MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; laravel_session=XjK6VYDiowDM5nRNraKjGe7T1mvQYxAjxzVYTtUE; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660812012531",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {
+      "status": "$19.list.0.status",
+      "flag": "1"
+    },
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$27",
+    "path": "/api/admin/coupon/list/20/1/createTime/desc",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Site-key": "liweijia",
+      "Accept": "application/json, text/plain, */*",
+      "SUMBIT-SITE-KEY": "liweijia",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "user_is_login=false; MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; laravel_session=XjK6VYDiowDM5nRNraKjGe7T1mvQYxAjxzVYTtUE; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660812015539",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {
+      "status": "$19.list.0.status",
+      "flag": "1"
+    },
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$28",
+    "path": "/api/admin/coupon/list/20/1/createTime/desc",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Site-key": "liweijia",
+      "Accept": "application/json, text/plain, */*",
+      "SUMBIT-SITE-KEY": "liweijia",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "user_is_login=false; MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; laravel_session=XjK6VYDiowDM5nRNraKjGe7T1mvQYxAjxzVYTtUE; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660812017543",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {
+      "status": "$19.list.0.status",
+      "flag": "1"
+    },
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$29",
+    "path": "/api/admin/coupon/list/20/1/createTime/desc",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Site-key": "liweijia",
+      "Accept": "application/json, text/plain, */*",
+      "SUMBIT-SITE-KEY": "liweijia",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "user_is_login=false; MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; laravel_session=XjK6VYDiowDM5nRNraKjGe7T1mvQYxAjxzVYTtUE; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660812022777",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {
+      "status": "$19.list.0.status",
+      "flag": "1"
+    },
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$30",
+    "path": "/api/admin/coupon/list/20/1/createTime/desc",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Site-key": "liweijia",
+      "Accept": "application/json, text/plain, */*",
+      "SUMBIT-SITE-KEY": "liweijia",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "user_is_login=false; MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; laravel_session=XjK6VYDiowDM5nRNraKjGe7T1mvQYxAjxzVYTtUE; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660812025142",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {
+      "status": "$19.list.0.status",
+      "flag": "1"
+    },
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  },
+  {
+    "number": "$31",
+    "path": "/api/admin/coupon/list/20/1/createTime/desc",
+    "headers": {
+      "Host": "cloud.sales-staging.liweijia.com",
+      "Connection": "keep-alive",
+      "Site-key": "liweijia",
+      "Accept": "application/json, text/plain, */*",
+      "SUMBIT-SITE-KEY": "liweijia",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+      "Referer": "http://cloud.sales-staging.liweijia.com/",
+      "Accept-Encoding": "gzip, deflate",
+      "Accept-Language": "zh-HK,zh;q=0.9,zh-CN;q=0.8,en-US;q=0.7,en;q=0.6,zh-TW;q=0.5,ja;q=0.4",
+      "Cookie": "user_is_login=false; MEIQIA_TRACK_ID=1pHnOlbcCI2KBqmDLBeFvrNqXDF; MEIQIA_VISIT_ID=283Aaw07Jj3S6uFCYbtqjXvsMMV; _dataflulx_an_id=ac88f777-5eb4-42d6-8879-eca8fa5b8547; Hm_lvt_1a37d6e50dc8404e45d7ab69adee8d9f=1659322618,1659402141,1659489289,1659607228; sid=sales8ujo60rh3lyj1od5tr28wt3bq.sales; LX-WXSRF-JTOKEN=95929e40-f58b-4627-b50f-f31dc2f463d5; laravel_session=XjK6VYDiowDM5nRNraKjGe7T1mvQYxAjxzVYTtUE; _dataflux_s=rum=1&id=06dd4b33-3f60-43d0-a0d6-6b4bf161ea70&created=1660809915775&expire=1660812028157",
+      "Pragma": "no-cache",
+      "Cache-Control": "no-cache"
+    },
+    "params": {
+      "status": "$19.list.0.status",
+      "flag": "1"
+    },
+    "json_body": "body",
+    "data": {},
+    "check": {
+      "code": 200
+    }
+  }
+]
