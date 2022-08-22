@@ -9,7 +9,8 @@ __pycache__/
 # Distribution / packaging
 /.idea
 *.json
-*.excel
+files/
+sqlite/
 .Python
 configs.py
 test*.py

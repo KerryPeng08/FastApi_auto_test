@@ -10,51 +10,58 @@
 import time
 from fastapi import APIRouter, UploadFile, HTTPException, status, Depends
 from sqlalchemy.orm import Session
-from apps.case_data import crud, schemas
+from apps.case_service import crud, schemas
 from apps.template import crud as temp_crud
-from tool.database import Base, engine
-from .tool import GenerateCase
+from tool import GenerateCase
 from depends import get_db
 from tool import OperationJson
 from starlette.responses import FileResponse
 
-case = APIRouter()
-
-Base.metadata.create_all(bind=engine)
+case_service = APIRouter()
 
 
-@case.get('/init/data', response_model=schemas.ReadTemplate, name='获取预处理后的测试数据')
-async def test_case_data(temp_name: str, db: Session = Depends(get_db)):
+@case_service.get('/init/data', response_model=schemas.ReadTemplate, name='获取预处理后的测试数据')
+async def test_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = Depends(get_db)):
     """
     自动处理部分接口数据上下级关联数据
     """
+    if mode != schemas.ModeEnum.service:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'该模式仅支持{mode}模式')
+
     template_data = await temp_crud.get_template_data(db=db, temp_name=temp_name)
     if template_data:
-        test_data = await GenerateCase().read_template(temp_name=temp_name, template_data=template_data)
+        test_data = await GenerateCase().read_template_to_api(temp_name=temp_name, mode=mode,
+                                                              template_data=template_data)
         return test_data
+
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')
 
 
-@case.get('/download/json', name='下载初步处理后的测试数据-json')
-async def download_case_data(temp_name: str, db: Session = Depends(get_db)):
+@case_service.get('/download/json', name='下载预处理后的测试数据-json')
+async def download_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = Depends(get_db)):
     """
     自动处理部分接口上下级关联数据\n
     json格式化数据下载
     """
+    if mode != schemas.ModeEnum.service:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'该模式仅支持{mode}模式')
+
     template_data = await temp_crud.get_template_data(db=db, temp_name=temp_name)
     if template_data:
-        test_data = await GenerateCase().read_template(temp_name=temp_name, template_data=template_data)
+        test_data = await GenerateCase().read_template_to_api(temp_name=temp_name, mode=mode,
+                                                              template_data=template_data)
         path = f'./files/json/{time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))}.json'
         await OperationJson.write(path=path, data=test_data)
         return FileResponse(
             path=path,
             filename=f'{temp_name}.json'
         )
+
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')
 
 
-@case.post('/upload/json', name='上传测试数据-json')
-async def test_case_upload_json(temp_name: str, case_name, file: UploadFile, db: Session = Depends(get_db)):
+@case_service.post('/upload/json', name='上传测试数据-json')
+async def test_case_upload_json(temp_name: str, case_name: str, file: UploadFile, db: Session = Depends(get_db)):
     """
     上传json文件，解析后储存测试数据
     """

@@ -10,11 +10,19 @@
 from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional, List
+from enum import Enum
 
 
 # 用例名称的请求/响应数据模型
+class ModeEnum(str, Enum):
+    service = 'service'
+    ddt = 'ddt'
+    perf = 'perf'
+
+
 class TestCaseIn(BaseModel):
     case_name: str
+    mode: ModeEnum
 
 
 class TestCaseOut(TestCaseIn):
@@ -28,27 +36,42 @@ class TestCaseOut(TestCaseIn):
 
 
 # 测试用例的数据模型
+class TestCaseConfig(BaseModel):
+    is_login: bool = None
+    sleep: float = 0.3
+
+
 class TestCaseDataIn(BaseModel):
     headers: Optional[dict] = {}
     params: Optional[dict] = {}
     data: Optional[dict] = {}
     check: Optional[dict] = {}
+    description: str
+    config: TestCaseConfig
+
+    class Config:
+        orm_mode = True
 
 
 class TestCaseDataOut(BaseModel):
     number: str
     path: str
-    is_login: bool = None
     headers: Optional[dict] = {}
     params: Optional[dict] = {}
     data: Optional[dict] = {}
     check: Optional[dict] = {}
+    description: str
+    config: TestCaseConfig
 
     class Config:
         orm_mode = True
 
 
 class ReadTemplate(BaseModel):
-    description: list
+    tips: list
     temp_name: str
+    mode: ModeEnum
     data: List[TestCaseDataOut]
+
+    class Config:
+        orm_mode = True

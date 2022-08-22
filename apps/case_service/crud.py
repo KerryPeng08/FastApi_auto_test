@@ -7,7 +7,7 @@
 @Time: 2022/8/20-21:59
 """
 from sqlalchemy.orm import Session
-from apps.case_data import models, schemas
+from apps.case_service import models, schemas
 
 
 async def create_test_case(db: Session, case_name: str, temp_id: int):

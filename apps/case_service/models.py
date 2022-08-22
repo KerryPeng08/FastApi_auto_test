@@ -20,6 +20,7 @@ class TestCase(Base):
     temp_id = Column(Integer, ForeignKey('case_template.id'))
     case_name = Column(String, unique=True, nullable=True, index=True, comment='用例名称')
     case_count = Column(Integer, default=0, nullable=True, comment='用例数量')
+    mode = Column(String, comment='用例运行模式')
 
     created_at = Column(DateTime, server_default=func.now(), comment='创建时间')
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), comment='更新时间')
@@ -34,11 +35,12 @@ class TestCaseData(Base):
     __tablename__ = 'test_case_data'
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     case_id = Column(Integer, ForeignKey('test_case.id'))
-    is_login = Column(Boolean, default=None, comment='登录接口')
     headers = Column(JSON, comment='请求头测试数据')
     params = Column(JSON, comment='请求参数测试数据')
     data = Column(JSON, comment='json/表单 测试数据')
     check = Column(JSON, comment='测试数据校验字段')
+    description = Column(String, comment='用例描述')
+    config = Column(JSON, comment='用例配置')
 
     created_at = Column(DateTime, server_default=func.now(), comment='创建时间')
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), comment='更新时间')

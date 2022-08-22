@@ -4,7 +4,7 @@
 """
 @Author: Kobayasi
 @File: __init__.py.py
-@Time: 2022/8/20-21:56
+@Time: 2022/8/22-9:50
 """
 
-from .router import case
+from .router import case_ddt
