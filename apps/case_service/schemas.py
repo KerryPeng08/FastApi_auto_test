@@ -13,13 +13,13 @@ from typing import Optional, List
 from enum import Enum
 
 
-# 用例名称的请求/响应数据模型
 class ModeEnum(str, Enum):
     service = 'service'
     ddt = 'ddt'
     perf = 'perf'
 
 
+# 用例名称的请求/响应数据模型
 class TestCaseIn(BaseModel):
     case_name: str
     mode: ModeEnum
@@ -53,7 +53,7 @@ class TestCaseDataIn(BaseModel):
         orm_mode = True
 
 
-class TestCaseDataOut(BaseModel):
+class TestCaseData(BaseModel):
     number: str
     path: str
     headers: Optional[dict] = {}
@@ -67,11 +67,11 @@ class TestCaseDataOut(BaseModel):
         orm_mode = True
 
 
-class ReadTemplate(BaseModel):
+class TestCaseDataOut(BaseModel):
     tips: list
     temp_name: str
     mode: ModeEnum
-    data: List[TestCaseDataOut]
+    data: List[TestCaseData]
 
     class Config:
         orm_mode = True

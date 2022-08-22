@@ -32,7 +32,7 @@ class GenerateCase:
                 # 'headers': template_data[num].headers,
                 'params': await self._extract_params_keys(param=template_data[num].params, response=response[:num + 1]),
                 'data': await self._extract_params_keys(param=template_data[num].data, response=response[:num + 1]),
-                'check': {'status_code': template_data[num].code},
+                'check': {'status_code': 200 if num == 0 else template_data[num].code},
                 'description': '',
                 'config': {
                     'is_login': True if num == 0 else None,
@@ -52,6 +52,7 @@ class GenerateCase:
                     '3.若value数据类型为: list, 索引0应填写比较符: <,<=,==,>=,>,in,not in; 索引1填写比较的值'
                 ]},
                 'description: 用例描述信息',
+                'mode: 运行模式, 支持: service/ddt/perf',
                 'config: 单接口的配置信息'
             ],
             'temp_name': temp_name,
