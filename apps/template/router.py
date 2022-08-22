@@ -25,10 +25,11 @@ Base.metadata.create_all(bind=engine)
 
 @template.post('/upload/har', response_model=schemas.TemplateOut, response_model_exclude_unset=True,
                name='上传Charles的har文件')
-async def upload_file_har(temp_name: str, file: UploadFile, db: Session = Depends(get_db)):
+async def upload_file_har(temp_name: str, project_name: schemas.TempEnum, file: UploadFile,
+                          db: Session = Depends(get_db)):
     """
     1、上传文件后，解析数据，形成模板数据\n
-    2、自动过滤掉'js','css','png','jpg','jpeg'\n
+    2、自动过滤掉'js','css','image'\n
     3、记录原始数据，拆解params、body、json数据
     """
     if file.content_type != 'application/har+json':
@@ -37,7 +38,7 @@ async def upload_file_har(temp_name: str, file: UploadFile, db: Session = Depend
     if await crud.get_temp_name(db=db, temp_name=temp_name):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='模板名称已存在')
 
-    return await ParseData.pares_data(db=db, temp_name=temp_name, har_data=file.file.read())
+    return await ParseData.pares_data(db=db, temp_name=temp_name, project_name=project_name, har_data=file.file.read())
 
 
 @template.get('/name', response_model=List[schemas.TemplateOut], response_model_exclude_unset=True, name='查询模板数据')

@@ -17,6 +17,7 @@ class Template(Base):
     """
     __tablename__ = 'case_template'
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    project_name = Column(String, unique=True, nullable=True, index=True, comment='项目名称')
     temp_name = Column(String, unique=True, nullable=True, index=True, comment='场景名称')
     api_count = Column(Integer, default=0, nullable=True, comment='接口数量')
 
@@ -47,4 +48,3 @@ class TemplateData(Base):
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), comment='更新时间')
 
     __mapper_args__ = {'order_by': id}
-

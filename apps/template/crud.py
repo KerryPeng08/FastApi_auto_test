@@ -11,14 +11,14 @@ from sqlalchemy.orm import Session
 from apps.template import models, schemas
 
 
-async def create_template(db: Session, temp_name: str):
+async def create_template(db: Session, temp_name: str, project_name: str):
     """
     创建模板信息
     :param db:
     :param temp_name:
     :return:
     """
-    db_temp = models.Template(temp_name=temp_name)
+    db_temp = models.Template(temp_name=temp_name, project_name=project_name)
     db.add(db_temp)
     db.commit()
     db.refresh(db_temp)
