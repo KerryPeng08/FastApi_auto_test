@@ -10,3 +10,8 @@
 from fastapi import APIRouter
 
 case_perf = APIRouter()
+
+
+@case_perf.get('/mode', name='开发中')
+async def mode():
+    pass

@@ -107,7 +107,7 @@ async def delete_name(temp_name: str, db: Session = Depends(get_db)):
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')
 
 
-@template.get('/download/excel', name='下载模板数据-excel')
+@template.get('/download/excel', name='下载模板数据-excel', deprecated=True)
 async def download_temp_excel(temp_name: str, db: Session = Depends(get_db)):
     """
     将Charles录制的测试场景原始数据下载到excel

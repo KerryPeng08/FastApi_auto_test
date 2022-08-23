@@ -10,3 +10,8 @@
 from fastapi import APIRouter
 
 case_ddt = APIRouter()
+
+
+@case_ddt.get('/mode', name='开发中')
+async def mode():
+    pass

@@ -11,3 +11,21 @@ from .excel import CreateExcel
 from .operation_json import OperationJson
 from .generate_case import GenerateCase
 # from .check_case_json import CheckJson
+
+from typing import List
+import pathlib
+from setting import PROJECT_NAME
+
+
+def mkdir(pro_names: List[str]):
+    """
+    按项目创建多级目录
+    :param pro_names:
+    :return:
+    """
+    for name in pro_names:
+        pathlib.Path(f'./allure_report/{name.lower()}/report').mkdir(parents=True, exist_ok=True)
+        pathlib.Path(f'./allure_report/{name.lower()}/allure').mkdir(parents=True, exist_ok=True)
+
+
+mkdir(PROJECT_NAME)

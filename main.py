@@ -10,12 +10,13 @@
 import uvicorn
 from fastapi import FastAPI
 
-# from apps.api_pool import api_pool
 from apps.template import template
 from apps.case_service import case_service
 from apps.case_ddt import case_ddt
 from apps.case_perf import case_perf
 from tools.database import Base, engine
+from setting import PROJECT_NAME
+from fastapi.staticfiles import StaticFiles
 
 Base.metadata.create_all(bind=engine)
 
@@ -25,13 +26,13 @@ app = FastAPI(
     title='一个基于FastApi实现的纯后端 接口测试平台'
 )
 
-# app.include_router(api_pool, prefix='/pool', tags=['获取接口数据[接口池]'])
 app.include_router(template, prefix='/template', tags=['测试场景'])
 app.include_router(case_service, prefix='/caseService', tags=['业务接口测试用例'])
 app.include_router(case_ddt, prefix='/caseDdt', tags=['数据驱动测试用例'])
 app.include_router(case_perf, prefix='/casePerf', tags=['性能测试用例'])
-# app.include_router(diff_api_data, prefix='/diff', tags=['接口数据对比'])
+
+for name in PROJECT_NAME:
+    app.mount(f"/allure/{name.lower()}", StaticFiles(directory=f'./allure_report/{name.lower()}/allure', html=True))
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host='0.0.0.0', port=8000, reload=True, debug=True)
-    # uvicorn.run('main:app', host='127.0.0.1', port=8000, reload=True, debug=True)

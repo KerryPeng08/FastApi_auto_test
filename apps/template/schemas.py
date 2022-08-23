@@ -14,15 +14,17 @@ from enum import Enum
 
 
 class TempEnum(str, Enum):
-    pro_name1 = '分销系统'
-    pro_name2 = 'OMS系统'
-    pro_name3 = '商城系统'
+    sales = 'sales'
+    oms = 'oms'
+    site = 'site'
+    tms = 'tms'
+    wxapp = 'wxapp'
 
 
 # 模板名称的请求/响应数据模型
 class TemplateIn(BaseModel):
     temp_name: str
-    project_name: str
+    project_name: TempEnum
 
 
 class TemplateOut(TemplateIn):
