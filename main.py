@@ -8,7 +8,7 @@
 """
 
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 
 from apps.template import template
 from apps.case_service import case_service
@@ -30,6 +30,15 @@ app.include_router(template, prefix='/template', tags=['测试场景'])
 app.include_router(case_service, prefix='/caseService', tags=['业务接口测试用例'])
 app.include_router(case_ddt, prefix='/caseDdt', tags=['数据驱动测试用例'])
 app.include_router(case_perf, prefix='/casePerf', tags=['性能测试用例'])
+
+
+@app.get('/allure', name='allure测试报告地址', tags=['测试报告'])
+async def allure(request: Request):
+    pro_info = {}
+    for name in PROJECT_NAME:
+        pro_info[name] = f"{request.url}/{name.lower()}"
+    return pro_info
+
 
 for name in PROJECT_NAME:
     app.mount(f"/allure/{name.lower()}", StaticFiles(directory=f'./allure_report/{name.lower()}/allure', html=True))
