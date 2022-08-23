@@ -9,6 +9,7 @@
 
 from sqlalchemy.orm import Session
 from apps.template import models, schemas
+from apps.case_service import models as case_models
 
 
 async def create_template(db: Session, temp_name: str, project_name: str):
@@ -64,8 +65,22 @@ async def get_temp_name(db: Session, temp_name: str = None):
     :return:
     """
     if temp_name:
-        return db.query(models.Template).filter(models.Template.temp_name == temp_name).first()
+        return db.query(models.Template).filter(models.Template.temp_name == temp_name).all()
     return db.query(models.Template).all()
+
+
+async def get_temp_case_info(db: Session, temp_id: int):
+    """
+    查询模板下有多少条用例
+    :param db:
+    :param temp_id:
+    :return:
+    """
+    db_case = db.query(case_models.TestCase).filter(case_models.TestCase.temp_id == temp_id).all()
+    case_info = []
+    for case in db_case:
+        case_info.append({'id': case.id, 'mode': case.mode, 'name': case.case_name})
+    return {'case_count': len(db_case), 'case_info': case_info}
 
 
 async def get_template_data(db: Session, temp_name: str):

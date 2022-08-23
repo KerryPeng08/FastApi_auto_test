@@ -7,3 +7,4 @@
 @Time: 2022/8/20-22:03
 """
 
+from .insert_case_data import insert, cover_insert

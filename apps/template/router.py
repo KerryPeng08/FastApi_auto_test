@@ -12,10 +12,10 @@ from typing import List, Optional
 from fastapi import APIRouter, UploadFile, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 from apps.template import crud, schemas
-from tool.database import Base, engine
+from tools.database import Base, engine
 from .tool import ParseData
 from depends import get_db
-from tool import CreateExcel
+from tools import CreateExcel
 from starlette.responses import FileResponse
 
 template = APIRouter()
@@ -41,18 +41,34 @@ async def upload_file_har(temp_name: str, project_name: schemas.TempEnum, file: 
     return await ParseData.pares_data(db=db, temp_name=temp_name, project_name=project_name, har_data=file.file.read())
 
 
-@template.get('/name', response_model=List[schemas.TemplateOut], response_model_exclude_unset=True, name='查询模板数据')
+@template.get('/name', response_model=List[schemas.TempTestCase], response_model_exclude_unset=True, name='查询模板数据')
 async def get_templates(temp_name: Optional[str] = None, db: Session = Depends(get_db)):
     """
     1、查询已存在的测试模板/场景\n
-    2、默认返回所有模板
+    2、场景包含的测试用例
+    3、默认返回所有模板
     """
     if not temp_name:
-        return await crud.get_temp_name(db=db)
+        templates = await crud.get_temp_name(db=db)
+    else:
+        templates = await crud.get_temp_name(db=db, temp_name=temp_name)
 
-    templates = await crud.get_temp_name(db=db, temp_name=temp_name)
-    if templates:
-        return [templates]
+    out_info = []
+    for temp in templates:
+        case_info = await crud.get_temp_case_info(db=db, temp_id=temp.id)
+        temp_info = {
+            'temp_name': temp.temp_name,
+            'project_name': temp.project_name,
+            'id': temp.id,
+            'api_count': temp.api_count,
+            'created_at': temp.created_at,
+            'updated_at': temp.updated_at,
+        }
+        temp_info.update(case_info)
+        out_info.append(temp_info)
+
+    if out_info:
+        return out_info
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板信息')
 

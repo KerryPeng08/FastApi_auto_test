@@ -13,10 +13,10 @@ from fastapi import APIRouter, UploadFile, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 from apps.case_service import crud, schemas
 from apps.template import crud as temp_crud
-from tool import GenerateCase
-from tool.check_case_json import CheckJson
+from .tool import insert, cover_insert
+from tools import GenerateCase, OperationJson
+from tools.check_case_json import CheckJson
 from depends import get_db
-from tool import OperationJson
 from starlette.responses import FileResponse
 
 case_service = APIRouter()
@@ -62,7 +62,7 @@ async def download_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')
 
 
-@case_service.post('/upload/json', name='上传测试数据-json')
+@case_service.post('/upload/json', response_model=schemas.TestCaseOut, name='上传测试数据-json')
 async def test_case_upload_json(temp_name: str, case_name: str, file: UploadFile, cover: bool = False,
                                 db: Session = Depends(get_db)):
     """
@@ -72,22 +72,22 @@ async def test_case_upload_json(temp_name: str, case_name: str, file: UploadFile
     if file.content_type != 'application/json':
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='文件类型错误，只支持json格式文件')
 
-    if not await temp_crud.get_temp_name(db=db, temp_name=temp_name):
+    db_temp = await temp_crud.get_temp_name(db=db, temp_name=temp_name)
+    if not db_temp:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='模板不存在')
 
+    # 校验数据
+    try:
+        case_data = json.loads(file.file.read().decode('utf-8'))
+    except json.decoder.JSONDecodeError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'json文件格式有错误: {str(e)}')
+    msg_list = await CheckJson.check_to_service(case_data=case_data['data'])
+    if msg_list:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=msg_list)
+
     if cover:  # 覆盖
-        try:
-            case_data = json.loads(file.file.read().decode('utf-8'))
-        except json.decoder.JSONDecodeError as e:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'json文件格式有错误: {str(e)}')
-
-        # 校验数据
-        msg_list = await CheckJson.check_to_service(case_data=case_data['data'])
-        if msg_list:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=msg_list)
-
-        # 写入数据
-
+        return await cover_insert(db=db, case_name=case_name, temp_id=db_temp.id, case_data=case_data)
     else:  # 不覆盖
         if await crud.get_case_name(db=db, case_name=case_name):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='用例名称已存在')
+        return await insert(db=db, case_name=case_name, temp_id=db_temp.id, case_data=case_data)

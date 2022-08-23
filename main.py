@@ -15,7 +15,7 @@ from apps.template import template
 from apps.case_service import case_service
 from apps.case_ddt import case_ddt
 from apps.case_perf import case_perf
-from tool.database import Base, engine
+from tools.database import Base, engine
 
 Base.metadata.create_all(bind=engine)
 

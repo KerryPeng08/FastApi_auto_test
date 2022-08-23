@@ -9,7 +9,7 @@
 
 from datetime import datetime
 from pydantic import BaseModel, HttpUrl
-from typing import Optional
+from typing import Optional, List
 from enum import Enum
 
 
@@ -33,6 +33,17 @@ class TemplateOut(TemplateIn):
 
     class Config:
         orm_mode = True
+
+
+class TestCase(BaseModel):
+    id: int
+    mode: str
+    name: str
+
+
+class TempTestCase(TemplateOut):
+    case_count: int
+    case_info: List[TestCase]
 
 
 # 测试模板数据的请求/响应数据模型

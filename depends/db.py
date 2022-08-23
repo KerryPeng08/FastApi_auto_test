@@ -7,7 +7,7 @@
 @Time: 2022/8/11-16:36
 """
 
-from tool.database import SessionLocal
+from tools.database import SessionLocal
 
 
 async def get_db():

@@ -8,7 +8,7 @@
 """
 
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, func, JSON
-from tool.database import Base
+from tools.database import Base
 
 
 class Template(Base):

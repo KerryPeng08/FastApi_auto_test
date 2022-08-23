@@ -7,9 +7,6 @@
 @Time: 2022/8/21-21:46
 """
 
-# import base64
-# import json
-# from sqlalchemy.orm import Session
 from apps.case_service import schemas
 from typing import List
 
@@ -54,8 +51,7 @@ class CheckJson:
                         msg_list.append(f"用例${x}比较类型不匹配: {k}: {v}")
                         continue
 
-        if msg_list:
-            return msg_list
+        return msg_list
 
     @classmethod
     async def check_to_ddt(cls):

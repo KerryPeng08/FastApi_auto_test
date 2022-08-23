@@ -7,8 +7,8 @@
 @Time: 2022/8/20-21:59
 """
 
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, func, JSON, Boolean
-from tool.database import Base
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, func, JSON
+from tools.database import Base
 
 
 class TestCase(Base):
@@ -25,7 +25,7 @@ class TestCase(Base):
     created_at = Column(DateTime, server_default=func.now(), comment='创建时间')
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), comment='更新时间')
 
-    __mapper_args__ = {'order_by': id.desc()}
+    __mapper_args__ = {'order_by': id}
 
 
 class TestCaseData(Base):
