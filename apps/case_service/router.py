@@ -81,13 +81,13 @@ async def test_case_upload_json(temp_name: str, case_name: str, file: UploadFile
         case_data = json.loads(file.file.read().decode('utf-8'))
     except json.decoder.JSONDecodeError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'json文件格式有错误: {str(e)}')
-    msg_list = await CheckJson.check_to_service(case_data=case_data['data'])
+    msg_list = await CheckJson.check_to_service(db=db, temp_name=temp_name, case_data=case_data['data'])
     if msg_list:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=msg_list)
 
     if cover:  # 覆盖
-        return await cover_insert(db=db, case_name=case_name, temp_id=db_temp.id, case_data=case_data)
+        return await cover_insert(db=db, case_name=case_name, temp_id=db_temp[0].id, case_data=case_data)
     else:  # 不覆盖
         if await crud.get_case_name(db=db, case_name=case_name):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='用例名称已存在')
-        return await insert(db=db, case_name=case_name, temp_id=db_temp.id, case_data=case_data)
+        return await insert(db=db, case_name=case_name, temp_id=db_temp[0].id, case_data=case_data)

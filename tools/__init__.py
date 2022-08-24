@@ -27,5 +27,9 @@ def mkdir(pro_names: List[str]):
         pathlib.Path(f'./allure_report/{name.lower()}/report').mkdir(parents=True, exist_ok=True)
         pathlib.Path(f'./allure_report/{name.lower()}/allure').mkdir(parents=True, exist_ok=True)
 
+    pathlib.Path(f'./files/excel').mkdir(parents=True, exist_ok=True)
+    pathlib.Path(f'./files/json').mkdir(parents=True, exist_ok=True)
+    pathlib.Path(f'./files/run_case').mkdir(parents=True, exist_ok=True)
+
 
 mkdir(PROJECT_NAME)

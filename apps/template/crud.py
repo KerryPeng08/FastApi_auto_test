@@ -83,16 +83,20 @@ async def get_temp_case_info(db: Session, temp_id: int):
     return {'case_count': len(db_case), 'case_info': case_info}
 
 
-async def get_template_data(db: Session, temp_name: str):
+async def get_template_data(db: Session, temp_name: str = None, temp_id: int = None):
     """
     查询模板数据
     :param db:
     :param temp_name:
+    :param temp_id:
     :return:
     """
     db_temp = db.query(models.Template).filter(models.Template.temp_name == temp_name).first()
     if db_temp:
         return db.query(models.TemplateData).filter(models.TemplateData.temp_id == db_temp.id).all()
+
+    if temp_id:
+        return db.query(models.TemplateData).filter(models.TemplateData.temp_id == temp_id).all()
 
 
 async def put_temp_name(db: Session, old_name: str, new_name: str):

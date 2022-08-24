@@ -8,6 +8,8 @@
 """
 
 from apps.case_service import schemas
+from apps.template import crud
+from sqlalchemy.orm import Session
 from typing import List
 
 
@@ -17,7 +19,18 @@ class CheckJson:
     """
 
     @classmethod
-    async def check_to_service(cls, case_data: List[schemas.TestCaseData]):
+    async def check_to_service(cls, db: Session, temp_name: str, case_data: List[schemas.TestCaseData]):
+        """
+        校验数据
+        :param db:
+        :param temp_name:
+        :param case_data:
+        :return:
+        """
+        temp_info = await crud.get_temp_name(db=db, temp_name=temp_name)
+        if temp_info[0].api_count != len(case_data):
+            return ['用例api数量与模板api数量不一致']
+
         keys = ['headers', 'params', 'data', 'check', 'description', 'config']
         msg_list = []
         for x in range(len(case_data)):

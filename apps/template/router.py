@@ -73,18 +73,6 @@ async def get_templates(temp_name: Optional[str] = None, db: Session = Depends(g
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板信息')
 
 
-@template.get('/data', response_model=List[schemas.TemplateDataOut], response_model_exclude_unset=True,
-              response_model_exclude=['headers'], name='查询模板接口数据')
-async def get_template_data(temp_name: str, db: Session = Depends(get_db)):
-    """
-    按模板名称查询接口原始数据
-    """
-    template_data = await crud.get_template_data(db=db, temp_name=temp_name)
-    if template_data:
-        return template_data
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')
-
-
 @template.put('/name', response_model=schemas.TemplateOut, name='修改模板名称')
 async def update_name(old_name: str, new_name: str, db: Session = Depends(get_db)):
     """
@@ -104,6 +92,18 @@ async def delete_name(temp_name: str, db: Session = Depends(get_db)):
     template_data = await crud.del_template_data(db=db, temp_name=temp_name)
     if template_data:
         return {'message': '删除成功'}
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')
+
+
+@template.get('/data', response_model=List[schemas.TemplateDataOut], response_model_exclude_unset=True,
+              response_model_exclude=['headers'], name='查询模板接口数据')
+async def get_template_data(temp_name: str, db: Session = Depends(get_db)):
+    """
+    按模板名称查询接口原始数据
+    """
+    template_data = await crud.get_template_data(db=db, temp_name=temp_name)
+    if template_data:
+        return template_data
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')
 
 

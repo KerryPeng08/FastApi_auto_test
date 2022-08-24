@@ -79,5 +79,15 @@ async def get_case_name(db: Session, case_name: str = None):
     :return:
     """
     if case_name:
-        return db.query(models.TestCase).filter(models.TestCase.case_name == case_name).first()
+        return db.query(models.TestCase).filter(models.TestCase.case_name == case_name).all()
     return db.query(models.TestCase).all()
+
+
+async def get_case_data(db: Session, case_id: int):
+    """
+    查询测试用例数据
+    :param db:
+    :param case_id:
+    :return:
+    """
+    return db.query(models.TestCaseData).filter(models.TestCaseData.case_id == case_id).all()
