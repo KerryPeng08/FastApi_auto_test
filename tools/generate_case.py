@@ -25,14 +25,19 @@ class GenerateCase:
 
         case_data_list = []
         for num in range(len(template_data)):
+            if num == 0:
+                params = template_data[num].params
+                data = template_data[num].data
+            else:
+                params = await self._extract_params_keys(param=template_data[num].params, response=response[:num])
+                data = await self._extract_params_keys(param=template_data[num].data, response=response[:num])
+
             case_data = {
                 'number': f'${num}',
                 'path': template_data[num].path,
                 'headers': {},
-                # 'headers': template_data[num].headers,
-                'params': await self._extract_params_keys(param=template_data[num].params, response=response[:num + 1]),
-                'data': await self._extract_params_keys(param=template_data[num].data, response=response[:num + 1]),
-                # 'check': {'status_code': 200 if num == 0 else template_data[num].code},
+                'params': params,
+                'data': data,
                 'check': {'status_code': template_data[num].code},
                 'description': '',
                 'config': {

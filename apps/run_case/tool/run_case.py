@@ -48,8 +48,10 @@ class RunCase:
             url = await self._replace_rul(old_str=f"{temp_data[num].host}{case_data[num].path}", response=response)
             # 识别params表达式
             params = await self._replace_params_data(data=case_data[num].params, response=response)
+            print(params)
             # 识别data表达式
             data = await self._replace_params_data(data=case_data[num].data, response=response)
+            print(data)
             # 替换headers中的内容
             headers = await self._replace_headers(tmp_header=temp_data[num].headers, case_header=case_data[num].headers)
 
@@ -66,6 +68,9 @@ class RunCase:
 
             if self.cookies:
                 request_info['headers']['Cookie'] = self.cookies
+
+            # print(request_info)
+
             async with self.sees.request(**request_info, allow_redirects=False) as res:
                 if config['is_login']:
                     self.cookies = await self._get_cookie(res)
@@ -73,7 +78,8 @@ class RunCase:
 
                 res_json = await res.json() if res.status == 200 and 'application/json' in res.content_type else {}
                 response.append(res_json)
-                # print(res_json)
+                print(res_json)
+                print("=" * 50)
 
                 # 收集结果
 
@@ -108,7 +114,7 @@ class RunCase:
             num, json_path = replace.split('.', 1)
             value = jsonpath.jsonpath(response[int(num)], json_path)
             if value:
-                old_str = re.sub("{{" + f"{num}." + '\\' + f"{json_path}" + "}}", value[0], old_str)
+                old_str = re.sub("{{" + f"{num}." + '\\' + f"{json_path}" + "}}", str(value[0]), old_str)
 
         return old_str
 
@@ -135,7 +141,14 @@ class RunCase:
                     continue
 
                 if isinstance(data_json[key], str):
-                    target[key] = await self._replace_rul(old_str=data_json[key], response=response)
+                    if "{{" in data_json[key] and "$" in data_json[key] and "}}" in data_json[key]:
+                        replace_value = re.compile(r'{{(.*?)}}', re.S).findall(data_json[key])[0]
+                        num, json_path = replace_value.split('.', 1)
+                        target[key] = jsonpath.jsonpath(response[int(num)], json_path)[0]
+                    else:
+                        target[key] = data_json[key]
+                else:
+                    target[key] = data_json[key]
 
             return target
 

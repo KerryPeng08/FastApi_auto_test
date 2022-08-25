@@ -7,6 +7,7 @@
 @Time: 2022/8/23-13:45
 """
 
+from aiohttp.client import ServerDisconnectedError, ServerConnectionError
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from apps.case_service import crud as case_crud
 from apps.template import crud as temp_crud
@@ -28,7 +29,10 @@ async def run_case_name(request: Request, case_name: str, db: Session = Depends(
         # 拿到模板数据
         temp_data = await temp_crud.get_template_data(db=db, temp_id=case_info[0].temp_id)
         # 处理数据，执行用例
-        await RunCase().fo_service(case_name=case_name, temp_data=temp_data, case_data=case_data)
+        try:
+            await RunCase().fo_service(case_name=case_name, temp_data=temp_data, case_data=case_data)
+        except (ServerDisconnectedError, ServerConnectionError) as e:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'message': f'执行失败: {str(e)}'})
         # 拿到项目名称
         # pro_name = await run_crud.get_pro_name(db=db, temp_id=case_info[0].temp_id)
         # 校验结果，生成报告
