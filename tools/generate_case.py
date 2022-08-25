@@ -32,7 +32,8 @@ class GenerateCase:
                 # 'headers': template_data[num].headers,
                 'params': await self._extract_params_keys(param=template_data[num].params, response=response[:num + 1]),
                 'data': await self._extract_params_keys(param=template_data[num].data, response=response[:num + 1]),
-                'check': {'status_code': 200 if num == 0 else template_data[num].code},
+                # 'check': {'status_code': 200 if num == 0 else template_data[num].code},
+                'check': {'status_code': template_data[num].code},
                 'description': '',
                 'config': {
                     'is_login': True if num == 0 else None,
@@ -87,7 +88,8 @@ class GenerateCase:
                 for x in range(len(response)):
                     value = jsonpath.jsonpath(response[x], f"$..{key}")
                     if isinstance(value, list) and len(value) == 1:
-                        target[key] = f"${x}.{'.'.join(GenerateCase._extract_response_key_path(key, response[x]))}"
+                        target[
+                            key] = "{{" + f"{x}.$.{'.'.join(GenerateCase._extract_response_key_path(key, response[x]))}" + "}}"
                         break
                     else:
                         target[key] = data[key]

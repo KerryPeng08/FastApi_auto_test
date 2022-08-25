@@ -7,7 +7,9 @@
 @Time: 2022/8/23-21:29
 """
 
+import json
 import asyncio
+import aiohttp
 # import time
 import allure
 import pytest
@@ -30,15 +32,23 @@ data_list = [
         run_data['data'][x]['description'],
         run_data['data'][x]['config'],
         run_data['data'][x]['check']
+
     ] for x in range(len(run_data['data']))
 ]
 
 
-@allure.feature(run_data['name'])
-@pytest.mark.parametrize(
-    'num,host,path,code,method,params,json_body,data,headers,description,config,check',
-    data_list
-)
-def test_service(num, host, path, code, method, params, json_body, data, headers, description, config, check):
-    allure.dynamic.title(f"${str(num).rjust(3, '0')}{path}-{description}")
-    assert 1 == 1
+# COOKIE = []
+
+
+class TestService:
+    cookie = None
+
+    @pytest.mark.asyncio
+    @allure.feature(run_data['name'])
+    @pytest.mark.parametrize(
+        'num,host,path,code,method,params,json_body,data,headers,description,config,check', data_list
+    )
+    async def test_service(self, num, host, path, code, method, params, json_body, data, headers, description, config,
+                           check):
+        allure.dynamic.title(f"${str(num).rjust(3, '0')}{path}-{description}")
+        allow = False if config['is_login'] else True

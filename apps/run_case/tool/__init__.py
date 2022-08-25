@@ -7,5 +7,5 @@
 @Time: 2022/8/23-14:33
 """
 
-from .collect_data import CollectData
-from .run_case import run
+from .run_case import RunCase
+from .run_pytest import run

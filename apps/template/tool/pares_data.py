@@ -21,7 +21,7 @@ class ParseData:
     """
 
     @classmethod
-    async def pares_data(cls, db: Session, temp_name: str, project_name: str, har_data: bytes):
+    async def pares_data(cls, db: Session, temp_name: str, project_name: schemas, har_data: bytes):
         data_json = json.loads(har_data.decode('utf-8'))
 
         db_template = await crud.create_template(db=db, temp_name=temp_name, project_name=project_name)

@@ -14,7 +14,7 @@ sqlite/
 allure_report/
 .Python
 configs.py
-test*.py
+#test*.py
 /test
 test/
 build/

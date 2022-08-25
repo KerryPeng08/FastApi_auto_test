@@ -35,6 +35,7 @@ class TestCaseData(Base):
     __tablename__ = 'test_case_data'
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     case_id = Column(Integer, ForeignKey('test_case.id'))
+    path = Column(String, nullable=False, comment='接口路径')
     headers = Column(JSON, comment='请求头测试数据')
     params = Column(JSON, comment='请求参数测试数据')
     data = Column(JSON, comment='json/表单 测试数据')

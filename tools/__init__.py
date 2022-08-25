@@ -14,7 +14,7 @@ from .generate_case import GenerateCase
 
 from typing import List
 import pathlib
-from setting import PROJECT_NAME
+from setting import PROJECT_NAME, ALLURE_PATH
 
 
 def mkdir(pro_names: List[str]):
@@ -24,8 +24,8 @@ def mkdir(pro_names: List[str]):
     :return:
     """
     for name in pro_names:
-        pathlib.Path(f'./allure_report/{name.lower()}/report').mkdir(parents=True, exist_ok=True)
-        pathlib.Path(f'./allure_report/{name.lower()}/allure').mkdir(parents=True, exist_ok=True)
+        pathlib.Path(f'{ALLURE_PATH}{name.lower()}/report').mkdir(parents=True, exist_ok=True)
+        pathlib.Path(f'{ALLURE_PATH}{name.lower()}/allure').mkdir(parents=True, exist_ok=True)
 
     pathlib.Path(f'./files/excel').mkdir(parents=True, exist_ok=True)
     pathlib.Path(f'./files/json').mkdir(parents=True, exist_ok=True)

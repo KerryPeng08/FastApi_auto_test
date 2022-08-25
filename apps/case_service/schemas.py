@@ -42,6 +42,7 @@ class TestCaseConfig(BaseModel):
 
 
 class TestCaseDataIn(BaseModel):
+    path: str
     headers: Optional[dict] = {}
     params: Optional[dict] = {}
     data: Optional[dict] = {}

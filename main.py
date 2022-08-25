@@ -16,7 +16,7 @@ from apps.case_ddt import case_ddt
 from apps.case_perf import case_perf
 from apps.run_case import run_case
 from tools.database import Base, engine
-from setting import PROJECT_NAME
+from setting import PROJECT_NAME, ALLURE_PATH
 from fastapi.staticfiles import StaticFiles
 
 Base.metadata.create_all(bind=engine)
@@ -40,7 +40,7 @@ async def allure(request: Request):
 
 
 for name in PROJECT_NAME:
-    app.mount(f"/allure/{name.lower()}", StaticFiles(directory=f'./allure_report/{name.lower()}/allure', html=True))
+    app.mount(f"/allure/{name.lower()}", StaticFiles(directory=f'{ALLURE_PATH}{name.lower()}/allure', html=True))
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host='0.0.0.0', port=8000, reload=True, debug=True)
