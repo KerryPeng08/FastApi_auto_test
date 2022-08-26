@@ -17,6 +17,7 @@ from .tool import ParseData
 from depends import get_db
 from tools import CreateExcel
 from starlette.responses import FileResponse
+# from apps.utils import resp_200, resp_404
 
 template = APIRouter()
 
@@ -96,7 +97,7 @@ async def delete_name(temp_name: str, db: Session = Depends(get_db)):
 
 
 @template.get('/data', response_model=List[schemas.TemplateDataOut], response_model_exclude_unset=True,
-              response_model_exclude=['headers'], name='查询模板接口数据')
+              response_model_exclude=['headers'], name='查询模板接口原始数据')
 async def get_template_data(temp_name: str, db: Session = Depends(get_db)):
     """
     按模板名称查询接口原始数据

@@ -46,21 +46,25 @@ class CheckJson:
                 continue
 
             for k, v in check.items():
-                if isinstance(v, (int, float, str, bool)):
+                if isinstance(v, (int, float, str, bool, dict)):
                     continue
 
                 if isinstance(v, list) and len(v) < 2:
                     msg_list.append(f"用例${x}比较符内容不足: {k}: {v}")
                     continue
 
-                if v[0] not in ['<', '<=', '==', '>=', '>', 'in', 'not in']:
+                if v[0] not in ['<', '<=', '==', '!=', '>=', '>', 'in', 'not in', 'notin']:
                     msg_list.append(f"用例${x}比较符填写错误: {k}: {v}")
                 else:
-                    if isinstance(v[1], (int, float)) and v[0] not in ['<', '<=', '==', '>=', '>']:
+                    if v[0] in ['<', '<=', '==', '!=', '>=', '>'] and not isinstance(v[1], (int, float)):
                         msg_list.append(f"用例${x}比较类型不匹配: {k}: {v}")
                         continue
 
-                    if isinstance(v[1], list) and v[0] not in ['in', 'not in']:
+                    if v[0] in ['in', 'not in'] and not isinstance(v[1], (list, str)):
+                        msg_list.append(f"用例${x}比较类型不匹配: {k}: {v}")
+                        continue
+
+                    if v[0] in ['==', '!='] and not isinstance(v[1], (bool, str, dict)):
                         msg_list.append(f"用例${x}比较类型不匹配: {k}: {v}")
                         continue
 

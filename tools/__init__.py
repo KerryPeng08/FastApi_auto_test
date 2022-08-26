@@ -10,6 +10,7 @@
 from .excel import CreateExcel
 from .operation_json import OperationJson
 from .generate_case import GenerateCase
+from .global_log import logger
 # from .check_case_json import CheckJson
 
 from typing import List

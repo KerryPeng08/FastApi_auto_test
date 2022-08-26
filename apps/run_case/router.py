@@ -32,18 +32,18 @@ async def run_case_name(request: Request, case_name: str, db: Session = Depends(
         try:
             await RunCase().fo_service(case_name=case_name, temp_data=temp_data, case_data=case_data)
         except (ServerDisconnectedError, ServerConnectionError) as e:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'message': f'执行失败: {str(e)}'})
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'message': f'访问失败: {str(e)}'})
         # 拿到项目名称
-        # pro_name = await run_crud.get_pro_name(db=db, temp_id=case_info[0].temp_id)
+        pro_name = await run_crud.get_pro_name(db=db, temp_id=case_info[0].temp_id)
         # 校验结果，生成报告
-        # await run(
-        #     test_path='./apps/run_case/test_case/test_service.py',
-        #     report_path=f'{ALLURE_PATH}{pro_name}/report',
-        #     allure_path=f'{ALLURE_PATH}{pro_name}/allure'
-        # )
+        await run(
+            test_path='./apps/run_case/test_case/test_service.py',
+            report_path=f'{ALLURE_PATH}{pro_name}/report',
+            allure_path=f'{ALLURE_PATH}{pro_name}/allure'
+        )
         return {
             'message': '执行完成',
-            # 'allure_report': f'{request.base_url}allure/{pro_name}'
+            'allure_report': f'{request.base_url}allure/{pro_name}'
         }
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到用例')

@@ -39,7 +39,7 @@ async def test_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = D
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')
 
 
-@case_service.get('/download/json', response_model=schemas.TestCaseDataOut, name='下载预处理后的测试数据-json')
+@case_service.get('/download/init/data/json', response_model=schemas.TestCaseDataOut, name='下载预处理后的测试数据-json')
 async def download_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = Depends(get_db)):
     """
     自动处理部分接口上下级关联数据\n
@@ -62,7 +62,7 @@ async def download_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')
 
 
-@case_service.post('/upload/json', response_model=schemas.TestCaseOut, name='上传测试数据-json')
+@case_service.post('/upload/case/json', response_model=schemas.TestCaseOut, name='上传测试数据-json')
 async def test_case_upload_json(temp_name: str, case_name: str, file: UploadFile, cover: bool = False,
                                 db: Session = Depends(get_db)):
     """

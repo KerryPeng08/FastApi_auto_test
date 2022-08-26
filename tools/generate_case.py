@@ -54,8 +54,8 @@ class GenerateCase:
                 '3.is_login标记登录接口，标记后自动获取token/cookie进行替换',
                 {'参数check': [
                     '1.key为要校验的字段，value为校验的值',
-                    '2.若value数据类型为: string/integer/bool, 按 == 直接进行校验',
-                    '3.若value数据类型为: list, 索引0应填写比较符: <,<=,==,>=,>,in,not in; 索引1填写比较的值'
+                    '2.若value数据类型为: string/integer/float/bool/dict, 按 == 直接进行校验',
+                    '3.若value数据类型为: list, 索引0应填写比较符: <,<=,==,!=,>=,>,in,not in; 索引1填写比较的值'
                 ]},
                 'description: 用例描述信息',
                 'mode: 运行模式, 支持: service/ddt/perf',
@@ -93,50 +93,19 @@ class GenerateCase:
                 for x in range(len(response)):
                     value = jsonpath.jsonpath(response[x], f"$..{key}")
                     if isinstance(value, list) and len(value) == 1:
-                        target[
-                            key] = "{{" + f"{x}.$.{'.'.join(GenerateCase._extract_response_key_path(key, response[x]))}" + "}}"
-                        break
+                        if data[key] == value[0]:
+                            ipath = jsonpath.jsonpath(response[x], f"$..{key}", result_type='IPATH')[0]
+                            value = "{{" + f"{x}.$.{'.'.join(ipath)}" + "}}"
+                            target[key] = value
+                            break
+                        else:
+                            target[key] = data[key]
                     else:
                         target[key] = data[key]
 
             return target
 
         return header_key(param)
-
-    @staticmethod
-    def _extract_response_key_path(key: str, response_data: dict) -> list:
-        """
-        从response里面提取key在json中的路径
-        :param key:
-        :param response_data:
-        :return:
-        """
-        if key in response_data.keys():
-            return [key]
-
-        param_str = []
-
-        def header_value(key, data):
-            for k in data.keys():
-                if k == key:
-                    param_str.append(k)
-
-                if isinstance(data[k], dict):
-                    if jsonpath.jsonpath(data[k], f"$..{key}"):
-                        param_str.append(k)
-                        header_value(key, data[k])
-
-                elif isinstance(data[k], list):
-                    for x in range(len(data[k])):
-                        if jsonpath.jsonpath(data[k][x], f"$..{key}"):
-                            param_str.append(k)
-                            param_str.append(str(x))
-                            header_value(key, data[k][x])
-                            break
-
-            return param_str
-
-        return header_value(key, response_data)
 
     async def read_template_to_ddt(self):
         pass
