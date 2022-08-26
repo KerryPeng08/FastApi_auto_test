@@ -30,7 +30,7 @@ async def run_case_name(request: Request, case_name: str, db: Session = Depends(
         temp_data = await temp_crud.get_template_data(db=db, temp_id=case_info[0].temp_id)
         # 处理数据，执行用例
         try:
-            await RunCase().fo_service(case_name=case_name, temp_data=temp_data, case_data=case_data)
+            await RunCase().fo_service(db=db, case_name=case_name, temp_data=temp_data, case_data=case_data)
         except (ServerDisconnectedError, ServerConnectionError) as e:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'message': f'访问失败: {str(e)}'})
         # 拿到项目名称

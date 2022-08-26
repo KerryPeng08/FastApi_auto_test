@@ -8,6 +8,7 @@
 """
 
 import re
+import time
 import copy
 import json
 import asyncio
@@ -16,8 +17,9 @@ import jsonpath
 from typing import List
 from apps.template import schemas as temp
 from apps.case_service import schemas as service
-from tools import OperationJson
 from tools import logger
+from apps.run_case import crud
+from sqlalchemy.orm import Session
 
 
 class RunCase:
@@ -27,6 +29,7 @@ class RunCase:
 
     async def fo_service(
             self,
+            db: Session,
             case_name: str,
             temp_data: List[temp.TemplateDataOut],
             case_data: List[service.TestCaseData]
@@ -97,8 +100,13 @@ class RunCase:
             logger.info(f"{'=' * 30}结束请求{num}{'=' * 30}")
 
         await self.sees.close()
-        path = f'./files/run_case/{123}.json'
-        await OperationJson.write(path=path, data={'name': case_name, 'data': result})
+        # path = f'./files/run_case/{123}.json'
+        # await OperationJson.write(path=path, data={'name': case_name, 'data': result})
+        await crud.queue_add(db=db, data={
+            'start_time': int(time.time() * 1000),
+            'case_name': case_name,
+            'case_data': result
+        })
         logger.info(f"用例: {case_name} 执行完成, 进行结果校验")
 
     @staticmethod

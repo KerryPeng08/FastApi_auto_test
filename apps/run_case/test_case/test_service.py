@@ -11,33 +11,52 @@ import asyncio
 import allure
 import pytest
 import typing
-from tools import OperationJson
+from apps.run_case import crud
+from sqlalchemy.orm import sessionmaker, Session
+from tools.database import engine
+
+# 建立数据库连接
+SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False, expire_on_commit=True)
+session = SessionLocal()
+
+
+async def get_case_info(db: Session):
+    # 获取数据
+    queue_info = await crud.queue_query(db=db)
+    case_data = queue_info[0].case_data
+    case_name = queue_info[0].case_name
+    queue_id = queue_info[0].id
+
+    # 删除数据
+    await crud.queue_del(db=db, queue_id=queue_id)
+    return case_name, case_data
+
 
 loop = asyncio.get_event_loop()
-run_data = loop.run_until_complete(OperationJson.read(path=f'./files/run_case/{123}.json'))
+case_name, case_data = loop.run_until_complete(get_case_info(session))
 
 data_list = [
     [
         x,
-        run_data['data'][x]['url'],
-        run_data['data'][x]['method'],
-        run_data['data'][x]['params'],
-        run_data['data'][x].get('data') or run_data['data'][x].get('json'),
-        run_data['data'][x]['expect'],
-        run_data['data'][x]['actual'],
-        run_data['data'][x]['response'],
-        run_data['data'][x]['description'],
-        run_data['data'][x]['config'],
-        run_data['data'][x]['headers'],
+        case_data[x]['url'],
+        case_data[x]['method'],
+        case_data[x]['params'],
+        case_data[x].get('data') or case_data[x].get('json'),
+        case_data[x]['expect'],
+        case_data[x]['actual'],
+        case_data[x]['response'],
+        case_data[x]['description'],
+        case_data[x]['config'],
+        case_data[x]['headers'],
 
-    ] for x in range(len(run_data['data']))
+    ] for x in range(len(case_data))
 ]
 
 
 class TestService:
 
     @pytest.mark.asyncio
-    @allure.feature(run_data['name'])
+    @allure.feature(case_name)
     @pytest.mark.parametrize(
         'num,url,method,params,data,expect,actual,response,description,config,headers', data_list
     )

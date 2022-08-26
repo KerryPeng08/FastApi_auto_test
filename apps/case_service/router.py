@@ -7,6 +7,7 @@
 @Time: 2022/8/20-22:00
 """
 
+import os
 import json
 import time
 from fastapi import APIRouter, UploadFile, HTTPException, status, Depends
@@ -18,11 +19,12 @@ from tools import GenerateCase, OperationJson
 from tools.check_case_json import CheckJson
 from depends import get_db
 from starlette.responses import FileResponse
+from starlette.background import BackgroundTask
 
 case_service = APIRouter()
 
 
-@case_service.get('/init/data', response_model=schemas.TestCaseDataOut, name='获取预处理后的测试数据')
+@case_service.get('/init/data', response_model=schemas.TestCaseDataOut, name='获取预处理后的模板数据')
 async def test_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = Depends(get_db)):
     """
     自动处理部分接口数据上下级关联数据
@@ -39,7 +41,7 @@ async def test_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = D
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')
 
 
-@case_service.get('/download/init/data/json', response_model=schemas.TestCaseDataOut, name='下载预处理后的测试数据-json')
+@case_service.get('/download/init/data/json', response_model=schemas.TestCaseDataOut, name='下载预处理后的模板数据-json')
 async def download_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = Depends(get_db)):
     """
     自动处理部分接口上下级关联数据\n
@@ -56,7 +58,8 @@ async def download_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session
         await OperationJson.write(path=path, data=test_data)
         return FileResponse(
             path=path,
-            filename=f'{temp_name}.json'
+            filename=f'{temp_name}.json',
+            background=BackgroundTask(lambda: os.remove(path))
         )
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')

@@ -7,6 +7,7 @@
 @Time: 2022/8/4-15:30
 """
 
+import os
 import time
 from typing import List, Optional
 from fastapi import APIRouter, UploadFile, HTTPException, status, Depends
@@ -17,6 +18,8 @@ from .tool import ParseData
 from depends import get_db
 from tools import CreateExcel
 from starlette.responses import FileResponse
+from starlette.background import BackgroundTask
+
 # from apps.utils import resp_200, resp_404
 
 template = APIRouter()
@@ -128,6 +131,7 @@ async def download_temp_excel(temp_name: str, db: Session = Depends(get_db)):
 
         return FileResponse(
             path=path,
-            filename=f'{temp_name}.xlsx'
+            filename=f'{temp_name}.xlsx',
+            background=BackgroundTask(lambda: os.remove(path))
         )
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')
