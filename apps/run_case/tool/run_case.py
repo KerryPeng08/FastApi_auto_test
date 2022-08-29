@@ -32,7 +32,9 @@ class RunCase:
             db: Session,
             case_name: str,
             temp_data: List[temp.TemplateDataOut],
-            case_data: List[service.TestCaseData]
+            case_data: List[service.TestCaseData],
+            temp_pro: str,
+            temp_name: str
     ):
         """
         集合模板用例和测试数据
@@ -100,14 +102,16 @@ class RunCase:
             logger.info(f"{'=' * 30}结束请求{num}{'=' * 30}")
 
         await self.sees.close()
-        # path = f'./files/run_case/{123}.json'
-        # await OperationJson.write(path=path, data={'name': case_name, 'data': result})
+
+        await crud.update_test_case_order(db=db, case_name=case_name)
+
         await crud.queue_add(db=db, data={
             'start_time': int(time.time() * 1000),
-            'case_name': case_name,
+            'case_name': f'{temp_pro}-{temp_name}-{case_name}',
             'case_data': result
         })
-        logger.info(f"用例: {case_name} 执行完成, 进行结果校验")
+        logger.info(f"用例: {temp_pro}-{temp_name}-{case_name} 执行完成, 进行结果校验")
+        return f"{temp_pro}-{temp_name}-{case_name}"
 
     @staticmethod
     async def _get_cookie(response) -> str:

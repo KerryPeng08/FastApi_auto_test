@@ -28,6 +28,7 @@ class TestCaseIn(BaseModel):
 class TestCaseOut(TestCaseIn):
     id: int
     case_count: int
+    run_order: int
     created_at: datetime
     updated_at: datetime
 

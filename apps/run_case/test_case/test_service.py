@@ -62,7 +62,8 @@ class TestService:
     )
     async def test_service(self, num: int, url: str, method: str, params: dict, data: dict, expect: dict, actual: dict,
                            response: dict, description: str, config: dict, headers: dict):
-        allure.dynamic.title(f"${str(num).rjust(3, '0')}-{description}\n{url}")
+        # allure.dynamic.title(f"${str(num).rjust(3, '0')}-{description}\n{url}")
+        allure.dynamic.title(f"{description}\n{url}")
 
         for k, v in expect.items():
             await self.assert_value(k, v, actual_value=actual)
@@ -73,28 +74,30 @@ class TestService:
         校验内容
         :return:
         """
-        allure.attach(f"expect: {v}，actual: {actual_value[k]}", f'校验内容: {k}')
+        value = actual_value[k][0] if actual_value[k] else actual_value[k]
+
+        allure.attach(f"expect: {v}，actual: {value}", f'校验内容: {k}')
         if isinstance(v, (str, int, float, bool, dict)):
-            assert v == actual_value[k][0]
+            assert v == value
 
         if isinstance(v, list):
             if v[0] == '<':
-                assert actual_value[k] < v[1]
+                assert value < v[1]
             elif v[0] == '<=':
-                assert actual_value[k] <= v[1]
+                assert value <= v[1]
             elif v[0] == '==':
-                assert actual_value[k] == v[1]
+                assert value == v[1]
             elif v[0] == '!=':
-                assert actual_value[k] != v[1]
+                assert value != v[1]
             elif v[0] == '>=':
-                assert actual_value[k] >= v[1]
+                assert value >= v[1]
             elif v[0] == '>':
-                assert actual_value[k] > v[1]
+                assert value > v[1]
             elif v[0] == 'in':
-                assert actual_value[k] in v[1]
+                assert value in v[1]
             elif v[0] == 'not in':
-                assert actual_value[k] not in v[1]
+                assert value not in v[1]
             elif v[0] == 'notin':
-                assert actual_value[k] not in v[1]
+                assert value not in v[1]
             else:
-                assert 1 == 0, '未匹配搭配比较符'
+                assert 1 == 0, '未匹配到比较符'

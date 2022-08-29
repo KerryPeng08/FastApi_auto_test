@@ -11,26 +11,29 @@ from .excel import CreateExcel
 from .operation_json import OperationJson
 from .generate_case import GenerateCase
 from .global_log import logger
-# from .check_case_json import CheckJson
-
-from typing import List
+import os
 import pathlib
-from setting import PROJECT_NAME, ALLURE_PATH
+from setting import ALLURE_PATH
+from fastapi.staticfiles import StaticFiles
 
 
-def mkdir(pro_names: List[str]):
+def load_allure_report():
+    files = os.listdir(os.path.join(ALLURE_PATH, 'allure_plus'))
+    from main import app
+    for file in files:
+        if file == 'history.json':
+            continue
+        app.mount(f"/allure/{file}", StaticFiles(directory=f'{ALLURE_PATH}/allure_plus/{file}', html=True))
+
+
+def mkdir():
     """
     按项目创建多级目录
-    :param pro_names:
     :return:
     """
-    for name in pro_names:
-        pathlib.Path(f'{ALLURE_PATH}{name.lower()}/report').mkdir(parents=True, exist_ok=True)
-        pathlib.Path(f'{ALLURE_PATH}{name.lower()}/allure').mkdir(parents=True, exist_ok=True)
-
+    pathlib.Path(f"{ALLURE_PATH}/allure_plus/1").mkdir(parents=True, exist_ok=True)
     pathlib.Path(f'./files/excel').mkdir(parents=True, exist_ok=True)
     pathlib.Path(f'./files/json').mkdir(parents=True, exist_ok=True)
-    pathlib.Path(f'./files/run_case').mkdir(parents=True, exist_ok=True)
 
 
-mkdir(PROJECT_NAME)
+mkdir()

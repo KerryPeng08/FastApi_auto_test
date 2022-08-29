@@ -57,13 +57,17 @@ async def create_template_data(db: Session, data: schemas.TemplateDataIn, temp_i
     return db_data
 
 
-async def get_temp_name(db: Session, temp_name: str = None):
+async def get_temp_name(db: Session, temp_name: str = None, temp_id: int = None):
     """
     按模板名称查询数据
     :param db:
     :param temp_name:
+    :param temp_id:
     :return:
     """
+    if temp_id:
+        return db.query(models.Template).filter(models.Template.id == temp_id).all()
+
     if temp_name:
         return db.query(models.Template).filter(models.Template.temp_name == temp_name).all()
     return db.query(models.Template).all()
@@ -79,7 +83,7 @@ async def get_temp_case_info(db: Session, temp_id: int):
     db_case = db.query(case_models.TestCase).filter(case_models.TestCase.temp_id == temp_id).all()
     case_info = []
     for case in db_case:
-        case_info.append({'id': case.id, 'mode': case.mode, 'name': case.case_name})
+        case_info.append({'id': case.id, 'mode': case.mode, 'name': case.case_name, 'run_num': case.run_order})
     return {'case_count': len(db_case), 'case_info': case_info}
 
 

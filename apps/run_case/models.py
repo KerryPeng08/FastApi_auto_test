@@ -21,4 +21,4 @@ class RunCaseQueue(Base):
     case_name = Column(String, comment='用例名称')
     case_data = Column(JSON, comment='测试结果数据')
 
-    __mapper_args__ = {'order_by': start_time}
+    # __mapper_args__ = {'order_by': start_time}

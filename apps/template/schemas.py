@@ -41,6 +41,7 @@ class TestCase(BaseModel):
     id: int
     mode: str
     name: str
+    run_num: int
 
 
 class TempTestCase(TemplateOut):

@@ -11,11 +11,11 @@ from aiohttp.client import ServerDisconnectedError, ServerConnectionError
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from apps.case_service import crud as case_crud
 from apps.template import crud as temp_crud
-from apps.run_case import crud as run_crud
 from sqlalchemy.orm import Session
 from depends import get_db
 from .tool import RunCase, run
 from setting import ALLURE_PATH
+from tools import load_allure_report
 
 run_case = APIRouter()
 
@@ -28,22 +28,33 @@ async def run_case_name(request: Request, case_name: str, db: Session = Depends(
         case_data = await case_crud.get_case_data(db=db, case_id=case_info[0].id)
         # 拿到模板数据
         temp_data = await temp_crud.get_template_data(db=db, temp_id=case_info[0].temp_id)
+        # 霸道项目名称、模板名称
+        temp_info = await temp_crud.get_temp_name(db=db, temp_id=case_info[0].temp_id)
         # 处理数据，执行用例
         try:
-            await RunCase().fo_service(db=db, case_name=case_name, temp_data=temp_data, case_data=case_data)
+            case = await RunCase().fo_service(
+                db=db,
+                case_name=case_name,
+                temp_data=temp_data,
+                case_data=case_data,
+                temp_pro=temp_info[0].project_name,
+                temp_name=temp_info[0].temp_name
+            )
         except (ServerDisconnectedError, ServerConnectionError) as e:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'message': f'访问失败: {str(e)}'})
-        # 拿到项目名称
-        pro_name = await run_crud.get_pro_name(db=db, temp_id=case_info[0].temp_id)
+
         # 校验结果，生成报告
         await run(
             test_path='./apps/run_case/test_case/test_service.py',
-            report_path=f'{ALLURE_PATH}{pro_name}/report',
-            allure_path=f'{ALLURE_PATH}{pro_name}/allure'
+            allure_dir=ALLURE_PATH,
+            report_url=request.base_url,
+            case_name=case
         )
+        load_allure_report()
+
         return {
             'message': '执行完成',
-            'allure_report': f'{request.base_url}allure/{pro_name}'
+            'allure_report': f'{request.base_url}allure/'
         }
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到用例')

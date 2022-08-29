@@ -21,6 +21,7 @@ class TestCase(Base):
     case_name = Column(String, unique=True, nullable=True, index=True, comment='用例名称')
     case_count = Column(Integer, default=0, nullable=True, comment='用例数量')
     mode = Column(String, comment='用例运行模式')
+    run_order = Column(Integer, default=0, nullable=True, comment='执行次数')
 
     created_at = Column(DateTime, server_default=func.now(), comment='创建时间')
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), comment='更新时间')

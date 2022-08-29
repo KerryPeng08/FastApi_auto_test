@@ -8,7 +8,4 @@
 """
 
 # allure总目录
-ALLURE_PATH = 'D:\\Works\\liweijia\\auto_report\\'
-
-# allure报告项目
-PROJECT_NAME = ['Sales', 'OMS', 'Site', 'WxApp', 'TMS']
+ALLURE_PATH = 'D:\\Works\\liweijia\\auto_report'
