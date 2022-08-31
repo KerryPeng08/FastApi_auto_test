@@ -15,8 +15,8 @@ from sqlalchemy.orm import Session
 from apps.case_service import crud, schemas
 from apps.template import crud as temp_crud
 from .tool import insert, cover_insert
-from tools import GenerateCase, OperationJson
 from tools.check_case_json import CheckJson
+from tools import GenerateCase, OperationJson
 from depends import get_db
 from starlette.responses import FileResponse
 from starlette.background import BackgroundTask
@@ -24,7 +24,7 @@ from starlette.background import BackgroundTask
 case_service = APIRouter()
 
 
-@case_service.get('/init/data', response_model=schemas.TestCaseDataOut, name='获取预处理后的模板数据')
+@case_service.get('/init/data/list', response_model=schemas.TestCaseDataOut, name='获取预处理后的模板数据')
 async def test_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = Depends(get_db)):
     """
     自动处理部分接口数据上下级关联数据

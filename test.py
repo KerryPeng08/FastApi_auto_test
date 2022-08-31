@@ -33,3 +33,10 @@ print(a)
 # bbb = "{{" + f"{'2.$.result.extend.tenantId'}" + "}}"
 # new_url = re.sub(bbb, 'asdaasd ', aaa)
 # print(new_url)
+
+from apps.api_pool.tool.reuqest_yapi import YApi
+
+yapi = YApi('http://yapi.liweijia.com')
+yapi.login('yangjie@liweijia.com', 'liweijia666')
+yapi.get_project_list()
+yapi.header_api_data()

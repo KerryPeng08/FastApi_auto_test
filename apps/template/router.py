@@ -45,7 +45,7 @@ async def upload_file_har(temp_name: str, project_name: schemas.TempEnum, file: 
     return await ParseData.pares_data(db=db, temp_name=temp_name, project_name=project_name, har_data=file.file.read())
 
 
-@template.get('/name', response_model=List[schemas.TempTestCase], response_model_exclude_unset=True, name='查询模板数据')
+@template.get('/name/list', response_model=List[schemas.TempTestCase], response_model_exclude_unset=True, name='查询模板数据')
 async def get_templates(temp_name: Optional[str] = None, db: Session = Depends(get_db)):
     """
     1、查询已存在的测试模板/场景\n
@@ -99,7 +99,7 @@ async def delete_name(temp_name: str, db: Session = Depends(get_db)):
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')
 
 
-@template.get('/data', response_model=List[schemas.TemplateDataOut], response_model_exclude_unset=True,
+@template.get('/data/list', response_model=List[schemas.TemplateDataOut], response_model_exclude_unset=True,
               response_model_exclude=['headers'], name='查询模板接口原始数据')
 async def get_template_data(temp_name: str, db: Session = Depends(get_db)):
     """

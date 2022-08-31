@@ -7,26 +7,45 @@
 @Time: 2022/8/9-16:07
 """
 
+from datetime import datetime
 from pydantic import BaseModel, EmailStr, HttpUrl, Field
-from typing import Optional
+from typing import Optional, Union
 
 
-class YApiInfo(BaseModel):
-    """
-    YApi登录信息
-    """
-    url: HttpUrl = Field(..., description='YApi登录接口')
-    email: EmailStr = Field(..., description='登录邮箱')
-    password: str = Field(..., max_length=50, description='登录密码')
+class YApi(BaseModel):
+    group_id: int
+    group_name: str
+    group_desc: str
+    project_id: int
+    project_name: str
+    api_count: Optional[int] = 0
 
 
-class SwaggerInfo(BaseModel):
-    url: HttpUrl
-    username: str
-    password: str
+class YApiOut(YApi):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        orm_mode = True
 
 
-class YApiInfoTask(BaseModel):
-    yapi_info: YApiInfo
-    message: str
-    id: Optional[int] = None
+class YApiData(BaseModel):
+    project_id: int
+    api_id: int
+    title: str
+    path: str
+    req_headers: Optional[list] = []
+    method: str
+    req_params: Optional[list] = []
+    json_body: str
+    req_data: Union[dict, list]
+
+
+class YApiDataOut(YApiData):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        orm_mode = True

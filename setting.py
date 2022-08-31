@@ -9,3 +9,10 @@
 
 # allure总目录
 ALLURE_PATH = 'D:\\Works\\liweijia\\auto_report'
+
+# YApi配置信息
+YAPI_INFO = {
+    'host': 'http://yapi.liweijia.com',
+    'email': 'yangjie@liweijia.com',
+    'password': 'liweijia666'
+}

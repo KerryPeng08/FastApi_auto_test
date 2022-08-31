@@ -11,6 +11,7 @@ from .excel import CreateExcel
 from .operation_json import OperationJson
 from .generate_case import GenerateCase
 from .global_log import logger
+from .aiohttp_get_cookie import get_cookie
 import os
 import pathlib
 from setting import ALLURE_PATH

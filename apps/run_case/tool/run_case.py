@@ -17,7 +17,7 @@ import jsonpath
 from typing import List
 from apps.template import schemas as temp
 from apps.case_service import schemas as service
-from tools import logger
+from tools import logger, get_cookie
 from apps.run_case import crud
 from sqlalchemy.orm import Session
 
@@ -80,7 +80,7 @@ class RunCase:
 
             async with self.sees.request(**request_info, allow_redirects=False) as res:
                 if config['is_login']:
-                    self.cookies = await self._get_cookie(res)
+                    self.cookies = await get_cookie(res)
 
                 res_json = await res.json() if res.status == 200 and 'application/json' in res.content_type else {}
                 response.append(res_json)
@@ -113,17 +113,17 @@ class RunCase:
         logger.info(f"用例: {temp_pro}-{temp_name}-{case_name} 执行完成, 进行结果校验")
         return f"{temp_pro}-{temp_name}-{case_name}"
 
-    @staticmethod
-    async def _get_cookie(response) -> str:
-        """
-        获取cookie数据
-        :param response:
-        :return:
-        """
-        cookie = ''
-        for k, v in response.cookies.items():
-            cookie += f"{k}={re.compile(r'=(.*?); ', re.S).findall(str(v))[0]}; "
-        return cookie
+    # @staticmethod
+    # async def _get_cookie(response) -> str:
+    #     """
+    #     获取cookie数据
+    #     :param response:
+    #     :return:
+    #     """
+    #     cookie = ''
+    #     for k, v in response.cookies.items():
+    #         cookie += f"{k}={re.compile(r'=(.*?); ', re.S).findall(str(v))[0]}; "
+    #     return cookie
 
     @staticmethod
     async def _replace_rul(old_str: str, response: list) -> str:

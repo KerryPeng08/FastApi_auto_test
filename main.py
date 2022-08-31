@@ -7,7 +7,6 @@
 @Time: 2022/8/3-16:40
 """
 
-import os
 import uvicorn
 from fastapi import FastAPI, Request
 from apps.template import template
@@ -15,6 +14,8 @@ from apps.case_service import case_service
 from apps.case_ddt import case_ddt
 from apps.case_perf import case_perf
 from apps.run_case import run_case
+from apps.api_pool import pool
+
 from tools.database import Base, engine
 from tools import load_allure_report
 
@@ -26,11 +27,13 @@ app = FastAPI(
     title='一个基于FastApi实现的纯后端 接口测试平台'
 )
 
+
+app.include_router(pool, prefix='/YApi', tags=['YApi接口池'])
 app.include_router(template, prefix='/template', tags=['测试场景'])
 app.include_router(case_service, prefix='/caseService', tags=['业务接口测试用例'])
 app.include_router(case_ddt, prefix='/caseDdt', tags=['数据驱动测试用例'])
 app.include_router(case_perf, prefix='/casePerf', tags=['性能测试用例'])
-app.include_router(run_case, prefix='/runCase', tags=['执行测试用例'])
+app.include_router(run_case, prefix='/runCase', tags=['执行测试'])
 
 
 # 测试报告路径
