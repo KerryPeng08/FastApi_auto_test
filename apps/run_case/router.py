@@ -8,7 +8,7 @@
 """
 
 from aiohttp.client import ServerDisconnectedError, ServerConnectionError
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, Request
 from apps.case_service import crud as case_crud
 from apps.template import crud as temp_crud
 from sqlalchemy.orm import Session
@@ -16,6 +16,7 @@ from depends import get_db
 from .tool import RunCase, run
 from setting import ALLURE_PATH
 from tools import load_allure_report
+from apps import response_code
 
 run_case = APIRouter()
 
@@ -41,7 +42,7 @@ async def run_case_name(request: Request, case_name: str, db: Session = Depends(
                 temp_name=temp_info[0].temp_name
             )
         except (ServerDisconnectedError, ServerConnectionError) as e:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'message': f'访问失败: {str(e)}'})
+            return await response_code.resp_400(message=f'网络访问失败: {str(e)}')
 
         # 校验结果，生成报告
         await run(
@@ -52,12 +53,9 @@ async def run_case_name(request: Request, case_name: str, db: Session = Depends(
         )
         load_allure_report()
 
-        return {
-            'message': '执行完成',
-            'allure_report': f'{request.base_url}allure/'
-        }
+        return response_code.resp_200(data={'allure_report': f'{request.base_url}allure/'})
     else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到用例')
+        return await response_code.resp_404()
 
 
 @run_case.post('/ids', name='按用例ID执行')

@@ -26,6 +26,9 @@ class TemplateIn(BaseModel):
     temp_name: str
     project_name: TempEnum
 
+    class Config:
+        orm_mode = True
+
 
 class TemplateOut(TemplateIn):
     id: int
@@ -43,10 +46,16 @@ class TestCase(BaseModel):
     name: str
     run_num: int
 
+    class Config:
+        orm_mode = True
+
 
 class TempTestCase(TemplateOut):
     case_count: int
     case_info: List[TestCase]
+
+    class Config:
+        orm_mode = True
 
 
 # 测试模板数据的请求/响应数据模型
@@ -60,6 +69,9 @@ class TemplateDataIn(BaseModel):
     data: Optional[dict] = {}
     headers: Optional[dict] = {}
     response: Optional[dict] = {}
+
+    class Config:
+        orm_mode = True
 
 
 class TemplateDataOut(TemplateDataIn):

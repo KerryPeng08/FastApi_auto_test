@@ -20,6 +20,9 @@ class YApi(BaseModel):
     project_name: str
     api_count: Optional[int] = 0
 
+    class Config:
+        orm_mode = True
+
 
 class YApiOut(YApi):
     id: int
@@ -40,6 +43,9 @@ class YApiData(BaseModel):
     req_params: Optional[list] = []
     json_body: str
     req_data: Union[dict, list]
+
+    class Config:
+        orm_mode = True
 
 
 class YApiDataOut(YApiData):

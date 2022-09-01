@@ -147,7 +147,6 @@ async def del_project_api_info(db: Session, project_id: int):
     按单个项目删除所有api
     :param db:
     :param project_id:
-    :param project_name:
     :return:
     """
     db.query(models.YApiPool).filter(models.YApiPool.project_id == project_id).delete()

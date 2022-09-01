@@ -10,7 +10,7 @@
 import os
 import time
 from typing import List, Optional
-from fastapi import APIRouter, UploadFile, HTTPException, status, Depends
+from fastapi import APIRouter, UploadFile, Depends
 from sqlalchemy.orm import Session
 from apps.template import crud, schemas
 from .tool import ParseData
@@ -18,11 +18,9 @@ from depends import get_db
 from tools import CreateExcel
 from starlette.responses import FileResponse
 from starlette.background import BackgroundTask
-
-# from apps.utils import resp_200, resp_404
+from apps import response_code
 
 template = APIRouter()
-
 
 
 @template.post('/upload/har', response_model=schemas.TemplateOut, response_model_exclude_unset=True,
@@ -35,10 +33,10 @@ async def upload_file_har(temp_name: str, project_name: schemas.TempEnum, file: 
     3、记录原始数据，拆解params、body、json数据
     """
     if file.content_type != 'application/har+json':
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='文件类型错误，只支持har格式文件')
+        return await response_code.resp_400(message=f'文件类型错误，只支持har格式文件')
 
     if await crud.get_temp_name(db=db, temp_name=temp_name):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='模板名称已存在')
+        return await response_code.resp_400(message=f'模板名称已存在')
 
     return await ParseData.pares_data(db=db, temp_name=temp_name, project_name=project_name, har_data=file.file.read())
 
@@ -72,7 +70,7 @@ async def get_templates(temp_name: Optional[str] = None, db: Session = Depends(g
     if out_info:
         return out_info
     else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板信息')
+        return await response_code.resp_404()
 
 
 @template.put('/name/edit', response_model=schemas.TemplateOut, name='修改模板名称')
@@ -83,7 +81,7 @@ async def update_name(old_name: str, new_name: str, db: Session = Depends(get_db
     temp_name = await crud.put_temp_name(db=db, old_name=old_name, new_name=new_name)
     if temp_name:
         return temp_name
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')
+    return await response_code.resp_404()
 
 
 @template.delete('/name/del', name='删除模板数据')
@@ -94,7 +92,7 @@ async def delete_name(temp_name: str, db: Session = Depends(get_db)):
     template_data = await crud.del_template_data(db=db, temp_name=temp_name)
     if template_data:
         return {'message': '删除成功'}
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')
+    return await response_code.resp_404()
 
 
 @template.get('/data/list', response_model=List[schemas.TemplateDataOut], response_model_exclude_unset=True,
@@ -106,7 +104,7 @@ async def get_template_data(temp_name: str, db: Session = Depends(get_db)):
     template_data = await crud.get_template_data(db=db, temp_name=temp_name)
     if template_data:
         return template_data
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')
+    return await response_code.resp_404()
 
 
 @template.get('/download/excel', name='下载模板数据-excel', deprecated=True)
@@ -132,4 +130,4 @@ async def download_temp_excel(temp_name: str, db: Session = Depends(get_db)):
             filename=f'{temp_name}.xlsx',
             background=BackgroundTask(lambda: os.remove(path))
         )
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')
+    return await response_code.resp_404()

@@ -14,6 +14,7 @@ from tools import get_cookie
 from apps.api_pool import crud
 from apps.api_pool import schemas
 from sqlalchemy.orm import Session
+from tools.global_log import logger
 
 
 class YApi:
@@ -39,11 +40,13 @@ class YApi:
 
         async with self._sess.post(self._host + api, json=data) as res:
             if res.status != 200:
+                logger.error('YApi登录失败')
                 return False
 
         self._headers = {
             'cookie': await get_cookie(response=res)
         }
+        logger.info('YApi登录成功')
         return True
 
     async def get_project_list(self, api: str = '/api/group/list'):
@@ -159,6 +162,7 @@ class YApi:
         """
         更新单个用例数据
         :param api_id:
+        :param project_id:
         :param db:
         :return:
         """

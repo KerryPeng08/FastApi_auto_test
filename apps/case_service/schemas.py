@@ -23,6 +23,8 @@ class ModeEnum(str, Enum):
 class TestCaseIn(BaseModel):
     case_name: str
     mode: ModeEnum
+    class Config:
+        orm_mode = True
 
 
 class TestCaseOut(TestCaseIn):
