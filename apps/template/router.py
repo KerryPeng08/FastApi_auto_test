@@ -107,7 +107,7 @@ async def get_template_data(temp_name: str, db: Session = Depends(get_db)):
     return await response_code.resp_404()
 
 
-@template.get('/download/excel', name='下载模板数据-excel', deprecated=True)
+@template.get('/download/excel', name='下载模板数据-excel', deprecated=True, include_in_schema=False)
 async def download_temp_excel(temp_name: str, db: Session = Depends(get_db)):
     """
     将Charles录制的测试场景原始数据下载到excel
@@ -131,3 +131,8 @@ async def download_temp_excel(temp_name: str, db: Session = Depends(get_db)):
             background=BackgroundTask(lambda: os.remove(path))
         )
     return await response_code.resp_404()
+
+
+@template.get('/diff', name='对比测试模板数据')
+async def diff_template():
+    pass
