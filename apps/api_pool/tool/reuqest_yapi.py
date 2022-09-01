@@ -24,10 +24,10 @@ class YApi:
         self._group = []
         self._sess = aiohttp.client.ClientSession()
 
-    async def login(self, email: str, password: str, api: str = '/api/user/login') -> None:
+    async def login(self, email: str, password: str, api: str = '/api/user/login') -> bool:
         """
-
-        :param api: 登录接口
+        登录接口
+        :param api:
         :param email:
         :param password:
         :return:
@@ -39,11 +39,12 @@ class YApi:
 
         async with self._sess.post(self._host + api, json=data) as res:
             if res.status != 200:
-                return
+                return False
 
         self._headers = {
             'cookie': await get_cookie(response=res)
         }
+        return True
 
     async def get_project_list(self, api: str = '/api/group/list'):
         """
@@ -132,32 +133,72 @@ class YApi:
                 # 第三层循环获取api数据
                 for api in interface_list:
                     interface_api = await self.get_interface_api(api['_id'])
-                    if interface_api.get('req_body_type') == 'json':
-                        json_body = 'json'
-                        req_data = json.loads(interface_api.get('req_body_other', "{}"))
-                    elif interface_api.get('req_body_type') == 'form':
-                        json_body = 'body'
-                        req_data = interface_api['req_body_form']
-                    else:
-                        json_body = 'json'
-                        if interface_api.get(''):
-                            req_data = re.sub('\n', '', interface_api['req_body_other'])
-                            req_data = json.loads(req_data)
-                        else:
-                            req_data = {}
-
-                    api_pool = {
-                        'api_id': interface_api['_id'],
-                        'project_id': project['_id'],
-                        'title': interface_api['title'],
-                        'path': interface_api['path'],
-                        'req_headers': interface_api.get('req_headers'),
-                        'method': interface_api['method'],
-                        'req_params': interface_api['req_query'],
-                        'json_body': json_body,
-                        'req_data': req_data
-                    }
+                    api_pool = await self._header_api_pool(interface_api, project['_id'])
                     await crud.create_api_pool(db=db, data=schemas.YApiData(**api_pool))
                 pro.append(await crud.update_api_project(db=db, yai_id=yai_info.id, api_count=len(interface_list)))
         await self._sess.close()
         return pro
+
+    async def header_project_data(self, project_id: int, db: Session):
+        """
+        按项目名称更新数据
+        :param project_id:
+        :param db:
+        :return:
+        """
+        interface_list = await self.get_interface_list(project_id)
+        api_list = []
+        for api in interface_list:
+            interface_api = await self.get_interface_api(api['_id'])
+            api_pool = await self._header_api_pool(interface_api, project_id)
+            api_list.append(await crud.create_api_pool(db=db, data=schemas.YApiData(**api_pool)))
+        await self._sess.close()
+        return api_list
+
+    async def header_api_data(self, api_id: int, project_id: int, db: Session):
+        """
+        更新单个用例数据
+        :param api_id:
+        :param db:
+        :return:
+        """
+        interface_api = await self.get_interface_api(api_id)
+        api_pool = await self._header_api_pool(interface_api, project_id)
+        api_info = await crud.create_api_pool(db=db, data=schemas.YApiData(**api_pool))
+        await self._sess.close()
+        return api_info
+
+    @staticmethod
+    async def _header_api_pool(interface_api: dict, project_id: int) -> dict:
+        """
+        处理api数据
+        :param interface_api:
+        :param project_id:
+        :return:
+        """
+        if interface_api.get('req_body_type') == 'json':
+            json_body = 'json'
+            req_data = json.loads(interface_api.get('req_body_other', "{}"))
+        elif interface_api.get('req_body_type') == 'form':
+            json_body = 'body'
+            req_data = interface_api['req_body_form']
+        else:
+            json_body = 'json'
+            if interface_api.get(''):
+                req_data = re.sub('\n', '', interface_api['req_body_other'])
+                req_data = json.loads(req_data)
+            else:
+                req_data = {}
+
+        api_pool = {
+            'api_id': interface_api['_id'],
+            'project_id': project_id,
+            'title': interface_api['title'],
+            'path': interface_api['path'],
+            'req_headers': interface_api.get('req_headers'),
+            'method': interface_api['method'],
+            'req_params': interface_api['req_query'],
+            'json_body': json_body,
+            'req_data': req_data
+        }
+        return api_pool

@@ -56,7 +56,7 @@ async def create_api_pool(db: Session, data: schemas.YApiData):
     return db_data
 
 
-async def get_project_info(db: Session, group_name: str, project_name: str, project_id: int):
+async def get_project_info(db: Session, group_name: str = None, project_name: str = None, project_id: int = None):
     """
     按项目名称查询数据
     :param db:
@@ -98,11 +98,57 @@ async def get_api_info(db: Session, project_name: str = None, project_id: int = 
         ).all()
 
 
-async def get_api(db: Session, api_id: int):
+async def get_api(db: Session, api_id: int = None, title: str = None):
     """
     获取单个接口数据
     :param db:
     :param api_id:
+    :param title:
     :return:
     """
-    return db.query(models.YApiPool).filter(models.YApiPool.api_id == api_id).first()
+    if api_id:
+        return db.query(models.YApiPool).filter(models.YApiPool.api_id == api_id).first()
+    if title:
+        return db.query(models.YApiPool).filter(models.YApiPool.title == title).first()
+
+
+async def del_api_info(db: Session, api_id: int):
+    """
+    删除单个接口的数据
+    :param db:
+    :param api_id:
+    :return:
+    """
+    db.query(models.YApiPool).filter(models.YApiPool.api_id == api_id).delete()
+
+
+async def del_project_all(db: Session):
+    """
+    删除所有YApi接口数据
+    :param db:
+    :return:
+    """
+    db.query(models.YAoiProject).delete()
+    db.commit()
+
+
+async def del_api_all(db: Session):
+    """
+    删除所有api数据
+    :param db:
+    :return:
+    """
+    db.query(models.YApiPool).delete()
+    db.commit()
+
+
+async def del_project_api_info(db: Session, project_id: int):
+    """
+    按单个项目删除所有api
+    :param db:
+    :param project_id:
+    :param project_name:
+    :return:
+    """
+    db.query(models.YApiPool).filter(models.YApiPool.project_id == project_id).delete()
+    db.commit()

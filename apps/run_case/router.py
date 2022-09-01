@@ -20,7 +20,7 @@ from tools import load_allure_report
 run_case = APIRouter()
 
 
-@run_case.post('/case_name', name='按用例执行')
+@run_case.post('/name', name='按用例执行')
 async def run_case_name(request: Request, case_name: str, db: Session = Depends(get_db)):
     case_info = await case_crud.get_case_name(db=db, case_name=case_name)
     if case_info:
@@ -60,11 +60,11 @@ async def run_case_name(request: Request, case_name: str, db: Session = Depends(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到用例')
 
 
-@run_case.post('/case_ids', name='按用例ID执行')
+@run_case.post('/ids', name='按用例ID执行')
 async def run_case_ids(ids: list, db: Session = Depends(get_db)):
     pass
 
 
-@run_case.post('/temp_name', name='按模块执行')
+@run_case.post('/tempName', name='按模块执行')
 async def run_temp_name(temp_name: str, db: Session = Depends(get_db)):
     pass

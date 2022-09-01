@@ -13,7 +13,6 @@ from typing import List, Optional
 from fastapi import APIRouter, UploadFile, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 from apps.template import crud, schemas
-from tools.database import Base, engine
 from .tool import ParseData
 from depends import get_db
 from tools import CreateExcel
@@ -24,7 +23,6 @@ from starlette.background import BackgroundTask
 
 template = APIRouter()
 
-Base.metadata.create_all(bind=engine)
 
 
 @template.post('/upload/har', response_model=schemas.TemplateOut, response_model_exclude_unset=True,
@@ -77,7 +75,7 @@ async def get_templates(temp_name: Optional[str] = None, db: Session = Depends(g
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板信息')
 
 
-@template.put('/name', response_model=schemas.TemplateOut, name='修改模板名称')
+@template.put('/name/edit', response_model=schemas.TemplateOut, name='修改模板名称')
 async def update_name(old_name: str, new_name: str, db: Session = Depends(get_db)):
     """
     修改模板名称
@@ -88,7 +86,7 @@ async def update_name(old_name: str, new_name: str, db: Session = Depends(get_db
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='未查询到模板名称')
 
 
-@template.delete('/name', name='删除模板数据')
+@template.delete('/name/del', name='删除模板数据')
 async def delete_name(temp_name: str, db: Session = Depends(get_db)):
     """
     删除模板数据

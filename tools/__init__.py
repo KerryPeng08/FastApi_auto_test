@@ -16,6 +16,9 @@ import os
 import pathlib
 from setting import ALLURE_PATH
 from fastapi.staticfiles import StaticFiles
+from tools.database import Base, engine
+
+Base.metadata.create_all(bind=engine)
 
 
 def load_allure_report():

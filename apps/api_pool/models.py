@@ -15,7 +15,7 @@ class YAoiProject(Base):
     """
     YApi项目表
     """
-    __tablename__ = 'pool_project_name_yapi'
+    __tablename__ = 'yapi_project'
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     group_id = Column(Integer, index=True, comment='项目分组id')
     group_name = Column(String, index=True, comment='项目分组名称')
@@ -35,9 +35,9 @@ class YApiPool(Base):
     """
     用例池数据
     """
-    __tablename__ = 'pool_project_data_yapi'
+    __tablename__ = 'yapi_pool'
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    project_id = Column(Integer, ForeignKey('pool_project_name_yapi.id'), index=True)
+    project_id = Column(Integer, ForeignKey('yapi_project.id'), index=True)
     api_id = Column(Integer, index=True, comment='接口id')
     title = Column(String, comment='接口名称')
     path = Column(String, comment='接口路径')
