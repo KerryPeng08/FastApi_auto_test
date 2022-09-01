@@ -23,6 +23,7 @@ class ModeEnum(str, Enum):
 class TestCaseIn(BaseModel):
     case_name: str
     mode: ModeEnum
+
     class Config:
         orm_mode = True
 
@@ -76,6 +77,21 @@ class TestCaseDataOut(BaseModel):
     temp_name: str
     mode: ModeEnum
     data: List[TestCaseData]
+
+    class Config:
+        orm_mode = True
+
+
+class TestCaseDataOut2(BaseModel):
+    id: int
+    case_id: int
+    path: str
+    headers: Optional[dict] = {}
+    params: Optional[dict] = {}
+    data: Optional[dict] = {}
+    check: Optional[dict] = {}
+    description: str
+    config: TestCaseConfig
 
     class Config:
         orm_mode = True

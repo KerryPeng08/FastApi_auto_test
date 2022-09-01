@@ -53,7 +53,7 @@ async def run_case_name(request: Request, case_name: str, db: Session = Depends(
         )
         load_allure_report()
 
-        return response_code.resp_200(data={'allure_report': f'{request.base_url}allure/'})
+        return await response_code.resp_200(data={'allure_report': f'{request.base_url}allure/1'})
     else:
         return await response_code.resp_404()
 

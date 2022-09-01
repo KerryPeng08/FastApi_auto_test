@@ -10,6 +10,7 @@
 import os
 import json
 import time
+from typing import List
 from fastapi import APIRouter, UploadFile, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 from apps.case_service import crud, schemas
@@ -97,3 +98,18 @@ async def test_case_upload_json(temp_name: str, case_name: str, file: UploadFile
         if await crud.get_case_name(db=db, case_name=case_name):
             return await response_code.resp_400(message=f'用例名称已存在')
         return await insert(db=db, case_name=case_name, temp_id=db_temp[0].id, case_data=case_data)
+
+
+@case_service.get('/case/data/{case_id}', response_model=List[schemas.TestCaseDataOut2], name='查看用例测试数据')
+async def case_data(case_id: int, db: Session = Depends(get_db)):
+    """
+    查看测试数据
+    :param case_id:
+    :param db:
+    :return:
+    """
+    case_info = await crud.get_case_data(db=db, case_id=case_id)
+    if case_info:
+        return case_info
+
+    return await response_code.resp_404()

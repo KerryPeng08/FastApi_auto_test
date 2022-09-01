@@ -80,7 +80,7 @@ class GenerateCase:
             for key in data.keys():
                 for x in range(len(response)):
                     value = jsonpath.jsonpath(response[x], f"$..{key}")
-                    if isinstance(value, list) and len(value) == 1:
+                    if isinstance(value, list):
                         ipath = jsonpath.jsonpath(response[x], f"$..{key}", result_type='IPATH')[0]
                         if key.lower() == ipath[-1].lower() and data[key] == value[0]:
                             value = "{{" + f"{x}.$.{'.'.join(ipath)}" + "}}"
