@@ -78,23 +78,11 @@ class GenerateCase:
         def header_key(data: dict) -> dict:
             target = {}
             for key in data.keys():
-                if isinstance(data[key], dict):
-                    header_key(data[key])
-                    continue
-
-                if isinstance(data[key], list):
-                    for k in data[key]:
-                        if isinstance(k, (list, dict)):
-                            header_key(k)
-                        else:
-                            target[key] = data[key]
-                    continue
-
                 for x in range(len(response)):
                     value = jsonpath.jsonpath(response[x], f"$..{key}")
                     if isinstance(value, list) and len(value) == 1:
-                        if data[key] == value[0]:
-                            ipath = jsonpath.jsonpath(response[x], f"$..{key}", result_type='IPATH')[0]
+                        ipath = jsonpath.jsonpath(response[x], f"$..{key}", result_type='IPATH')[0]
+                        if key.lower() == ipath[-1].lower() and data[key] == value[0]:
                             value = "{{" + f"{x}.$.{'.'.join(ipath)}" + "}}"
                             target[key] = value
                             break
@@ -102,6 +90,18 @@ class GenerateCase:
                             target[key] = data[key]
                     else:
                         target[key] = data[key]
+                else:
+                    if isinstance(data[key], dict):
+                        header_key(data[key])
+                        continue
+
+                    if isinstance(data[key], list):
+                        for k in data[key]:
+                            if isinstance(k, (list, dict)):
+                                header_key(k)
+                            else:
+                                target[key] = data[key]
+                        continue
 
             return target
 
