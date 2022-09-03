@@ -83,7 +83,7 @@ async def download_api_title(api_id: int, db: Session = Depends(get_db)):
         return await response_code.resp_404()
 
 
-@pool.get('/project/data', response_model=List[schemas.YApiOut], name='获取YApi项目数据')
+@pool.get('/projects/data', response_model=List[schemas.YApiOut], name='获取YApi项目数据')
 async def get_project_data(
         group_name: str = None,
         project_name: str = None,
@@ -98,7 +98,7 @@ async def get_project_data(
     )
 
 
-@pool.get('/api/data', response_model=List[schemas.YApiDataOut], name='获取单项目中的接口数据')
+@pool.get('/project/api/data', response_model=List[schemas.YApiDataOut], name='获取单项目中的接口数据')
 async def get_api_data(project_name: str = None, project_id: int = None, db: Session = Depends(get_db)):
     if project_id:
         api_info = await pool_crud.get_api_info(db=db, project_id=project_id)
@@ -113,7 +113,7 @@ async def get_api_data(project_name: str = None, project_id: int = None, db: Ses
     return await response_code.resp_404()
 
 
-@pool.get('/getApi/', response_model=schemas.YApiDataOut, name='获取单个接口的信息')
+@pool.get('/api/', response_model=schemas.YApiDataOut, name='获取单个接口的信息')
 async def get_api_id(api_id: int = None, title: str = None, db: Session = Depends(get_db)):
     if api_id:
         api_info = await pool_crud.get_api(db=db, api_id=api_id)

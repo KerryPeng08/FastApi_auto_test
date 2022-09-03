@@ -10,13 +10,20 @@
 import re
 
 
-async def get_cookie(response) -> str:
+async def get_cookie(rep_type, response) -> str:
     """
     获取cookie数据
+    :param rep_type: requests 或者 aiohttp
     :param response:
     :return:
     """
     cookie = ''
-    for k, v in response.cookies.items():
-        cookie += f"{k}={re.compile(r'=(.*?); ', re.S).findall(str(v))[0]}; "
-    return cookie
+    if rep_type == 'aiohttp':
+        for k, v in response.cookies.items():
+            cookie += f"{k}={re.compile(r'=(.*?); ', re.S).findall(str(v))[0]}; "
+        return cookie
+
+    if rep_type == 'requests':
+        for k, v in response.cookies.get_dict().items():
+            cookie += f"{k}={v}; "
+        return cookie

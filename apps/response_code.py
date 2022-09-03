@@ -10,7 +10,6 @@
 from fastapi import status
 from fastapi.responses import JSONResponse, Response  # , ORJSONResponse,UJSONResponse
 from typing import Union
-from pydantic import BaseModel
 
 
 async def resp_200(*, data: Union[list, dict, str, int, float] = '', message: str = 'Success') -> Response:

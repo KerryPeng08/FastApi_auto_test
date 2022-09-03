@@ -21,9 +21,9 @@ from apps import response_code
 run_case = APIRouter()
 
 
-@run_case.post('/name', name='按用例执行')
-async def run_case_name(request: Request, case_name: str, db: Session = Depends(get_db)):
-    case_info = await case_crud.get_case_name(db=db, case_name=case_name)
+@run_case.post('/{case_id}', name='按用例执行')
+async def run_case_name(request: Request, case_id: int, db: Session = Depends(get_db)):
+    case_info = await case_crud.get_case_name(db=db, case_id=case_id)
     if case_info:
         # 拿到测试数据
         case_data = await case_crud.get_case_data(db=db, case_id=case_info[0].id)
@@ -35,7 +35,7 @@ async def run_case_name(request: Request, case_name: str, db: Session = Depends(
         try:
             case = await RunCase().fo_service(
                 db=db,
-                case_name=case_name,
+                case_name=case_info[0].case_name,
                 temp_data=temp_data,
                 case_data=case_data,
                 temp_pro=temp_info[0].project_name,

@@ -44,7 +44,7 @@ class YApi:
                 return False
 
         self._headers = {
-            'cookie': await get_cookie(response=res)
+            'cookie': await get_cookie(rep_type='aiohttp', response=res)
         }
         logger.info('YApi登录成功')
         return True

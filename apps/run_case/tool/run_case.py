@@ -12,8 +12,11 @@ import time
 import copy
 import json
 import asyncio
-import aiohttp
+# import aiohttp
 import jsonpath
+# import ujson
+import requests
+from requests import exceptions
 from typing import List
 from apps.template import schemas as temp
 from apps.case_service import schemas as service
@@ -24,7 +27,7 @@ from sqlalchemy.orm import Session
 
 class RunCase:
     def __init__(self):
-        self.sees = aiohttp.client.ClientSession()
+        # self.sees = aiohttp.client.ClientSession(json_serialize=ujson.dumps)
         self.cookies = None
 
     async def fo_service(
@@ -42,11 +45,6 @@ class RunCase:
         1.识别url，data中的表达式
         2.拿表达式从response里面提取出来值
         2.url拿到值，直接替换
-
-        :param case_name:
-        :param temp_data:
-        :param case_data:
-        :return:
         """
         # 返回结果收集
         response = []
@@ -68,7 +66,7 @@ class RunCase:
                 'method': temp_data[num].method,
                 'headers': headers,
                 'params': params,
-                f"{'data' if temp_data[num].json_body == 'body' else 'json'}": data,
+                f"{'json' if temp_data[num].json_body == 'json' else 'data'}": data,
             }
 
             config = case_data[num].config
@@ -76,32 +74,48 @@ class RunCase:
             if self.cookies:
                 request_info['headers']['Cookie'] = self.cookies
 
-            logger.info(f"请求信息: {json.dumps(request_info, indent=2)}")
+            logger.info(f"请求信息: {json.dumps(request_info, indent=2, ensure_ascii=False)}")
 
-            async with self.sees.request(**request_info, allow_redirects=False) as res:
-                if config['is_login']:
-                    self.cookies = await get_cookie(res)
+            # async with self.sees.request(**request_info, allow_redirects=False) as res:
+            res = requests.request(**request_info, allow_redirects=False)
+            if config['is_login']:
+                self.cookies = await get_cookie(rep_type='requests', response=res)
+            logger.info(f"状态码: {res.status_code}")
 
-                res_json = await res.json() if res.status == 200 and 'application/json' in res.content_type else {}
-                response.append(res_json)
+            # 收集结果
+            request_info['expect'] = case_data[num].check
+            request_info['description'] = case_data[num].description
+            request_info['config'] = case_data[num].config
+            # res_json = await res.json() if 'application/json' in res.content_type else {}
+            try:
+                res_json = res.json()
+            except exceptions.RequestException:
+                res_json = {}
+            request_info['response'] = res_json
+            response.append(res_json)
 
-                # 收集结果
-                request_info['expect'] = case_data[num].check
+            if res.status_code != case_data[num].check['status_code']:
+                request_info['actual'] = {'status_code': [res.status_code]}
+
+                logger.info(f"响应信息: {json.dumps(res_json, indent=2, ensure_ascii=False)}")
+                result.append(request_info)
+                await asyncio.sleep(config['sleep'])
+                logger.info(f"{'=' * 30}结束请求{num}{'=' * 30}")
+                continue
+            else:
                 new_check = copy.deepcopy(case_data[num].check)
                 del new_check['status_code']
                 request_info['actual'] = {
-                    **{'status_code': [res.status]},
+                    **{'status_code': [res.status_code]},
                     **{k: jsonpath.jsonpath(res_json, f'$..{k}') for k in new_check}
                 }
-                request_info['response'] = res_json
-                request_info['description'] = case_data[num].description
-                request_info['config'] = case_data[num].config
+                logger.info(f"响应信息: {json.dumps(res_json, indent=2, ensure_ascii=False)}")
+                result.append(request_info)
+                await asyncio.sleep(config['sleep'])
+                logger.info(f"{'=' * 30}结束请求{num}{'=' * 30}")
+                continue
 
-            result.append(request_info)
-            await asyncio.sleep(config['sleep'])
-            logger.info(f"{'=' * 30}结束请求{num}{'=' * 30}")
-
-        await self.sees.close()
+        # await self.sees.close()
 
         await crud.update_test_case_order(db=db, case_name=case_name)
 
@@ -112,18 +126,6 @@ class RunCase:
         })
         logger.info(f"用例: {temp_pro}-{temp_name}-{case_name} 执行完成, 进行结果校验")
         return f"{temp_pro}-{temp_name}-{case_name}"
-
-    # @staticmethod
-    # async def _get_cookie(response) -> str:
-    #     """
-    #     获取cookie数据
-    #     :param response:
-    #     :return:
-    #     """
-    #     cookie = ''
-    #     for k, v in response.cookies.items():
-    #         cookie += f"{k}={re.compile(r'=(.*?); ', re.S).findall(str(v))[0]}; "
-    #     return cookie
 
     @staticmethod
     async def _replace_rul(old_str: str, response: list) -> str:
@@ -142,7 +144,8 @@ class RunCase:
 
         return old_str
 
-    async def _replace_params_data(self, data: dict, response: list) -> dict:
+    @staticmethod
+    async def _replace_params_data(data: dict, response: list) -> dict:
         """
         替换params和data的值
         :param data:
@@ -160,7 +163,10 @@ class RunCase:
                 if isinstance(data_json[key], list):
                     none_list = []
                     for i in data_json[key]:
-                        none_list.append(await handle_value(i))
+                        if isinstance(i, dict):
+                            none_list.append(await handle_value(i))
+                        else:
+                            none_list.append(i)
                     target[key] = none_list
                     continue
 
@@ -168,7 +174,11 @@ class RunCase:
                     if "{{" in data_json[key] and "$" in data_json[key] and "}}" in data_json[key]:
                         replace_value = re.compile(r'{{(.*?)}}', re.S).findall(data_json[key])[0]
                         num, json_path = replace_value.split('.', 1)
-                        target[key] = jsonpath.jsonpath(response[int(num)], json_path)[0]
+                        value = jsonpath.jsonpath(response[int(num)], json_path)
+                        if value:
+                            target[key] = value[0]
+                        else:
+                            target[key] = value
                     else:
                         target[key] = data_json[key]
                 else:

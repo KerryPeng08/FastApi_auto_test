@@ -18,6 +18,7 @@ class GenerateCase:
         """
         读取模板生成准测试数据
         :param temp_name:
+        :param mode:
         :param template_data:
         :return:
         """
@@ -82,7 +83,7 @@ class GenerateCase:
                     value = jsonpath.jsonpath(response[x], f"$..{key}")
                     if isinstance(value, list):
                         ipath = jsonpath.jsonpath(response[x], f"$..{key}", result_type='IPATH')[0]
-                        if key.lower() == ipath[-1].lower() and data[key] == value[0]:
+                        if key.lower() == ipath[-1].lower() and data[key] == value[0] and value[0]:
                             value = "{{" + f"{x}.$.{'.'.join(ipath)}" + "}}"
                             target[key] = value
                             break

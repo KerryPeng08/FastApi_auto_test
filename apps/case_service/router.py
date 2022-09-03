@@ -11,7 +11,7 @@ import os
 import json
 import time
 from typing import List
-from fastapi import APIRouter, UploadFile, HTTPException, status, Depends
+from fastapi import APIRouter, UploadFile, Depends
 from sqlalchemy.orm import Session
 from apps.case_service import crud, schemas
 from apps.template import crud as temp_crud
@@ -69,7 +69,8 @@ async def download_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session
 
 
 @case_service.post('/upload/json', response_model=schemas.TestCaseOut, name='上传测试数据-json')
-async def test_case_upload_json(temp_name: str, case_name: str, file: UploadFile, cover: bool = False,
+async def test_case_upload_json(temp_name: str, file: UploadFile,
+                                case_id: int = None, case_name: str = None, cover: bool = False,
                                 db: Session = Depends(get_db)):
     """
     上传json文件，解析后储存测试数据
@@ -80,7 +81,7 @@ async def test_case_upload_json(temp_name: str, case_name: str, file: UploadFile
 
     db_temp = await temp_crud.get_temp_name(db=db, temp_name=temp_name)
     if not db_temp:
-        return await response_code.resp_404()
+        return await response_code.resp_404(message='temp_name不存在')
 
     # 校验数据
     try:
@@ -90,26 +91,37 @@ async def test_case_upload_json(temp_name: str, case_name: str, file: UploadFile
 
     msg_list = await CheckJson.check_to_service(db=db, temp_name=temp_name, case_data=case_data['data'])
     if msg_list:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=msg_list)
+        return await response_code.resp_400(data=msg_list)
 
     if cover:  # 覆盖
-        return await cover_insert(db=db, case_name=case_name, temp_id=db_temp[0].id, case_data=case_data)
+        if not case_id:
+            return await response_code.resp_400(message='未输入case_id')
+
+        if not await crud.get_case_name(db=db, case_id=case_id):
+            return await response_code.resp_404()
+
+        return await cover_insert(db=db, case_id=case_id, case_data=case_data)
     else:  # 不覆盖
-        if await crud.get_case_name(db=db, case_name=case_name):
-            return await response_code.resp_400(message=f'用例名称已存在')
+        if not case_name:
+            return await response_code.resp_400(message='未输入case_name')
         return await insert(db=db, case_name=case_name, temp_id=db_temp[0].id, case_data=case_data)
 
 
-@case_service.get('/case/data/{case_id}', response_model=List[schemas.TestCaseDataOut2], name='查看用例测试数据')
+@case_service.get('/data/{case_id}', response_model=List[schemas.TestCaseDataOut2], name='查看用例测试数据')
 async def case_data(case_id: int, db: Session = Depends(get_db)):
     """
     查看测试数据
-    :param case_id:
-    :param db:
-    :return:
     """
     case_info = await crud.get_case_data(db=db, case_id=case_id)
     if case_info:
         return case_info
 
     return await response_code.resp_404()
+
+
+@case_service.delete('/del/{case_id}', name='删除测试数据')
+async def del_case(case_id: int, db: Session = Depends(get_db)):
+    if not await crud.get_case_name(db=db, case_id=case_id):
+        return await response_code.resp_404()
+    await crud.del_case_data(db=db, case_id=case_id)
+    return await response_code.resp_200(message=f'用例{case_id}删除成功')

@@ -1,6 +1,6 @@
 fastapi~=0.79.0
 uvicorn~=0.18.2
-aiohttp~=3.7.4.post0
+aiohttp~=3.8.1
 pydantic~=1.8.2
 SQLAlchemy~=1.3.24
 jsonpath~=0.82
