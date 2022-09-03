@@ -34,6 +34,7 @@ class TemplateData(Base):
     __tablename__ = 'case_template_data'
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     temp_id = Column(Integer, ForeignKey('case_template.id'))
+    number = Column(Integer, nullable=False, comment='序号')
     host = Column(String, nullable=False, comment='域名')
     path = Column(String, nullable=False, comment='接口路径')
     code = Column(Integer, nullable=False, comment='响应状态码')

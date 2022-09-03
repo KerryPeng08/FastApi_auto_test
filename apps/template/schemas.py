@@ -9,7 +9,7 @@
 
 from datetime import datetime
 from pydantic import BaseModel, HttpUrl
-from typing import Optional, List
+from typing import Optional, List, Union
 from enum import Enum
 
 
@@ -60,6 +60,7 @@ class TempTestCase(TemplateOut):
 
 # 测试模板数据的请求/响应数据模型
 class TemplateDataIn(BaseModel):
+    number: Union[str, int]
     host: HttpUrl
     path: str
     code: int

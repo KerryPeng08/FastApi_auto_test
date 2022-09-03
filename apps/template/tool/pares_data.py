@@ -54,6 +54,7 @@ class ParseData:
                 res_data = {}
 
             new_data = {
+                'number': api_count,
                 'host': http + host,
                 'path': path.split('?', 1)[0],
                 'code': data['response']['status'],

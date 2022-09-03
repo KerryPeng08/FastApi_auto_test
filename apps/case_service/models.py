@@ -18,7 +18,7 @@ class TestCase(Base):
     __tablename__ = 'test_case'
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     temp_id = Column(Integer, ForeignKey('case_template.id'))
-    case_name = Column(String, unique=True, nullable=True, index=True, comment='用例名称')
+    case_name = Column(String, nullable=True, index=True, comment='用例名称')
     case_count = Column(Integer, default=0, nullable=True, comment='用例数量')
     mode = Column(String, comment='用例运行模式')
     run_order = Column(Integer, default=0, nullable=True, comment='执行次数')
@@ -36,6 +36,7 @@ class TestCaseData(Base):
     __tablename__ = 'test_case_data'
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     case_id = Column(Integer, ForeignKey('test_case.id'))
+    number = Column(Integer, nullable=False, comment='序号')
     path = Column(String, nullable=False, comment='接口路径')
     headers = Column(JSON, comment='请求头测试数据')
     params = Column(JSON, comment='请求参数测试数据')

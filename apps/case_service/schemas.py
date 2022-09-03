@@ -9,7 +9,7 @@
 
 from datetime import datetime
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Union
 from enum import Enum
 
 
@@ -46,6 +46,7 @@ class TestCaseConfig(BaseModel):
 
 
 class TestCaseDataIn(BaseModel):
+    number: Union[str, int]
     path: str
     headers: Optional[dict] = {}
     params: Optional[dict] = {}
@@ -59,7 +60,7 @@ class TestCaseDataIn(BaseModel):
 
 
 class TestCaseData(BaseModel):
-    number: str
+    number: Union[str, int]
     path: str
     headers: Optional[dict] = {}
     params: Optional[dict] = {}
@@ -83,7 +84,7 @@ class TestCaseDataOut(BaseModel):
 
 
 class TestCaseDataOut2(BaseModel):
-    id: int
+    number: int
     case_id: int
     path: str
     headers: Optional[dict] = {}

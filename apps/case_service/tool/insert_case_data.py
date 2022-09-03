@@ -25,6 +25,7 @@ async def cover_insert(db: Session, case_id: int, case_data: dict):
     case_count = 0
     for data in case_data['data']:
         del data['number']
+        data['number'] = case_count
         await crud.create_test_case_data(db=db, data=schemas.TestCaseDataIn(**data), case_id=case_id)
         case_count += 1
 
@@ -43,6 +44,7 @@ async def insert(db: Session, case_name: str, temp_id: int, case_data: dict):
     case_count = 0
     for data in case_data['data']:
         del data['number']
+        data['number'] = case_count
         await crud.create_test_case_data(db=db, data=schemas.TestCaseDataIn(**data), case_id=db_case.id)
         case_count += 1
 
