@@ -39,7 +39,7 @@ app.include_router(run_case, prefix='/runCase', tags=['执行测试'])
 # 测试报告路径
 @app.get('/allure', name='allure测试报告地址', tags=['测试报告'])
 async def allure(request: Request):
-    return await response_code.resp_200(data={'allure_report': f"{request.url}/case_id"})
+    return await response_code.resp_200(data={'allure_report': f"{request.url}" + "/{case_id}/{run_order}"})
 
 
 load_allure_reports(app=app, allure_dir=ALLURE_PATH)

@@ -41,23 +41,25 @@ class RunCase:
     ):
         """
         集合模板用例和测试数据
-
         1.识别url，data中的表达式
         2.拿表达式从response里面提取出来值
-        2.url拿到值，直接替换
+        2.拿到值，直接替换
         """
         # 返回结果收集
         response = []
 
         result = []
-        for num in range(len(temp_data) - 38):
+        for num in range(len(temp_data) - 30):
             logger.info(f"{'=' * 30}开始请求{num}{'=' * 30}")
-            # 识别url表达式
-            url = await self._replace_rul(old_str=f"{temp_data[num].host}{case_data[num].path}", response=response)
-            # 识别params表达式
-            params = await self._replace_params_data(data=case_data[num].params, response=response)
-            # 识别data表达式
-            data = await self._replace_params_data(data=case_data[num].data, response=response)
+            try:
+                # 识别url表达式
+                url = await self._replace_rul(old_str=f"{temp_data[num].host}{case_data[num].path}", response=response)
+                # 识别params表达式
+                params = await self._replace_params_data(data=case_data[num].params, response=response)
+                # 识别data表达式
+                data = await self._replace_params_data(data=case_data[num].data, response=response)
+            except IndexError:
+                raise IndexError(f'参数提取错误, 请检查用例编号: {num} 的提取表达式')
             # 替换headers中的内容
             headers = await self._replace_headers(tmp_header=temp_data[num].headers, case_header=case_data[num].headers)
 

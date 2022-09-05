@@ -45,6 +45,9 @@ async def run_case_name(request: Request, case_id: int, db: Session = Depends(ge
         except (ServerDisconnectedError, ServerConnectionError) as e:
             return await response_code.resp_400(message=f'网络访问失败: {str(e)}')
 
+        except IndexError as e:
+            return await response_code.resp_400(message=f': {str(e)}')
+
         # 校验结果，生成报告
         allure_dir = ALLURE_PATH
         await run(
