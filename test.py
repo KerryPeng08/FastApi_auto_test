@@ -107,11 +107,36 @@ async def test():
 # loop = asyncio.get_event_loop()
 # result = loop.run_until_complete(test())
 # #
-res = requests.post(
-    url=url,
-    headers=headers,
-    json=data
-)
-print(res.status_code)
-print(res.json())
-print(res.cookies.get_dict())
+# res = requests.post(
+#     url=url,
+#     headers=headers,
+#     json=data
+# )
+# print(res.status_code)
+# print(res.json())
+# print(res.cookies.get_dict())
+
+import os
+from setting import ALLURE_PATH
+
+
+def load_allure_reports(allure_dir: str):
+    """
+    加载所有的allures测试报告
+    :param app: 主程序
+    :param allure_dir: 测试报告目录
+    :return:
+    """
+    try:
+        files = os.listdir(os.path.join(allure_dir, 'allure_plus'))
+    except FileNotFoundError:
+        return
+    for file in files:
+        file_ = os.listdir(os.path.join(allure_dir, 'allure_plus', file))
+        for f in file_:
+            if f == 'history.json':
+                continue
+            print(f)
+
+
+load_allure_reports(ALLURE_PATH)

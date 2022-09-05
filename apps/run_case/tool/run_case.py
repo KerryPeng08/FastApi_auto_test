@@ -33,7 +33,7 @@ class RunCase:
     async def fo_service(
             self,
             db: Session,
-            case_name: str,
+            case_id: int,
             temp_data: List[temp.TemplateDataOut],
             case_data: List[service.TestCaseData],
             temp_pro: str,
@@ -50,7 +50,7 @@ class RunCase:
         response = []
 
         result = []
-        for num in range(len(temp_data)):
+        for num in range(len(temp_data) - 38):
             logger.info(f"{'=' * 30}开始请求{num}{'=' * 30}")
             # 识别url表达式
             url = await self._replace_rul(old_str=f"{temp_data[num].host}{case_data[num].path}", response=response)
@@ -117,15 +117,15 @@ class RunCase:
 
         # await self.sees.close()
 
-        await crud.update_test_case_order(db=db, case_name=case_name)
+        case_info = await crud.update_test_case_order(db=db, case_id=case_id)
 
         await crud.queue_add(db=db, data={
             'start_time': int(time.time() * 1000),
-            'case_name': f'{temp_pro}-{temp_name}-{case_name}',
+            'case_name': f'{temp_pro}-{temp_name}-{case_info.case_name}',
             'case_data': result
         })
-        logger.info(f"用例: {temp_pro}-{temp_name}-{case_name} 执行完成, 进行结果校验")
-        return f"{temp_pro}-{temp_name}-{case_name}"
+        logger.info(f"用例: {temp_pro}-{temp_name}-{case_info.case_name} 执行完成, 进行结果校验, 序号: {case_info.run_order}")
+        return f"{temp_pro}-{temp_name}-{case_info.case_name}", case_info.run_order
 
     @staticmethod
     async def _replace_rul(old_str: str, response: list) -> str:

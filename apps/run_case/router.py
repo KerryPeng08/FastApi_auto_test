@@ -20,7 +20,6 @@ from apps.run_case.tool import RunCase, run
 from tools.load_allure import load_allure_report
 
 run_case = APIRouter()
-from main import app
 
 
 @run_case.post('/{case_id}', name='按用例执行')
@@ -35,9 +34,9 @@ async def run_case_name(request: Request, case_id: int, db: Session = Depends(ge
         temp_info = await temp_crud.get_temp_name(db=db, temp_id=case_info[0].temp_id)
         # 处理数据，执行用例
         try:
-            case = await RunCase().fo_service(
+            case, run_order = await RunCase().fo_service(
                 db=db,
-                case_name=case_info[0].case_name,
+                case_id=case_id,
                 temp_data=temp_data,
                 case_data=case_data,
                 temp_pro=temp_info[0].project_name,
@@ -52,9 +51,10 @@ async def run_case_name(request: Request, case_id: int, db: Session = Depends(ge
             test_path='./apps/run_case/test_case/test_service.py',
             allure_dir=allure_dir,
             report_url=request.base_url,
-            case_name=case
+            case_name=case,
+            case_id=case_id
         )
-        load_allure_report(app=app, allure_dir=allure_dir)
+        load_allure_report(allure_dir=allure_dir, case_id=case_id, run_order=run_order)
 
         return await response_code.resp_200(data={'allure_report': f'{request.base_url}allure/1'})
     else:

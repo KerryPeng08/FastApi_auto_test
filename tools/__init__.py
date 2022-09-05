@@ -20,7 +20,7 @@ def mkdir():
     按项目创建多级目录
     :return:
     """
-    pathlib.Path(f"{ALLURE_PATH}/allure_plus/1").mkdir(parents=True, exist_ok=True)
+    # pathlib.Path(f"{ALLURE_PATH}/allure_plus/1/1").mkdir(parents=True, exist_ok=True)
     pathlib.Path(f'./files/excel').mkdir(parents=True, exist_ok=True)
     pathlib.Path(f'./files/json').mkdir(parents=True, exist_ok=True)
 
