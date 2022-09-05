@@ -42,7 +42,7 @@ async def allure(request: Request):
     return await response_code.resp_200(data={'allure_report': f"{request.url}/case_id"})
 
 
-load_allure_reports(allure_dir=ALLURE_PATH)
+load_allure_reports(app=app, allure_dir=ALLURE_PATH)
 
 if __name__ == '__main__':
     uvicorn.run('main:app', host='0.0.0.0', port=8000, reload=True)

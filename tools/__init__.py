@@ -8,7 +8,6 @@
 """
 
 import pathlib
-from setting import ALLURE_PATH
 from .excel import CreateExcel
 from .operation_json import OperationJson
 from .global_log import logger
