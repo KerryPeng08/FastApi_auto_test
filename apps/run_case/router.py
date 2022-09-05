@@ -9,16 +9,18 @@
 
 from aiohttp.client import ServerDisconnectedError, ServerConnectionError
 from fastapi import APIRouter, Depends, Request
-from apps.case_service import crud as case_crud
-from apps.template import crud as temp_crud
 from sqlalchemy.orm import Session
 from depends import get_db
-from .tool import RunCase, run
 from setting import ALLURE_PATH
-from tools import load_allure_report
 from apps import response_code
 
+from apps.case_service import crud as case_crud
+from apps.template import crud as temp_crud
+from apps.run_case.tool import RunCase, run
+from tools.load_allure import load_allure_report
+
 run_case = APIRouter()
+from main import app
 
 
 @run_case.post('/{case_id}', name='按用例执行')
@@ -45,13 +47,14 @@ async def run_case_name(request: Request, case_id: int, db: Session = Depends(ge
             return await response_code.resp_400(message=f'网络访问失败: {str(e)}')
 
         # 校验结果，生成报告
+        allure_dir = ALLURE_PATH
         await run(
             test_path='./apps/run_case/test_case/test_service.py',
-            allure_dir=ALLURE_PATH,
+            allure_dir=allure_dir,
             report_url=request.base_url,
             case_name=case
         )
-        load_allure_report()
+        load_allure_report(app=app, allure_dir=allure_dir)
 
         return await response_code.resp_200(data={'allure_report': f'{request.base_url}allure/1'})
     else:

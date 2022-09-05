@@ -24,4 +24,4 @@ engine = create_engine(
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False, expire_on_commit=True)
 
 # 数据模型的基类
-Base = declarative_base(bind=engine)
+Base = declarative_base()

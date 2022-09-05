@@ -6,5 +6,3 @@
 @File: __init__.py.py
 @Time: 2022/8/4-15:22
 """
-
-from .router import pool

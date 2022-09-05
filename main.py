@@ -9,15 +9,16 @@
 
 import uvicorn
 from fastapi import FastAPI, Request
-from apps.template import template
-from apps.case_service import case_service
-from apps.case_ddt import case_ddt
-from apps.case_perf import case_perf
-from apps.run_case import run_case
-from apps.api_pool import pool
+from setting import ALLURE_PATH
+from apps.template.router import template
+from apps.case_service.router import case_service
+from apps.case_ddt.router import case_ddt
+from apps.case_perf.router import case_perf
+from apps.run_case.router import run_case
+from apps.api_pool.router import pool
 from apps import response_code
 from tools.database import Base, engine
-from tools import load_allure_report
+from tools.load_allure import load_allure_report
 
 Base.metadata.create_all(bind=engine)
 
@@ -38,10 +39,10 @@ app.include_router(run_case, prefix='/runCase', tags=['执行测试'])
 # 测试报告路径
 @app.get('/allure', name='allure测试报告地址', tags=['测试报告'])
 async def allure(request: Request):
-    return await response_code.resp_200(data={'allure_report': f"{request.url}/*"})
+    return await response_code.resp_200(data={'allure_report': f"{request.url}/case_id"})
 
 
-load_allure_report()
+load_allure_report(app=app, allure_dir=ALLURE_PATH)
 
 if __name__ == '__main__':
-    uvicorn.run('main:app', host='0.0.0.0', port=8000, reload=True, debug=True)
+    uvicorn.run('main:app', host='0.0.0.0', port=8000, reload=True)

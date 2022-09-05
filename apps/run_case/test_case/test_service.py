@@ -11,9 +11,9 @@ import asyncio
 import allure
 import pytest
 import typing
-from apps.run_case import crud
 from sqlalchemy.orm import sessionmaker, Session
 from tools.database import engine
+from apps.run_case import crud
 
 # 建立数据库连接
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False, expire_on_commit=True)

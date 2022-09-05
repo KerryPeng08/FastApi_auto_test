@@ -13,16 +13,17 @@ import time
 from typing import List
 from fastapi import APIRouter, UploadFile, Depends
 from sqlalchemy.orm import Session
-from apps.case_service import crud, schemas
-from apps.template import crud as temp_crud
-from .tool import insert, cover_insert
-from tools.check_case_json import CheckJson
-from depends import get_db
 from starlette.responses import FileResponse
 from starlette.background import BackgroundTask
-from tools import GenerateCase as case_
-from tools import OperationJson as json_
+from depends import get_db
 from apps import response_code
+from tools.check_case_json import CheckJson
+from tools import OperationJson
+
+from apps.template import crud as temp_crud
+from apps.case_service import crud, schemas
+from apps.case_service.tool import insert, cover_insert
+from apps.template.tool import GenerateCase
 
 case_service = APIRouter()
 
@@ -37,7 +38,7 @@ async def test_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = D
 
     template_data = await temp_crud.get_template_data(db=db, temp_name=temp_name)
     if template_data:
-        test_data = await case_().read_template_to_api(temp_name=temp_name, mode=mode,
+        test_data = await GenerateCase().read_template_to_api(temp_name=temp_name, mode=mode,
                                                        template_data=template_data)
         return test_data
 
@@ -55,10 +56,10 @@ async def download_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session
 
     template_data = await temp_crud.get_template_data(db=db, temp_name=temp_name)
     if template_data:
-        test_data = await case_().read_template_to_api(temp_name=temp_name, mode=mode,
+        test_data = await GenerateCase().read_template_to_api(temp_name=temp_name, mode=mode,
                                                        template_data=template_data)
         path = f'./files/json/{time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))}.json'
-        await json_.write(path=path, data=test_data)
+        await OperationJson.write(path=path, data=test_data)
         return FileResponse(
             path=path,
             filename=f'{temp_name}.json',

@@ -6,5 +6,3 @@
 @File: __init__.py.py
 @Time: 2022/8/20-21:56
 """
-
-from .router import case_service
