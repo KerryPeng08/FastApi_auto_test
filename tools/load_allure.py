@@ -16,6 +16,7 @@ from fastapi import FastAPI
 def load_allure_reports(app: FastAPI, allure_dir: str):
     """
     加载所有的allures测试报告
+    :param app:
     :param allure_dir: 测试报告目录
     :return:
     """

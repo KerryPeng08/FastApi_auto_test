@@ -104,3 +104,13 @@ async def del_case_data(db: Session, case_id: int):
     db.query(models.TestCase).filter(models.TestCase.id == case_id).delete()
     db.query(models.TestCaseData).filter(models.TestCaseData.case_id == case_id).delete()
     db.commit()
+
+
+async def get_case(db: Session, temp_id: int):
+    """
+    按模板查用例
+    :param db:
+    :param temp_id:
+    :return:
+    """
+    return db.query(models.TestCase).filter(models.TestCase.temp_id == temp_id).first()

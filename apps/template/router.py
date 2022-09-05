@@ -18,6 +18,7 @@ from apps import response_code
 from depends import get_db
 
 from apps.template import crud, schemas
+from apps.case_service import crud as case_crud
 from apps.template.tool import ParseData
 from tools import CreateExcel
 
@@ -86,14 +87,25 @@ async def update_name(old_name: str, new_name: str, db: Session = Depends(get_db
 
 
 @template.delete('/name/del', name='删除模板数据')
-async def delete_name(temp_name: str, db: Session = Depends(get_db)):
+async def delete_name(temp_name: str = None, temp_id: int = None, db: Session = Depends(get_db)):
     """
     删除模板数据
     """
-    template_data = await crud.del_template_data(db=db, temp_name=temp_name)
-    if template_data:
-        return {'message': '删除成功'}
-    return await response_code.resp_404()
+    if not temp_name and not temp_id:
+        return await response_code.resp_400()
+
+    temp_info = await crud.get_temp_name(db=db, temp_name=temp_name, temp_id=temp_id)
+
+    if temp_info:
+        case_info = await case_crud.get_case(db=db, temp_id=temp_info[0].id)
+        if case_info:
+            return await response_code.resp_400(message='模板下还存在用例')
+        else:
+            template_data = await crud.del_template_data(db=db, temp_name=temp_name)
+        if template_data:
+            return await response_code.resp_200(message='删除成功')
+    else:
+        return await response_code.resp_404()
 
 
 @template.get('/data/list', response_model=List[schemas.TemplateDataOut], response_model_exclude_unset=True,
