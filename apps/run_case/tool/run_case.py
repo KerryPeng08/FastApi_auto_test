@@ -96,12 +96,9 @@ class RunCase:
             request_info['response'] = res_json
             response.append(res_json)
 
+            # 判断响应结果，调整交易内容收集
             if res.status_code != case_data[num].check['status_code']:
                 request_info['actual'] = {'status_code': [res.status_code]}
-                await asyncio.sleep(config['sleep'])
-
-                logger.info(f"响应信息: {json.dumps(res_json, indent=2, ensure_ascii=False)}")
-                logger.info(f"{'=' * 30}结束请求{num}{'=' * 30}")
             else:
                 new_check = copy.deepcopy(case_data[num].check)
                 del new_check['status_code']
@@ -109,12 +106,11 @@ class RunCase:
                     **{'status_code': [res.status_code]},
                     **{k: jsonpath.jsonpath(res_json, f'$..{k}') for k in new_check}
                 }
-                await asyncio.sleep(config['sleep'])
 
-                logger.info(f"响应信息: {json.dumps(res_json, indent=2, ensure_ascii=False)}")
-                logger.info(f"{'=' * 30}结束请求{num}{'=' * 30}")
-
+            await asyncio.sleep(config['sleep'])
             result.append(request_info)
+            logger.info(f"响应信息: {json.dumps(res_json, indent=2, ensure_ascii=False)}")
+            logger.info(f"{'=' * 30}结束请求{num}{'=' * 30}")
 
         # await self.sees.close()
 
