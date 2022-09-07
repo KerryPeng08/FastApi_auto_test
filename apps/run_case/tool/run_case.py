@@ -49,7 +49,7 @@ class RunCase:
         response = []
 
         result = []
-        for num in range(len(temp_data) - 30):
+        for num in range(len(temp_data) - 20):
             logger.info(f"{'=' * 30}开始请求{num}{'=' * 30}")
             try:
                 # 识别url表达式
@@ -98,12 +98,10 @@ class RunCase:
 
             if res.status_code != case_data[num].check['status_code']:
                 request_info['actual'] = {'status_code': [res.status_code]}
+                await asyncio.sleep(config['sleep'])
 
                 logger.info(f"响应信息: {json.dumps(res_json, indent=2, ensure_ascii=False)}")
-                result.append(request_info)
-                await asyncio.sleep(config['sleep'])
                 logger.info(f"{'=' * 30}结束请求{num}{'=' * 30}")
-                continue
             else:
                 new_check = copy.deepcopy(case_data[num].check)
                 del new_check['status_code']
@@ -111,11 +109,12 @@ class RunCase:
                     **{'status_code': [res.status_code]},
                     **{k: jsonpath.jsonpath(res_json, f'$..{k}') for k in new_check}
                 }
-                logger.info(f"响应信息: {json.dumps(res_json, indent=2, ensure_ascii=False)}")
-                result.append(request_info)
                 await asyncio.sleep(config['sleep'])
+
+                logger.info(f"响应信息: {json.dumps(res_json, indent=2, ensure_ascii=False)}")
                 logger.info(f"{'=' * 30}结束请求{num}{'=' * 30}")
-                continue
+
+            result.append(request_info)
 
         # await self.sees.close()
 
