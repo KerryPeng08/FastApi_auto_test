@@ -11,7 +11,7 @@ import os
 import json
 import time
 from typing import List
-from fastapi import APIRouter, UploadFile, Depends
+from fastapi import APIRouter, UploadFile, Depends, Query
 from sqlalchemy.orm import Session
 from starlette.responses import FileResponse
 from starlette.background import BackgroundTask
@@ -34,12 +34,12 @@ async def test_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = D
     自动处理部分接口数据上下级关联数据
     """
     if mode != schemas.ModeEnum.service:
-        return await response_code.resp_400(message=f'该模式仅支持{mode}模式')
+        return await response_code.resp_400(message=f'该模式仅支持{schemas.ModeEnum.service}模式')
 
     template_data = await temp_crud.get_template_data(db=db, temp_name=temp_name)
     if template_data:
         test_data = await GenerateCase().read_template_to_api(temp_name=temp_name, mode=mode,
-                                                       template_data=template_data)
+                                                              template_data=template_data)
         return test_data
 
     return await response_code.resp_404()
@@ -52,12 +52,12 @@ async def download_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session
     json格式化数据下载
     """
     if mode != schemas.ModeEnum.service:
-        return await response_code.resp_400(message=f'该模式仅支持{mode}模式')
+        return await response_code.resp_400(message=f'该模式仅支持{schemas.ModeEnum.service}模式')
 
     template_data = await temp_crud.get_template_data(db=db, temp_name=temp_name)
     if template_data:
         test_data = await GenerateCase().read_template_to_api(temp_name=temp_name, mode=mode,
-                                                       template_data=template_data)
+                                                              template_data=template_data)
         path = f'./files/json/{time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))}.json'
         await OperationJson.write(path=path, data=test_data)
         return FileResponse(
@@ -113,11 +113,7 @@ async def case_data(case_id: int, db: Session = Depends(get_db)):
     """
     查看测试数据
     """
-    case_info = await crud.get_case_data(db=db, case_id=case_id)
-    if case_info:
-        return case_info
-
-    return await response_code.resp_404()
+    return await crud.get_case_data(db=db, case_id=case_id) or await response_code.resp_404()
 
 
 @case_service.delete('/del/{case_id}', name='删除测试数据')
@@ -126,3 +122,15 @@ async def del_case(case_id: int, db: Session = Depends(get_db)):
         return await response_code.resp_404()
     await crud.del_case_data(db=db, case_id=case_id)
     return await response_code.resp_200(message=f'用例{case_id}删除成功')
+
+
+@case_service.get('/query/urls', response_model=List[schemas.TestCaseDataOut2], name='查询url数据')
+async def query_urls(url: str = Query(..., min_length=5), db: Session = Depends(get_db)):
+    return await crud.get_urls(db=db, url=url) or await response_code.resp_404()
+
+
+@case_service.put('/update/urls', response_model=List[schemas.TestCaseDataOut2], name='批量修改url')
+async def update_urls(old_url: str = Query(..., min_length=5),
+                      new_url: str = Query(..., min_length=5),
+                      db: Session = Depends(get_db)):
+    return await crud.update_urls(db=db, old_url=old_url, new_url=new_url) or await response_code.resp_404()

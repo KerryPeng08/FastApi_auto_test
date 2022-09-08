@@ -36,7 +36,7 @@ class TemplateData(Base):
     temp_id = Column(Integer, ForeignKey('case_template.id'))
     number = Column(Integer, nullable=False, comment='序号')
     host = Column(String, nullable=False, comment='域名')
-    path = Column(String, nullable=False, comment='接口路径')
+    path = Column(String, nullable=False, index=True, comment='接口路径')
     code = Column(Integer, nullable=False, comment='响应状态码')
     method = Column(String, nullable=False, comment='请求方法')
     params = Column(JSON, comment='请求参数数据')

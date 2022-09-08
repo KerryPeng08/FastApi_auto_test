@@ -30,7 +30,7 @@ async def run_case_name(request: Request, case_id: int, db: Session = Depends(ge
         case_data = await case_crud.get_case_data(db=db, case_id=case_info[0].id)
         # 拿到模板数据
         temp_data = await temp_crud.get_template_data(db=db, temp_id=case_info[0].temp_id)
-        # 霸道项目名称、模板名称
+        # 拿到项目名称、模板名称
         temp_info = await temp_crud.get_temp_name(db=db, temp_id=case_info[0].temp_id)
         # 处理数据，执行用例
         try:
@@ -59,7 +59,9 @@ async def run_case_name(request: Request, case_id: int, db: Session = Depends(ge
         )
         load_allure_report(allure_dir=allure_dir, case_id=case_id, run_order=run_order)
 
-        return await response_code.resp_200(data={'allure_report': f'{request.base_url}allure/1'})
+        return await response_code.resp_200(
+            data={'allure_report': f'{request.base_url}allure/{case_id}/{run_order}'}
+        )
     else:
         return await response_code.resp_404()
 

@@ -80,10 +80,7 @@ async def update_name(old_name: str, new_name: str, db: Session = Depends(get_db
     """
     修改模板名称
     """
-    temp_name = await crud.put_temp_name(db=db, old_name=old_name, new_name=new_name)
-    if temp_name:
-        return temp_name
-    return await response_code.resp_404()
+    return await crud.put_temp_name(db=db, old_name=old_name, new_name=new_name) or await response_code.resp_404()
 
 
 @template.delete('/name/del', name='删除模板数据')
@@ -114,10 +111,7 @@ async def get_template_data(temp_name: str, db: Session = Depends(get_db)):
     """
     按模板名称查询接口原始数据
     """
-    template_data = await crud.get_template_data(db=db, temp_name=temp_name)
-    if template_data:
-        return template_data
-    return await response_code.resp_404()
+    return await crud.get_template_data(db=db, temp_name=temp_name) or await response_code.resp_404()
 
 
 @template.get('/download/excel', name='下载模板数据-excel', deprecated=True, include_in_schema=False)

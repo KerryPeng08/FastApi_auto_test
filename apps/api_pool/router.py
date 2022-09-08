@@ -96,7 +96,7 @@ async def get_project_data(
         group_name=group_name,
         project_name=project_name,
         project_id=project_id
-    )
+    ) or await response_code.resp_404()
 
 
 @pool.get('/project/api/data', response_model=List[schemas.YApiDataOut], name='获取单项目中的接口数据')

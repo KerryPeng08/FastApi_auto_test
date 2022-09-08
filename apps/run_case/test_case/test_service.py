@@ -62,7 +62,6 @@ class TestService:
     )
     async def test_service(self, num: int, url: str, method: str, params: dict, data: dict, expect: dict, actual: dict,
                            response: dict, description: str, config: dict, headers: dict):
-        # allure.dynamic.title(f"${str(num).rjust(3, '0')}-{description}\n{url}")
         allure.dynamic.title(f"{description}\n{url}")
 
         for k, v in expect.items():
@@ -76,7 +75,7 @@ class TestService:
         """
         value = actual_value[k][0] if actual_value[k] else actual_value[k]
 
-        allure.attach(f"expect: {v}，actual: {value}", f'校验内容: {k}')
+        allure.attach(f"期望: {v}，实际: {value}", f'校验内容: {k}')
         if isinstance(v, (str, int, float, bool, dict)):
             assert v == value
 

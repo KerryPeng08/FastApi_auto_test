@@ -114,3 +114,35 @@ async def get_case(db: Session, temp_id: int):
     :return:
     """
     return db.query(models.TestCase).filter(models.TestCase.temp_id == temp_id).first()
+
+
+async def get_urls(db: Session, url: str):
+    """
+    模糊查询url
+    :param db:
+    :param url:
+    :return:
+    """
+    return db.query(models.TestCaseData).filter(models.TestCaseData.path.like(f"%{url}%")).all()
+
+
+async def update_urls(db: Session, old_url: str, new_url: str):
+    """
+    按url查询数据
+    :param db:
+    :param old_url:
+    :param new_url:
+    :return:
+    """
+    if not await get_urls(db=db, url=old_url):
+        return None
+
+    db_info = db.query(models.TestCaseData).filter(models.TestCaseData.path.like(f"%{old_url}%")).all()
+
+    url_info = []
+    for info in db_info:
+        info.path = new_url
+        db.commit()
+        db.refresh(info)
+        url_info.append(info)
+    return url_info

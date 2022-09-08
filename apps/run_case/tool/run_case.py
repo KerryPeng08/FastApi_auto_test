@@ -53,7 +53,7 @@ class RunCase:
             logger.info(f"{'=' * 30}开始请求{num}{'=' * 30}")
             try:
                 # 识别url表达式
-                url = await self._replace_rul(old_str=f"{temp_data[num].host}{case_data[num].path}", response=response)
+                url = await self._replace_url(old_str=f"{temp_data[num].host}{case_data[num].path}", response=response)
                 # 识别params表达式
                 params = await self._replace_params_data(data=case_data[num].params, response=response)
                 # 识别data表达式
@@ -96,7 +96,7 @@ class RunCase:
             request_info['response'] = res_json
             response.append(res_json)
 
-            # 判断响应结果，调整交易内容收集
+            # 判断响应结果，调整校验内容收集
             if res.status_code != case_data[num].check['status_code']:
                 request_info['actual'] = {'status_code': [res.status_code]}
             else:
@@ -125,7 +125,7 @@ class RunCase:
         return f"{temp_pro}-{temp_name}-{case_info.case_name}", case_info.run_order
 
     @staticmethod
-    async def _replace_rul(old_str: str, response: list) -> str:
+    async def _replace_url(old_str: str, response: list) -> str:
         """
         替换url的值
         :param old_str:
