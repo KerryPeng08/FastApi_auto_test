@@ -182,9 +182,12 @@ class RunCase:
                         replace_value: str = re.compile(r'{(.*?)}', re.S).findall(data_json[key])[0]
                         try:
                             func, param = replace_value.split('.', 1)
-                            if func and param:
-                                value = faker.faker_data(func=func, param=param)
-                                data_json[key] = re.sub(r'{(.*?)}', value, data_json[key]) if value else data_json[key]
+                            value = faker.faker_data(func=func, param=param)
+                            if value:
+                                try:
+                                    target[key] = int(re.sub(r'{(.*?)}', str(value), data_json[key]))
+                                except ValueError:
+                                    target[key] = re.sub(r'{(.*?)}', str(value), data_json[key])
                             else:
                                 target[key] = data_json[key]
                         except ValueError:

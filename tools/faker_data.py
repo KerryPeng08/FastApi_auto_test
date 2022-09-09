@@ -14,25 +14,25 @@ from faker import Faker
 
 class FakerData:
 
-    def __init__(self):
+    def __init__(self, *_):
         self._faker = Faker(locale='zh_CN')
 
-    def _name(self) -> str:
+    def _name(self, *_) -> str:
         return self._faker.name_female()
 
-    def _ssn(self, min_age: int = 18, max_age: int = 50) -> int:
-        return self._faker.ssn(min_age=min_age, max_age=max_age)
+    def _ssn(self, *_) -> int:
+        return self._faker.ssn(min_age=18, max_age=50)
 
-    def _phone_number(self) -> int:
+    def _phone_number(self, *_) -> int:
         return self._faker.phone_number()
 
-    def _credit_card_number(self) -> int:
+    def _credit_card_number(self, *_) -> int:
         return self._faker.credit_card_number()
 
-    def _city(self) -> str:
+    def _city(self, *_) -> str:
         return self._faker.city()
 
-    def _address(self) -> str:
+    def _address(self, *_) -> str:
         return self._faker.address()[:-7]
 
     @staticmethod
