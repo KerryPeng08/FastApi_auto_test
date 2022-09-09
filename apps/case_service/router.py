@@ -109,7 +109,7 @@ async def test_case_upload_json(temp_name: str, file: UploadFile,
 
 
 @case_service.get('/data/{case_id}', response_model=List[schemas.TestCaseDataOut2], name='查看用例测试数据')
-async def case_data(case_id: int, db: Session = Depends(get_db)):
+async def case_data_info(case_id: int, db: Session = Depends(get_db)):
     """
     查看测试数据
     """
@@ -130,7 +130,9 @@ async def query_urls(url: str = Query(..., min_length=5), db: Session = Depends(
 
 
 @case_service.put('/update/urls', response_model=List[schemas.TestCaseDataOut2], name='批量修改url')
-async def update_urls(old_url: str = Query(..., min_length=5),
-                      new_url: str = Query(..., min_length=5),
-                      db: Session = Depends(get_db)):
+async def update_urls(
+        old_url: str = Query(..., min_length=5),
+        new_url: str = Query(..., min_length=5),
+        db: Session = Depends(get_db)
+):
     return await crud.update_urls(db=db, old_url=old_url, new_url=new_url) or await response_code.resp_404()

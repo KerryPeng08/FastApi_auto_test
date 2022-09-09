@@ -17,32 +17,34 @@ class FakerData:
     def __init__(self):
         self._faker = Faker(locale='zh_CN')
 
-    def name(self) -> str:
+    def _name(self) -> str:
         return self._faker.name_female()
 
-    def ssn(self, min_age: int = 18, max_age: int = 50) -> int:
+    def _ssn(self, min_age: int = 18, max_age: int = 50) -> int:
         return self._faker.ssn(min_age=min_age, max_age=max_age)
 
-    def phone_number(self) -> int:
+    def _phone_number(self) -> int:
         return self._faker.phone_number()
 
-    def credit_card_number(self) -> int:
+    def _credit_card_number(self) -> int:
         return self._faker.credit_card_number()
 
-    def city(self) -> str:
+    def _city(self) -> str:
         return self._faker.city()
 
-    def address(self) -> str:
+    def _address(self) -> str:
         return self._faker.address()[:-7]
 
     @staticmethod
-    def random_int(length: int) -> int:
+    def _random_int(*args) -> int:
+        length = args[0] if args[0] <= 20 else 20
         i = [str(x) for x in range(9)]
         return int(''.join(random.sample(i, length)))
 
     @staticmethod
-    def time_int(day: int) -> int:
+    def _time_int(*args) -> int:
         now_time = int(time.time())
+        day = args[0]
         if day == 0:
             return now_time * 1000
 
@@ -62,18 +64,25 @@ class FakerData:
 
         return now_time * 1000
 
-    def time_str(self, day: int) -> str:
-        return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.time_int(day=int(day)) // 1000))
+    def _time_str(self, *args) -> str:
+        return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self._time_int(args) // 1000))
 
-
-if __name__ == '__main__':
-    f = FakerData()
-    print(f.name())
-    print(f.ssn())
-    print(f.phone_number())
-    print(f.credit_card_number())
-    print(f.city())
-    print(f.address())
-    print(f.time_int(1))
-    print(f.time_str(1))
-    print(f.random_int(4))
+    def faker_data(self, func: str, param: int) -> (str, int, None):
+        """
+        :param func:
+        :param param:
+        :return:
+        """
+        func_dict = {
+            'name': self._name,
+            'ssn': self._ssn,
+            'phone_number': self._phone_number,
+            'credit_card_number': self._credit_card_number,
+            'city': self._city,
+            'address': self._address,
+            'random_int': self._random_int,
+            'time_int': self._time_int,
+            'time_str': self._time_str,
+        }
+        if func_dict.get(func):
+            return func_dict[func](param)

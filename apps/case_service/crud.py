@@ -123,7 +123,7 @@ async def get_urls(db: Session, url: str):
     :param url:
     :return:
     """
-    return db.query(models.TestCaseData).filter(models.TestCaseData.path.like(f"%{url}%")).all()
+    return db.query(models.TestCaseData).filter(models.TestCaseData.path.like(f"{url}%")).all()
 
 
 async def update_urls(db: Session, old_url: str, new_url: str):
@@ -137,7 +137,7 @@ async def update_urls(db: Session, old_url: str, new_url: str):
     if not await get_urls(db=db, url=old_url):
         return None
 
-    db_info = db.query(models.TestCaseData).filter(models.TestCaseData.path.like(f"%{old_url}%")).all()
+    db_info = db.query(models.TestCaseData).filter(models.TestCaseData.path.like(f"{old_url}%")).all()
 
     url_info = []
     for info in db_info:

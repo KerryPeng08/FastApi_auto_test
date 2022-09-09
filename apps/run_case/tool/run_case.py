@@ -16,19 +16,21 @@ import asyncio
 import jsonpath
 # import ujson
 import requests
-from requests import exceptions
 from typing import List
+from requests import exceptions
+from sqlalchemy.orm import Session
+from tools import logger, get_cookie
+from tools.faker_data import FakerData
 from apps.template import schemas as temp
 from apps.case_service import schemas as service
-from tools import logger, get_cookie
 from apps.run_case import crud
-from sqlalchemy.orm import Session
 
 
 class RunCase:
     def __init__(self):
         # self.sees = aiohttp.client.ClientSession(json_serialize=ujson.dumps)
         self.cookies = None
+        self.fk = FakerData()
 
     async def fo_service(
             self,
@@ -55,9 +57,9 @@ class RunCase:
                 # 识别url表达式
                 url = await self._replace_url(old_str=f"{temp_data[num].host}{case_data[num].path}", response=response)
                 # 识别params表达式
-                params = await self._replace_params_data(data=case_data[num].params, response=response)
+                params = await self._replace_params_data(data=case_data[num].params, response=response, faker=self.fk)
                 # 识别data表达式
-                data = await self._replace_params_data(data=case_data[num].data, response=response)
+                data = await self._replace_params_data(data=case_data[num].data, response=response, faker=self.fk)
             except IndexError:
                 raise IndexError(f'参数提取错误, 请检查用例编号: {num} 的提取表达式')
             # 替换headers中的内容
@@ -142,7 +144,7 @@ class RunCase:
         return old_str
 
     @staticmethod
-    async def _replace_params_data(data: dict, response: list) -> dict:
+    async def _replace_params_data(data: dict, response: list, faker: FakerData) -> dict:
         """
         替换params和data的值
         :param data:
@@ -169,13 +171,24 @@ class RunCase:
 
                 if isinstance(data_json[key], str):
                     if "{{" in data_json[key] and "$" in data_json[key] and "}}" in data_json[key]:
-                        replace_value = re.compile(r'{{(.*?)}}', re.S).findall(data_json[key])[0]
+                        replace_value: str = re.compile(r'{{(.*?)}}', re.S).findall(data_json[key])[0]
                         num, json_path = replace_value.split('.', 1)
                         value = jsonpath.jsonpath(response[int(num)], json_path)
                         if value:
                             target[key] = value[0]
                         else:
                             target[key] = value
+                    elif "{" in data_json[key] and "}" in data_json[key]:
+                        replace_value: str = re.compile(r'{(.*?)}', re.S).findall(data_json[key])[0]
+                        try:
+                            func, param = replace_value.split('.', 1)
+                            if func and param:
+                                value = faker.faker_data(func=func, param=param)
+                                data_json[key] = re.sub(r'{(.*?)}', value, data_json[key]) if value else data_json[key]
+                            else:
+                                target[key] = data_json[key]
+                        except ValueError:
+                            target[key] = data_json[key]
                     else:
                         target[key] = data_json[key]
                 else:

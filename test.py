@@ -139,4 +139,9 @@ def load_allure_reports(allure_dir: str):
             print(f)
 
 
-load_allure_reports(ALLURE_PATH)
+# load_allure_reports(ALLURE_PATH)
+
+import re
+a = 'asda,{sda}'
+print(re.compile(r'{(.*?)}', re.S).findall(a)[0])
+print(re.sub(r'{(.*?)}', 'aa', a))
