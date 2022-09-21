@@ -31,7 +31,7 @@ class CheckJson:
         if temp_info[0].api_count != len(case_data):
             return ['用例api数量与模板api数量不一致']
 
-        keys = ['headers', 'params', 'data', 'check', 'description', 'config']
+        keys = ['number', 'path', 'headers', 'params', 'data', 'file', 'check', 'description', 'config']
         msg_list = []
         for x in range(len(case_data)):
             # 校验字段

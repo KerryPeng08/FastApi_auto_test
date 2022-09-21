@@ -39,6 +39,7 @@ class GenerateCase:
                 'headers': {},
                 'params': params,
                 'data': data,
+                'file': True if template_data[num].file else False,
                 'check': {'status_code': template_data[num].code},
                 'description': '',
                 'config': {

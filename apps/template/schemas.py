@@ -68,6 +68,8 @@ class TemplateDataIn(BaseModel):
     params: Optional[dict] = {}
     json_body: str
     data: Optional[dict] = {}
+    file: bool
+    file_data: Optional[list] = []
     headers: Optional[dict] = {}
     response: Optional[dict] = {}
 

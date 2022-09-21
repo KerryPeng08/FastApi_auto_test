@@ -7,7 +7,7 @@
 @Time: 2022/8/20-21:59
 """
 
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, func, JSON
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, func, JSON, Boolean
 from tools.database import Base
 
 
@@ -41,10 +41,10 @@ class TestCaseData(Base):
     headers = Column(JSON, comment='请求头测试数据')
     params = Column(JSON, comment='请求参数测试数据')
     data = Column(JSON, comment='json/表单 测试数据')
+    file = Column(Integer, comment='是否有附件')
     check = Column(JSON, comment='测试数据校验字段')
     description = Column(String, comment='用例描述')
     config = Column(JSON, comment='用例配置')
-
     created_at = Column(DateTime, server_default=func.now(), comment='创建时间')
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), comment='更新时间')
 

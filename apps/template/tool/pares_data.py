@@ -50,6 +50,8 @@ class ParseData:
 
             if 'application/json' in str(data['response']['content'].get('mimeType')):
                 res_data = json.loads(base64.b64decode(data['response']['content']['text'].encode('utf-8')))
+            elif 'text/json' in str(data['response']['content'].get('mimeType')):
+                res_data = json.loads(data['response']['content']['text'])
             else:
                 res_data = {}
 
@@ -60,8 +62,10 @@ class ParseData:
                 'code': data['response']['status'],
                 'method': data['request']['method'],
                 'params': query,
-                'json_body': body_json[0],
-                'data': body_json[1],
+                'json_body': body_json[0] if body_json[0] == 'json' else 'body',
+                'data': body_json[1] if body_json[0] == 'json' else {},
+                'file': True if body_json[0] == 'file' else False,
+                'file_data': body_json[1] if body_json[0] == 'file' else [],
                 'headers': {header['name']: header['value'] for header in data['request']['headers']},
                 'response': res_data,
             }
@@ -83,7 +87,7 @@ class ParseData:
         if 'application/json' in post_data['mimeType']:
             return ['json', json.loads(post_data['text'])]
 
-        # if 'multipart/form-data' in post_data['mimeType']:
-        #     return ['files', post_data['text']]
+        if 'multipart/form-data' in post_data['mimeType']:
+            return ['file', post_data['params']]
 
         return ['other', {}]

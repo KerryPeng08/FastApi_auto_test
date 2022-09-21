@@ -119,16 +119,23 @@ async def put_temp_name(db: Session, old_name: str, new_name: str):
         return db_temp
 
 
-async def del_template_data(db: Session, temp_name: str):
+async def del_template_data(db: Session, temp_name: str = None, temp_id: int = None):
     """
     删除模板数据
     :param db:
     :param temp_name:
+    :param temp_id:
     :return:
     """
-    db_temp = db.query(models.Template).filter(models.Template.temp_name == temp_name).first()
+    db_temp = None
+    if temp_name:
+        db_temp = db.query(models.Template).filter(models.Template.temp_name == temp_name).first()
+
+    if temp_id:
+        db_temp = db.query(models.Template).filter(models.Template.id == temp_id).first()
+
     if db_temp:
-        db.query(models.Template).filter(models.Template.temp_name == temp_name).delete()
         db.query(models.TemplateData).filter(models.TemplateData.temp_id == db_temp.id).delete()
+        db.query(models.Template).filter(models.Template.id == db_temp.id).delete()
         db.commit()
         return db_temp

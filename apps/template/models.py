@@ -42,6 +42,8 @@ class TemplateData(Base):
     params = Column(JSON, comment='请求参数数据')
     json_body = Column(String, nullable=False, comment='json格式/表单格式')
     data = Column(JSON, comment='json/表单 数据')
+    file = Column(Integer, default=0, comment='是否有附件')
+    file_data = Column(JSON, comment='文件数据')
     headers = Column(JSON, comment='请求头')
     response = Column(JSON, comment='响应数据')
 

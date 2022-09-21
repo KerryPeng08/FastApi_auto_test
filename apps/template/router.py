@@ -98,15 +98,17 @@ async def delete_name(temp_name: str = None, temp_id: int = None, db: Session = 
         if case_info:
             return await response_code.resp_400(message='模板下还存在用例')
         else:
-            template_data = await crud.del_template_data(db=db, temp_name=temp_name)
-        if template_data:
-            return await response_code.resp_200(message='删除成功')
+            template_data = await crud.del_template_data(db=db, temp_id=temp_info[0].id)
+            if template_data:
+                return await response_code.resp_200(message='删除成功')
+            else:
+                return await response_code.resp_400()
     else:
         return await response_code.resp_404()
 
 
 @template.get('/data/list', response_model=List[schemas.TemplateDataOut], response_model_exclude_unset=True,
-              response_model_exclude=['headers'], name='查询模板接口原始数据')
+              response_model_exclude=['headers', 'file_data'], name='查询模板接口原始数据')
 async def get_template_data(temp_name: str, db: Session = Depends(get_db)):
     """
     按模板名称查询接口原始数据

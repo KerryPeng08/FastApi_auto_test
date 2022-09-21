@@ -51,6 +51,7 @@ class TestCaseDataIn(BaseModel):
     headers: Optional[dict] = {}
     params: Optional[dict] = {}
     data: Optional[dict] = {}
+    file: bool
     check: Optional[dict] = {}
     description: str
     config: TestCaseConfig
@@ -65,6 +66,7 @@ class TestCaseData(BaseModel):
     headers: Optional[dict] = {}
     params: Optional[dict] = {}
     data: Optional[dict] = {}
+    file: bool
     check: Optional[dict] = {}
     description: str
     config: TestCaseConfig
@@ -90,6 +92,7 @@ class TestCaseDataOut2(BaseModel):
     headers: Optional[dict] = {}
     params: Optional[dict] = {}
     data: Optional[dict] = {}
+    file: bool
     check: Optional[dict] = {}
     description: str
     config: TestCaseConfig

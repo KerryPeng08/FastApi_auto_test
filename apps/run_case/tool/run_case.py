@@ -51,7 +51,7 @@ class RunCase:
         response = []
 
         result = []
-        for num in range(len(temp_data) - 20):
+        for num in range(len(temp_data)):
             logger.info(f"{'=' * 30}开始请求{num}{'=' * 30}")
             try:
                 # 识别url表达式
@@ -71,6 +71,13 @@ class RunCase:
                 'headers': headers,
                 'params': params,
                 f"{'json' if temp_data[num].json_body == 'json' else 'data'}": data,
+                'files': {
+                    "file": (
+                        temp_data[num].file_data[0]['fileName'],
+                        temp_data[num].file_data[0]['value'],
+                        temp_data[num].file_data[0]['contentType']
+                    )
+                } if temp_data[num].file else None
             }
 
             config = case_data[num].config
