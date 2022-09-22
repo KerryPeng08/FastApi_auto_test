@@ -10,6 +10,7 @@
 import os
 import json
 import time
+import shutil
 from typing import List
 from fastapi import APIRouter, UploadFile, Depends, Query
 from sqlalchemy.orm import Session
@@ -19,6 +20,7 @@ from depends import get_db
 from apps import response_code
 from tools.check_case_json import CheckJson
 from tools import OperationJson
+from setting import ALLURE_PATH
 
 from apps.template import crud as temp_crud
 from apps.case_service import crud, schemas
@@ -121,6 +123,7 @@ async def del_case(case_id: int, db: Session = Depends(get_db)):
     if not await crud.get_case_name(db=db, case_id=case_id):
         return await response_code.resp_404()
     await crud.del_case_data(db=db, case_id=case_id)
+    shutil.rmtree(f"{ALLURE_PATH}/{case_id}", ignore_errors=True)
     return await response_code.resp_200(message=f'用例{case_id}删除成功')
 
 

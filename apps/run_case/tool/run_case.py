@@ -195,7 +195,10 @@ class RunCase:
                     elif "{" in data_json[key] and "}" in data_json[key]:
                         replace_value: str = re.compile(r'{(.*?)}', re.S).findall(data_json[key])[0]
                         try:
-                            func, param = replace_value.split('.', 1) if '.' in replace_value else replace_value, 1
+                            if '.' in replace_value:
+                                func, param = replace_value.split('.', 1)
+                            else:
+                                func, param = replace_value, 1
                             value = faker.faker_data(func=func, param=param)
                             if value:
                                 value = re.sub(r'{(.*?)}', str(value), data_json[key])
