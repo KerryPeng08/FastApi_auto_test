@@ -17,6 +17,7 @@ import asyncio
 import jsonpath
 # import ujson
 import requests
+from requests.exceptions import RequestException
 from typing import List
 from requests import exceptions
 from sqlalchemy.orm import Session
@@ -82,7 +83,7 @@ class RunCase:
                 )
             } if temp_data[num].file else None
 
-            config = case_data[num].config
+            config = copy.deepcopy(case_data[num].config)
 
             if self.cookies:
                 request_info['headers']['Cookie'] = self.cookies
@@ -93,8 +94,14 @@ class RunCase:
 
             logger.info(f"请求信息: {json.dumps(request_info, indent=2, ensure_ascii=False)}")
 
-            # async with self.sees.request(**request_info, allow_redirects=False) as res:
-            res = requests.request(**request_info, files=files, allow_redirects=False)
+            # 轮询执行接口
+            res = await self.polling(
+                sleep=config['sleep'],
+                check=case_data[num].check,
+                request_info=request_info,
+                files=files
+            )
+
             if config['is_login']:
                 self.cookies = await get_cookie(rep_type='requests', response=res)
             logger.info(f"状态码: {res.status_code}")
@@ -123,6 +130,7 @@ class RunCase:
                     **{k: jsonpath.jsonpath(res_json, f'$..{k}') for k in new_check}
                 }
 
+            config['sleep'] = 0.3
             await asyncio.sleep(config['sleep'])
             result.append(request_info)
             logger.info(f"响应信息: {json.dumps(res_json, indent=2, ensure_ascii=False)}")
@@ -139,6 +147,90 @@ class RunCase:
         })
         logger.info(f"用例: {temp_pro}-{temp_name}-{case_info.case_name} 执行完成, 进行结果校验, 序号: {case_info.run_order}")
         return f"{temp_pro}-{temp_name}-{case_info.case_name}", case_info.run_order
+
+    @staticmethod
+    async def polling(sleep: int, check: dict, request_info: dict, files):
+        """
+        轮询执行接口
+        :param sleep:
+        :param check:
+        :param request_info:
+        :param files:
+        :return:
+        """
+
+        check = copy.deepcopy(check)
+        del check['status_code']
+
+        num = 1
+        while True:
+            # async with self.sees.request(**request_info, allow_redirects=False) as res:
+            res = requests.request(**request_info, files=files, allow_redirects=False)
+            if sleep < 5:
+                break
+
+            logger.info(f"循环{num + 1}次: {request_info['url']}")
+            if res.status_code != 200:
+                logger.error(f"状态码: {res.status_code}")
+                break
+            try:
+                res_json = res.json()
+            except RequestException as e:
+                logger.error(f"错误信息: {str(e)}")
+                break
+
+            result = []
+            for k, v in check.items():
+                # 获取需要的值
+                value = jsonpath.jsonpath(res_json, f'$..{k}')
+
+                if value:
+                    value = value[0]
+                else:
+                    break
+
+                if isinstance(v, (str, int, float, bool, dict)):
+                    if v == value:
+                        result.append({k: value})
+                    continue
+
+                if isinstance(v, list):
+                    if v[0] == '<':
+                        if value < v[1]:
+                            result.append({k: value})
+                    elif v[0] == '<=':
+                        if value <= v[1]:
+                            result.append({k: value})
+                    elif v[0] == '==':
+                        if value == v[1]:
+                            result.append({k: value})
+                    elif v[0] == '!=':
+                        if value != v[1]:
+                            result.append({k: value})
+                    elif v[0] == '>=':
+                        if value >= v[1]:
+                            result.append({k: value})
+                    elif v[0] == '>':
+                        if value > v[1]:
+                            result.append({k: value})
+                    elif v[0] == 'in':
+                        if value in v[1]:
+                            result.append({k: value})
+                    elif v[0] == 'not in':
+                        if value not in v[1]:
+                            result.append({k: value})
+                    elif v[0] == 'notin':
+                        if value not in v[1]:
+                            result.append({k: value})
+            logger.info(f"匹配结果: {result}")
+            if len(result) == len(check):
+                break
+
+            await asyncio.sleep(5)
+            sleep -= 5
+            num += 1
+
+        return res
 
     @staticmethod
     async def _replace_url(old_str: str, response: list) -> str:
