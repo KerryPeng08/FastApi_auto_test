@@ -28,12 +28,12 @@ app = FastAPI(
     title='一个基于FastApi实现的纯后端 接口测试平台'
 )
 
-app.include_router(pool, prefix='/YApi', tags=['YApi接口池'])
 app.include_router(template, prefix='/template', tags=['测试场景'])
 app.include_router(case_service, prefix='/caseService', tags=['业务接口测试用例'])
 app.include_router(case_ddt, prefix='/caseDdt', tags=['数据驱动测试用例'])
 app.include_router(case_perf, prefix='/casePerf', tags=['性能测试用例'])
 app.include_router(run_case, prefix='/runCase', tags=['执行测试'])
+app.include_router(pool, prefix='/YApi', tags=['YApi接口池'])
 
 
 # 测试报告路径

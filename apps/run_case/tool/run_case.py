@@ -11,6 +11,7 @@ import re
 import time
 import copy
 import json
+import base64
 import asyncio
 # import aiohttp
 import jsonpath
@@ -71,29 +72,35 @@ class RunCase:
                 'headers': headers,
                 'params': params,
                 f"{'json' if temp_data[num].json_body == 'json' else 'data'}": data,
-                'files': {
-                    "file": (
-                        temp_data[num].file_data[0]['fileName'],
-                        temp_data[num].file_data[0]['value'],
-                        temp_data[num].file_data[0]['contentType']
-                    )
-                } if temp_data[num].file else None
             }
+            # 上传附件
+            files = {
+                f"{temp_data[num].file_data[0]['name']}": (
+                    temp_data[num].file_data[0]['fileName'],
+                    base64.b64decode(temp_data[num].file_data[0]['value'].encode('utf-8')),
+                    temp_data[num].file_data[0]['contentType']
+                )
+            } if temp_data[num].file else None
 
             config = case_data[num].config
 
             if self.cookies:
                 request_info['headers']['Cookie'] = self.cookies
 
+            # 由附件时，要删除Content-Type
+            if files:
+                del request_info['headers']['Content-Type']
+
             logger.info(f"请求信息: {json.dumps(request_info, indent=2, ensure_ascii=False)}")
 
             # async with self.sees.request(**request_info, allow_redirects=False) as res:
-            res = requests.request(**request_info, allow_redirects=False)
+            res = requests.request(**request_info, files=files, allow_redirects=False)
             if config['is_login']:
                 self.cookies = await get_cookie(rep_type='requests', response=res)
             logger.info(f"状态码: {res.status_code}")
 
             # 收集结果
+            request_info['file'] = True if temp_data[num].file else False
             request_info['expect'] = case_data[num].check
             request_info['description'] = case_data[num].description
             request_info['config'] = case_data[num].config

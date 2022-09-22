@@ -7,7 +7,7 @@
 @Time: 2022/8/20-21:59
 """
 
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, func, JSON, Boolean
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, func, JSON
 from tools.database import Base
 
 
