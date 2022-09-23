@@ -59,9 +59,29 @@ class GenerateCase:
                     '2.若value数据类型为: string/integer/float/bool/dict, 按 == 直接进行校验',
                     '3.若value数据类型为: list, 索引0应填写比较符: <,<=,==,!=,>=,>,in,not in; 索引1填写比较的值'
                 ]},
-                'description: 用例描述信息',
+                'description: 单接口用例描述信息',
                 'mode: 运行模式, 支持: service/ddt/perf',
-                'config: 单接口的配置信息'
+                'config: 单接口的配置信息',
+                {'假数据工具': {
+                    'name': '名称',
+                    'ssn': '身份证',
+                    'phone_number': '电话',
+                    'credit_card_number': '银行卡',
+                    'city': '城市',
+                    'address': '地址',
+                    'random_int': {
+                        ':param 1': '长度为1的随机数字',
+                        ':param 5': '长度为5的随机数字'
+                    },
+                    'time_int': {
+                        ':param 0': '当前时间',
+                        ':param -1': '当前时间前一天',
+                        ':param 1': '当前时间后一天',
+                        ':param -2': '前一天00:00:00',
+                        ':param 2': '后一天23:59:59',
+                    },
+                    'time_str': '时间字符串, 同上',
+                }}
             ],
             'temp_name': temp_name,
             'mode': mode,
