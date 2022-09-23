@@ -25,13 +25,9 @@ run_case = APIRouter()
 
 
 @run_case.post('/', name='按用例执行')
-async def run_case_name(request: Request, case_id: int = None, case_ids: List[int] = None,
-                        db: Session = Depends(get_db)):
-    if not case_id and not case_ids:
+async def run_case_name(request: Request, case_ids: List[int], db: Session = Depends(get_db)):
+    if not case_ids:
         return await response_code.resp_400()
-
-    if case_id:
-        case_ids = [case_id]
 
     report = []
     for case_id in case_ids:
