@@ -57,7 +57,7 @@ async def upload_file_har(temp_name: str, project_name: schemas.TempEnum, file: 
                name='上传Charles的har文件-仅解析-不写入', response_model_exclude=['headers', 'file_data', 'response'])
 async def analysis_file_har(file: UploadFile):
     """
-    仅解析charles数据，不返回['headers', 'file_data', 'response']\n
+    仅解析Charles数据，不返回['headers', 'file_data', 'response']\n
     用于同一接口多次使用时，查看请求数据的不同处
     """
     if file.content_type != 'application/har+json':
