@@ -26,7 +26,7 @@ template = APIRouter()
 
 
 @template.post('/upload/har', response_model=schemas.TemplateOut, response_model_exclude_unset=True,
-               name='上传Charles的har文件')
+               name='上传Charles的har文件-先解析-再写入')
 async def upload_file_har(temp_name: str, project_name: schemas.TempEnum, file: UploadFile,
                           db: Session = Depends(get_db)):
     """
@@ -51,6 +51,19 @@ async def upload_file_har(temp_name: str, project_name: schemas.TempEnum, file: 
     for temp in temp_info:
         await crud.create_template_data(db=db, data=schemas.TemplateDataIn(**temp), temp_id=db_template.id)
     return await crud.update_template(db=db, temp_name=db_template.temp_name, api_count=len(temp_info))
+
+
+@template.post('/analysis/har', response_model=List[schemas.TemplateDataIn], response_model_exclude_unset=True,
+               name='上传Charles的har文件-仅解析-不写入', response_model_exclude=['headers', 'file_data', 'response'])
+async def analysis_file_har(file: UploadFile):
+    """
+    仅解析charles数据，不返回['headers', 'file_data', 'response']\n
+    用于同一接口多次使用时，查看请求数据的不同处
+    """
+    if file.content_type != 'application/har+json':
+        return await response_code.resp_400(message=f'文件类型错误，只支持har格式文件')
+
+    return await ParseData.pares_data(har_data=file.file.read())
 
 
 @template.get('/name/list', response_model=List[schemas.TempTestCase], response_model_exclude_unset=True, name='查询模板数据')
@@ -121,7 +134,7 @@ async def delete_name(temp_name: str = None, temp_id: int = None, db: Session = 
               response_model_exclude=['headers', 'file_data'], name='查询模板接口原始数据')
 async def get_template_data(temp_name: str, db: Session = Depends(get_db)):
     """
-    按模板名称查询接口原始数据
+    按模板名称查询接口原始数据，不返回['headers', 'file_data']
     """
     return await crud.get_template_data(db=db, temp_name=temp_name) or await response_code.resp_404()
 
