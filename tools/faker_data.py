@@ -37,14 +37,17 @@ class FakerData:
 
     @staticmethod
     def _random_int(*args) -> int:
-        length = args[0] if args[0] <= 20 else 20
+        length = int(args[0]) if int(args[0]) <= 20 else 20
         i = [str(x) for x in range(9)]
         return int(''.join(random.sample(i, length)))
 
     @staticmethod
     def _time_int(*args) -> int:
         now_time = int(time.time())
-        day = args[0]
+        if isinstance(args, tuple):
+            day = args[0]
+        else:
+            day = args
         if day == 0:
             return now_time * 1000
 
@@ -65,7 +68,7 @@ class FakerData:
         return now_time * 1000
 
     def _time_str(self, *args) -> str:
-        return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self._time_int(args) // 1000))
+        return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self._time_int(args[0]) // 1000))
 
     def faker_data(self, func: str, param: int) -> (str, int, None):
         """

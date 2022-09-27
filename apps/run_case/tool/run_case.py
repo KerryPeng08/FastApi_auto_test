@@ -291,6 +291,12 @@ class RunCase:
                                 func, param = replace_value.split('.', 1)
                             else:
                                 func, param = replace_value, 1
+
+                            try:
+                                param = int(param)
+                            except TypeError:
+                                param = 1
+
                             value = faker.faker_data(func=func, param=param)
                             if value:
                                 value = re.sub(r'{(.*?)}', str(value), data_json[key])
