@@ -146,3 +146,35 @@ async def update_urls(db: Session, old_url: str, new_url: str):
         db.refresh(info)
         url_info.append(info)
     return url_info
+
+
+async def get_api_info(db: Session, case_id: int, number: int):
+    """
+    查询用例api信息
+    :param db:
+    :param case_id:
+    :param number:
+    :return:
+    """
+    return db.query(models.TestCaseData).filter(
+        models.TestCaseData.case_id == case_id,
+        models.TestCaseData.number == number
+    ).first()
+
+
+async def update_api_info(db: Session, api_info: schemas.TestCaseDataOut1):
+    """
+    修改用例api信息
+    :param db:
+    :param api_info:
+    :return:
+    """
+    if not await get_api_info(db=db, case_id=api_info.case_id, number=api_info.number):
+        return False
+
+    db.query(models.TestCaseData).filter(
+        models.TestCaseData.case_id == api_info.case_id,
+        models.TestCaseData.number == api_info.number
+    ).update(api_info.dict())
+    db.commit()
+    return True

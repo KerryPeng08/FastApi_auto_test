@@ -85,6 +85,22 @@ class TestCaseDataOut(BaseModel):
         orm_mode = True
 
 
+class TestCaseDataOut1(BaseModel):
+    number: int
+    case_id: int
+    path: str
+    headers: Optional[dict] = {}
+    params: Optional[dict] = {}
+    data: Optional[dict] = {}
+    file: bool
+    check: Optional[dict] = {}
+    description: str
+    config: TestCaseConfig
+
+    class Config:
+        orm_mode = True
+
+
 class TestCaseDataOut2(BaseModel):
     number: int
     case_id: int
@@ -96,6 +112,8 @@ class TestCaseDataOut2(BaseModel):
     check: Optional[dict] = {}
     description: str
     config: TestCaseConfig
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         orm_mode = True

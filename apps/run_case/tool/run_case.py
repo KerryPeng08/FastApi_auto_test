@@ -165,7 +165,7 @@ class RunCase:
         num = 1
         while True:
             # async with self.sees.request(**request_info, allow_redirects=False) as res:
-            res = requests.request(**request_info, files=files, allow_redirects=False)
+            res = requests.request(**request_info, files=files, allow_redirects=False, timeout=60)
             if sleep < 5:
                 break
 

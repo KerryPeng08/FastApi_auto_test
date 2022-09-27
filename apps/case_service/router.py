@@ -139,3 +139,16 @@ async def update_urls(
         db: Session = Depends(get_db)
 ):
     return await crud.update_urls(db=db, old_url=old_url, new_url=new_url) or await response_code.resp_404()
+
+
+@case_service.get('/query/api/info', response_model=schemas.TestCaseDataOut1, name='按用例/序号查看API数据')
+async def get_api_info(case_id: int, number: int, db: Session = Depends(get_db)):
+    return await crud.get_api_info(db=db, case_id=case_id, number=number) or await response_code.resp_404()
+
+
+@case_service.put('/update/api/info', name='按用例/序号修改API数据')
+async def put_api_info(api_info: schemas.TestCaseDataOut1, db: Session = Depends(get_db)):
+    if await crud.update_api_info(db=db, api_info=api_info):
+        return await response_code.resp_200()
+    else:
+        return await response_code.resp_404(message='修改失败，未获取到内容')
