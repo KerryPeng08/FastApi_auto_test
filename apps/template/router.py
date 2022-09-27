@@ -40,7 +40,17 @@ async def upload_file_har(temp_name: str, project_name: schemas.TempEnum, file: 
     if await crud.get_temp_name(db=db, temp_name=temp_name):
         return await response_code.resp_400(message=f'模板名称已存在')
 
-    return await ParseData.pares_data(db=db, temp_name=temp_name, project_name=project_name, har_data=file.file.read())
+    # 解析数据，拿到解析结果
+    temp_info = await ParseData.pares_data(
+        har_data=file.file.read()
+    )
+
+    # 创建主表数据
+    db_template = await crud.create_template(db=db, temp_name=temp_name, project_name=project_name)
+    # 批量写入数据
+    for temp in temp_info:
+        await crud.create_template_data(db=db, data=schemas.TemplateDataIn(**temp), temp_id=db_template.id)
+    return await crud.update_template(db=db, temp_name=db_template.temp_name, api_count=len(temp_info))
 
 
 @template.get('/name/list', response_model=List[schemas.TempTestCase], response_model_exclude_unset=True, name='查询模板数据')

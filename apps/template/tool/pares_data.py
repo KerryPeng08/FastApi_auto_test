@@ -9,8 +9,6 @@
 
 import base64
 import json
-from sqlalchemy.orm import Session
-from apps.template import schemas, crud
 
 filter_url = ['application/javascript', 'text/css', 'image/png']
 
@@ -21,11 +19,10 @@ class ParseData:
     """
 
     @classmethod
-    async def pares_data(cls, db: Session, temp_name: str, project_name: schemas, har_data: bytes):
+    async def pares_data(cls, har_data: bytes) -> list:
         data_json = json.loads(har_data.decode('utf-8'))
 
-        db_template = await crud.create_template(db=db, temp_name=temp_name, project_name=project_name)
-
+        temp_info = []
         api_count = 0
         for data in data_json['log']['entries']:
 
@@ -69,10 +66,9 @@ class ParseData:
                 'headers': {header['name']: header['value'] for header in data['request']['headers']},
                 'response': res_data,
             }
-            await crud.create_template_data(db=db, data=schemas.TemplateDataIn(**new_data), temp_id=db_template.id)
             api_count += 1
-
-        return await crud.update_template(db=db, temp_name=db_template.temp_name, api_count=api_count)
+            temp_info.append(new_data)
+        return temp_info
 
     @classmethod
     async def post_data(cls, post_data: dict):
