@@ -30,7 +30,12 @@ from apps.template.tool import GenerateCase
 case_service = APIRouter()
 
 
-@case_service.get('/init/data/list', response_model=schemas.TestCaseDataOut, name='获取预处理后的模板数据')
+@case_service.get(
+    '/init/data/list',
+    response_model=schemas.TestCaseDataOut,
+    response_class=response_code.MyJSONResponse,
+    name='获取预处理后的模板数据'
+)
 async def test_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = Depends(get_db)):
     """
     自动处理部分接口数据上下级关联数据
@@ -47,7 +52,11 @@ async def test_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = D
     return await response_code.resp_404()
 
 
-@case_service.get('/download/init/data/json', response_model=schemas.TestCaseDataOut, name='下载预处理后的模板数据-json')
+@case_service.get(
+    '/download/init/data/json',
+    response_model=schemas.TestCaseDataOut,
+    name='下载预处理后的模板数据-json'
+)
 async def download_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = Depends(get_db)):
     """
     自动处理部分接口上下级关联数据\n
@@ -71,7 +80,12 @@ async def download_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session
     return await response_code.resp_404()
 
 
-@case_service.post('/upload/json', response_model=schemas.TestCaseOut, name='上传测试数据-json')
+@case_service.post(
+    '/upload/json',
+    response_model=schemas.TestCaseOut,
+    response_class=response_code.MyJSONResponse,
+    name='上传测试数据-json'
+)
 async def test_case_upload_json(temp_name: str, file: UploadFile,
                                 case_id: int = None, case_name: str = None, cover: bool = False,
                                 db: Session = Depends(get_db)):
@@ -110,7 +124,12 @@ async def test_case_upload_json(temp_name: str, file: UploadFile,
         return await insert(db=db, case_name=case_name, temp_id=db_temp[0].id, case_data=case_data)
 
 
-@case_service.get('/data/{case_id}', response_model=List[schemas.TestCaseDataOut2], name='查看用例测试数据')
+@case_service.get(
+    '/data/{case_id}',
+    response_model=List[schemas.TestCaseDataOut2],
+    response_class=response_code.MyJSONResponse,
+    name='查看用例测试数据'
+)
 async def case_data_info(case_id: int, db: Session = Depends(get_db)):
     """
     查看测试数据
@@ -118,7 +137,10 @@ async def case_data_info(case_id: int, db: Session = Depends(get_db)):
     return await crud.get_case_data(db=db, case_id=case_id) or await response_code.resp_404()
 
 
-@case_service.delete('/del/{case_id}', name='删除测试数据')
+@case_service.delete(
+    '/del/{case_id}',
+    name='删除测试数据'
+)
 async def del_case(case_id: int, db: Session = Depends(get_db)):
     if not await crud.get_case_name(db=db, case_id=case_id):
         return await response_code.resp_404()
@@ -127,12 +149,22 @@ async def del_case(case_id: int, db: Session = Depends(get_db)):
     return await response_code.resp_200(message=f'用例{case_id}删除成功')
 
 
-@case_service.get('/query/urls', response_model=List[schemas.TestCaseDataOut2], name='查询url数据')
+@case_service.get(
+    '/query/urls',
+    response_model=List[schemas.TestCaseDataOut2],
+    response_class=response_code.MyJSONResponse,
+    name='查询url数据'
+)
 async def query_urls(url: str = Query(..., min_length=5), db: Session = Depends(get_db)):
     return await crud.get_urls(db=db, url=url) or await response_code.resp_404()
 
 
-@case_service.put('/update/urls', response_model=List[schemas.TestCaseDataOut2], name='批量修改url')
+@case_service.put(
+    '/update/urls',
+    response_model=List[schemas.TestCaseDataOut2],
+    response_class=response_code.MyJSONResponse,
+    name='批量修改url'
+)
 async def update_urls(
         old_url: str = Query(..., min_length=5),
         new_url: str = Query(..., min_length=5),
@@ -141,12 +173,20 @@ async def update_urls(
     return await crud.update_urls(db=db, old_url=old_url, new_url=new_url) or await response_code.resp_404()
 
 
-@case_service.get('/query/api/info', response_model=schemas.TestCaseDataOut1, name='按用例/序号查看API数据')
+@case_service.get(
+    '/query/api/info',
+    response_model=schemas.TestCaseDataOut1,
+    response_class=response_code.MyJSONResponse,
+    name='按用例/序号查看API数据'
+)
 async def get_api_info(case_id: int, number: int, db: Session = Depends(get_db)):
     return await crud.get_api_info(db=db, case_id=case_id, number=number) or await response_code.resp_404()
 
 
-@case_service.put('/update/api/info', name='按用例/序号修改API数据')
+@case_service.put(
+    '/update/api/info',
+    name='按用例/序号修改API数据'
+)
 async def put_api_info(api_info: schemas.TestCaseDataOut1, db: Session = Depends(get_db)):
     if await crud.update_api_info(db=db, api_info=api_info):
         return await response_code.resp_200()

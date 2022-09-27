@@ -24,7 +24,11 @@ from tools.load_allure import load_allure_report
 run_case = APIRouter()
 
 
-@run_case.post('/', name='按用例执行')
+@run_case.post(
+    '/',
+    response_class=response_code.MyJSONResponse,
+    name='按用例执行'
+)
 async def run_case_name(request: Request, case_ids: List[int], db: Session = Depends(get_db)):
     if not case_ids:
         return await response_code.resp_400()

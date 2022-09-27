@@ -95,9 +95,10 @@ async def get_template_data(db: Session, temp_name: str = None, temp_id: int = N
     :param temp_id:
     :return:
     """
-    db_temp = db.query(models.Template).filter(models.Template.temp_name == temp_name).first()
-    if db_temp:
-        return db.query(models.TemplateData).filter(models.TemplateData.temp_id == db_temp.id).all()
+    if temp_name:
+        db_temp = db.query(models.Template).filter(models.Template.temp_name == temp_name).first()
+        if db_temp:
+            return db.query(models.TemplateData).filter(models.TemplateData.temp_id == db_temp.id).all()
 
     if temp_id:
         return db.query(models.TemplateData).filter(models.TemplateData.temp_id == temp_id).all()

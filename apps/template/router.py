@@ -25,8 +25,13 @@ from tools import CreateExcel
 template = APIRouter()
 
 
-@template.post('/upload/har', response_model=schemas.TemplateOut, response_model_exclude_unset=True,
-               name='上传Charles的har文件-先解析-再写入')
+@template.post(
+    '/upload/har',
+    response_model=schemas.TemplateOut,
+    response_class=response_code.MyJSONResponse,
+    response_model_exclude_unset=True,
+    name='上传Charles的har文件-先解析-再写入'
+)
 async def upload_file_har(temp_name: str, project_name: schemas.TempEnum, file: UploadFile,
                           db: Session = Depends(get_db)):
     """
@@ -53,8 +58,14 @@ async def upload_file_har(temp_name: str, project_name: schemas.TempEnum, file: 
     return await crud.update_template(db=db, temp_name=db_template.temp_name, api_count=len(temp_info))
 
 
-@template.post('/analysis/har', response_model=List[schemas.TemplateDataIn], response_model_exclude_unset=True,
-               name='上传Charles的har文件-仅解析-不写入', response_model_exclude=['headers', 'file_data', 'response'])
+@template.post(
+    '/analysis/har',
+    response_model=List[schemas.TemplateDataIn],
+    response_class=response_code.MyJSONResponse,
+    response_model_exclude_unset=True,
+    name='上传Charles的har文件-仅解析-不写入',
+    response_model_exclude=['headers', 'file_data', 'response']
+)
 async def analysis_file_har(file: UploadFile):
     """
     仅解析Charles数据，不返回['headers', 'file_data', 'response']\n
@@ -66,7 +77,13 @@ async def analysis_file_har(file: UploadFile):
     return await ParseData.pares_data(har_data=file.file.read())
 
 
-@template.get('/name/list', response_model=List[schemas.TempTestCase], response_model_exclude_unset=True, name='查询模板数据')
+@template.get(
+    '/name/list',
+    response_model=List[schemas.TempTestCase],
+    response_class=response_code.MyJSONResponse,
+    response_model_exclude_unset=True,
+    name='查询模板数据'
+)
 async def get_templates(temp_name: Optional[str] = None, db: Session = Depends(get_db)):
     """
     1、查询已存在的测试模板/场景\n
@@ -98,7 +115,12 @@ async def get_templates(temp_name: Optional[str] = None, db: Session = Depends(g
         return await response_code.resp_404()
 
 
-@template.put('/name/edit', response_model=schemas.TemplateOut, name='修改模板名称')
+@template.put(
+    '/name/edit',
+    response_model=schemas.TemplateOut,
+    response_class=response_code.MyJSONResponse,
+    name='修改模板名称'
+)
 async def update_name(old_name: str, new_name: str, db: Session = Depends(get_db)):
     """
     修改模板名称
@@ -106,7 +128,10 @@ async def update_name(old_name: str, new_name: str, db: Session = Depends(get_db
     return await crud.put_temp_name(db=db, old_name=old_name, new_name=new_name) or await response_code.resp_404()
 
 
-@template.delete('/name/del', name='删除模板数据')
+@template.delete(
+    '/name/del',
+    name='删除模板数据'
+)
 async def delete_name(temp_name: str = None, temp_id: int = None, db: Session = Depends(get_db)):
     """
     删除模板数据
@@ -130,16 +155,33 @@ async def delete_name(temp_name: str = None, temp_id: int = None, db: Session = 
         return await response_code.resp_404()
 
 
-@template.get('/data/list', response_model=List[schemas.TemplateDataOut], response_model_exclude_unset=True,
-              response_model_exclude=['headers', 'file_data'], name='查询模板接口原始数据')
-async def get_template_data(temp_name: str, db: Session = Depends(get_db)):
+@template.get(
+    '/data/list',
+    response_model=List[schemas.TemplateDataOut],
+    response_class=response_code.MyJSONResponse,
+    response_model_exclude_unset=True,
+    response_model_exclude=['headers', 'file_data'],
+    name='查询模板接口原始数据'
+)
+async def get_template_data(temp_name: str = None, temp_id: int = None, db: Session = Depends(get_db)):
     """
     按模板名称查询接口原始数据，不返回['headers', 'file_data']
     """
-    return await crud.get_template_data(db=db, temp_name=temp_name) or await response_code.resp_404()
+    if temp_name:
+        return await crud.get_template_data(db=db, temp_name=temp_name) or await response_code.resp_404()
+
+    if temp_id:
+        return await crud.get_template_data(db=db, temp_id=temp_id) or await response_code.resp_404()
+
+    return await response_code.resp_400()
 
 
-@template.get('/download/excel', name='下载模板数据-excel', deprecated=True, include_in_schema=False)
+@template.get(
+    '/download/excel',
+    name='下载模板数据-excel',
+    deprecated=True,
+    include_in_schema=False
+)
 async def download_temp_excel(temp_name: str, db: Session = Depends(get_db)):
     """
     将Charles录制的测试场景原始数据下载到excel
@@ -165,6 +207,9 @@ async def download_temp_excel(temp_name: str, db: Session = Depends(get_db)):
     return await response_code.resp_404()
 
 
-@template.get('/diff', name='对比测试模板数据')
+@template.get(
+    '/diff',
+    name='对比测试模板数据'
+)
 async def diff_template(name: str, db: Session = Depends(get_db)):
     pass
