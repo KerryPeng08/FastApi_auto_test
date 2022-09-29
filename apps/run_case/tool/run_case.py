@@ -19,7 +19,7 @@ from apps import response_code
 from setting import ALLURE_PATH
 
 
-async def run_case(db: Session, request: Request, case_ids: list):
+async def run_service_case(db: Session, request: Request, case_ids: list):
     report = []
     for case_id in case_ids:
         case_info = await case_crud.get_case_name(db=db, case_id=case_id)

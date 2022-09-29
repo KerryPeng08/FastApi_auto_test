@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 from typing import List
 from depends import get_db
-from .tool.run_case import run_case as run
+from .tool.run_case import run_service_case
 from apps import response_code
 from apps.case_service import crud as case_crud
 
@@ -27,7 +27,7 @@ async def run_case_name(request: Request, case_ids: List[int], db: Session = Dep
     if not case_ids:
         return await response_code.resp_400()
 
-    return await run(db=db, request=request, case_ids=case_ids)
+    return await run_service_case(db=db, request=request, case_ids=case_ids)
 
 
 @run_case.post(
@@ -37,4 +37,4 @@ async def run_case_name(request: Request, case_ids: List[int], db: Session = Dep
 )
 async def run_case_name(request: Request, temp_id: int, db: Session = Depends(get_db)):
     case_ids = await case_crud.get_case_ids(db=db, temp_id=temp_id)
-    return await run(db=db, request=request, case_ids=[x[0] for x in case_ids])
+    return await run_service_case(db=db, request=request, case_ids=[x[0] for x in case_ids])
