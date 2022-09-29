@@ -7,5 +7,5 @@
 @Time: 2022/8/23-14:33
 """
 
-from .run_case import RunCase
+from .run_api import RunApi
 from .run_pytest import run

@@ -116,6 +116,16 @@ async def get_case(db: Session, temp_id: int):
     return db.query(models.TestCase).filter(models.TestCase.temp_id == temp_id).first()
 
 
+async def get_case_ids(db: Session, temp_id: int):
+    """
+    按模板查用例id
+    :param db:
+    :param temp_id:
+    :return:
+    """
+    return db.query(models.TestCase.id).filter(models.TestCase.temp_id == temp_id).all()
+
+
 async def get_urls(db: Session, url: str):
     """
     模糊查询url

@@ -76,7 +76,7 @@ class TestCaseData(BaseModel):
 
 
 class TestCaseDataOut(BaseModel):
-    tips: list
+    tips: dict
     temp_name: str
     mode: ModeEnum
     data: List[TestCaseData]

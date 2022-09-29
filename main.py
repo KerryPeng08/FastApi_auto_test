@@ -9,7 +9,7 @@
 
 import uvicorn
 from fastapi import FastAPI, Request
-from setting import ALLURE_PATH
+from setting import ALLURE_PATH, TIPS
 from apps.template.router import template
 from apps.case_service.router import case_service
 from apps.case_ddt.router import case_ddt
@@ -29,7 +29,7 @@ app = FastAPI(
 )
 
 
-@app.get('/helpInfo', name='操作说明概要', tags=['Help'])
+@app.get('/helpInfo', name='操作概要说明', tags=['Help'])
 async def help_info():
     return await response_code.resp_200(data={
         'order': {
@@ -39,7 +39,8 @@ async def help_info():
             '/caseService/upload/json': '上传测试数据-Json',
             '/runCase/': '按用例执行',
         },
-        'description': '将模板数据Json下载下来后，通常需要对照原始数据进行jsonPath表达式进行编辑，编辑完成即可上传Json'
+        'description': '将模板数据Json下载下来后，通常需要对照原始数据进行jsonPath表达式进行编辑，编辑完成即可上传Json',
+        'tips': TIPS
     })
 
 
