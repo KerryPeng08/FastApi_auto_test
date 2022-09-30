@@ -31,7 +31,7 @@ from apps.run_case import crud
 class RunApi:
     def __init__(self):
         # self.sees = aiohttp.client.ClientSession(json_serialize=ujson.dumps)
-        self.cookies = None
+        self.cookies = {}
         self.fk = FakerData()
 
     async def fo_service(
@@ -85,8 +85,8 @@ class RunApi:
 
             config = copy.deepcopy(case_data[num].config)
 
-            if self.cookies:
-                request_info['headers']['Cookie'] = self.cookies
+            if self.cookies.get(temp_data[num].host):
+                request_info['headers']['Cookie'] = self.cookies[temp_data[num].host]
 
             # 由附件时，要删除Content-Type
             if files:
@@ -103,7 +103,7 @@ class RunApi:
             )
 
             if config['is_login']:
-                self.cookies = await get_cookie(rep_type='requests', response=res)
+                self.cookies = {temp_data[num].host: await get_cookie(rep_type='requests', response=res)}
             logger.info(f"状态码: {res.status_code}")
 
             # 收集结果
@@ -243,9 +243,26 @@ class RunApi:
         replace_values: List[str] = re.compile(r'{{(.*?)}}', re.S).findall(old_str)
         for replace in replace_values:
             num, json_path = replace.split('.', 1)
+
+            # 字符串截取
+            start_index, end_index = None, None
+            if "|" in json_path:
+                json_path, str_index = json_path.split('|', 1)
+                start_index, end_index = str_index.split(':', 1)
+
             value = jsonpath.jsonpath(response[int(num)], json_path)
+
             if value:
-                old_str = re.sub("{{" + f"{num}." + '\\' + f"{json_path}" + "}}", str(value[0]), old_str)
+                if start_index is None and end_index is None:
+                    old_str = re.sub("{{" + f"{num}." + '\\' + f"{json_path}" + "}}", str(value[0]), old_str)
+                else:
+                    if isinstance(value[0], str):
+                        try:
+                            old_str = re.sub("{{" + f"{num}." + '\\' + f"{json_path}" + "}}", str(
+                                value[0][int(start_index):int(end_index) if end_index != '' else None]
+                            ), old_str)
+                        except ValueError:
+                            old_str = re.sub("{{" + f"{num}." + '\\' + f"{json_path}" + "}}", str(value[0]), old_str)
 
         return old_str
 
@@ -279,9 +296,27 @@ class RunApi:
                     if "{{" in data_json[key] and "$" in data_json[key] and "}}" in data_json[key]:
                         replace_value: str = re.compile(r'{{(.*?)}}', re.S).findall(data_json[key])[0]
                         num, json_path = replace_value.split('.', 1)
+
+                        # 字符串截取
+                        start_index, end_index = None, None
+                        if "|" in json_path:
+                            json_path, str_index = json_path.split('|', 1)
+                            start_index, end_index = str_index.split(':', 1)
+
                         value = jsonpath.jsonpath(response[int(num)], json_path)
                         if value:
-                            target[key] = value[0]
+                            if start_index is None and end_index is None:
+                                target[key] = value[0]
+                            else:
+                                if isinstance(value[0], str):
+                                    try:
+                                        target[key] = value[0][
+                                                      int(start_index):int(end_index) if end_index != '' else None
+                                                      ]
+                                    except ValueError:
+                                        target[key] = value[0]
+                                else:
+                                    target[key] = value[0]
                         else:
                             target[key] = value
                     elif "{" in data_json[key] and "}" in data_json[key]:

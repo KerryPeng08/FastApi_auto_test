@@ -11,9 +11,9 @@ from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 from typing import List
 from depends import get_db
-from .tool.run_case import run_service_case
 from apps import response_code
 from apps.case_service import crud as case_crud
+from .tool.run_case import run_service_case
 
 run_case = APIRouter()
 

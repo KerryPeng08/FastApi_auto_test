@@ -71,7 +71,7 @@ class TemplateDataIn(BaseModel):
     file: bool
     file_data: Optional[list] = []
     headers: Optional[dict] = {}
-    response: Optional[dict] = {}
+    response: Union[dict, list] = {}
 
     class Config:
         orm_mode = True

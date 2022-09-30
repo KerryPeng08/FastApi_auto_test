@@ -109,10 +109,7 @@ async def get_templates(temp_name: Optional[str] = None, db: Session = Depends(g
         temp_info.update(case_info)
         out_info.append(temp_info)
 
-    if out_info:
-        return out_info
-    else:
-        return await response_code.resp_404()
+    return out_info or await response_code.resp_404()
 
 
 @template.put(
