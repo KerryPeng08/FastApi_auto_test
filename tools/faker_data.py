@@ -70,7 +70,7 @@ class FakerData:
     def _time_str(self, *args) -> str:
         return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self._time_int(args[0]) // 1000))
 
-    def faker_data(self, func: str, param: int) -> (str, int, None):
+    def faker_data(self, func: str, param: int) -> (str, int):
         """
         :param func:
         :param param:

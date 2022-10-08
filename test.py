@@ -67,10 +67,7 @@ async def test():
 
 import jsonpath
 
-a = '/MCH000143/JS000000195253'
+import re
+a = '/{{MCH000143}}/{{JS000000195253}}'
 b = '-14:'
-start_index = int('a')
-end_index = int(b.split(':')[1]) if b.split(':')[1] else None
-print(start_index,end_index)
-print(type(start_index), type(end_index))
-print(a[start_index:end_index])
+print(re.sub('{{(.*?)}}', '222', a, count=1))

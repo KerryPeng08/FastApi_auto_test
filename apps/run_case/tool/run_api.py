@@ -57,7 +57,9 @@ class RunApi:
             logger.info(f"{'=' * 30}开始请求{num}{'=' * 30}")
             try:
                 # 识别url表达式
-                url = await self._replace_url(old_str=f"{temp_data[num].host}{case_data[num].path}", response=response)
+                url = await self._replace_url(
+                    old_str=f"{temp_data[num].host}{case_data[num].path}", response=response, faker=self.fk
+                )
                 # 识别params表达式
                 params = await self._replace_params_data(data=case_data[num].params, response=response, faker=self.fk)
                 # 识别data表达式
@@ -88,7 +90,7 @@ class RunApi:
             if self.cookies.get(temp_data[num].host):
                 request_info['headers']['Cookie'] = self.cookies[temp_data[num].host]
 
-            # 由附件时，要删除Content-Type
+            # 有附件时，要删除Content-Type
             if files:
                 del request_info['headers']['Content-Type']
 
@@ -103,7 +105,7 @@ class RunApi:
             )
 
             if config['is_login']:
-                self.cookies = {temp_data[num].host: await get_cookie(rep_type='requests', response=res)}
+                self.cookies[temp_data[num].host] = await get_cookie(rep_type='requests', response=res)
             logger.info(f"状态码: {res.status_code}")
 
             # 收集结果
@@ -233,38 +235,14 @@ class RunApi:
         return res
 
     @staticmethod
-    async def _replace_url(old_str: str, response: list) -> str:
+    async def _replace_url(old_str: str, response: list, faker: FakerData) -> str:
         """
         替换url的值
         :param old_str:
         :param response:
         :return:
         """
-        replace_values: List[str] = re.compile(r'{{(.*?)}}', re.S).findall(old_str)
-        for replace in replace_values:
-            num, json_path = replace.split('.', 1)
-
-            # 字符串截取
-            start_index, end_index = None, None
-            if "|" in json_path:
-                json_path, str_index = json_path.split('|', 1)
-                start_index, end_index = str_index.split(':', 1)
-
-            value = jsonpath.jsonpath(response[int(num)], json_path)
-
-            if value:
-                if start_index is None and end_index is None:
-                    old_str = re.sub("{{" + f"{num}." + '\\' + f"{json_path}" + "}}", str(value[0]), old_str)
-                else:
-                    if isinstance(value[0], str):
-                        try:
-                            old_str = re.sub("{{" + f"{num}." + '\\' + f"{json_path}" + "}}", str(
-                                value[0][int(start_index):int(end_index) if end_index != '' else None]
-                            ), old_str)
-                        except ValueError:
-                            old_str = re.sub("{{" + f"{num}." + '\\' + f"{json_path}" + "}}", str(value[0]), old_str)
-
-        return old_str
+        return await header_srt(x=old_str, response=response, faker=faker, value_type='url')
 
     @staticmethod
     async def _replace_params_data(data: dict, response: list, faker: FakerData) -> dict:
@@ -278,75 +256,28 @@ class RunApi:
         async def handle_value(data_json):
             target = {}
             for key in data_json.keys():
+                if isinstance(data_json[key], str):
+                    target[key] = await header_srt(x=data_json[key], response=response, faker=faker)
+                    continue
+
                 if isinstance(data_json[key], dict):
                     target[key] = await handle_value(data_json[key])
                     continue
 
                 if isinstance(data_json[key], list):
-                    none_list = []
-                    for i in data_json[key]:
-                        if isinstance(i, dict):
-                            none_list.append(await handle_value(i))
+                    new_list = []
+                    for x in data_json[key]:
+                        if isinstance(x, (list, dict)):
+                            new_list.append(await handle_value(x))
+                        elif isinstance(x, str):
+                            new_list.append(await header_srt(x=x, response=response, faker=faker))
                         else:
-                            none_list.append(i)
-                    target[key] = none_list
+                            new_list.append(x)
+
+                    target[key] = new_list
                     continue
 
-                if isinstance(data_json[key], str):
-                    if "{{" in data_json[key] and "$" in data_json[key] and "}}" in data_json[key]:
-                        replace_value: str = re.compile(r'{{(.*?)}}', re.S).findall(data_json[key])[0]
-                        num, json_path = replace_value.split('.', 1)
-
-                        # 字符串截取
-                        start_index, end_index = None, None
-                        if "|" in json_path:
-                            json_path, str_index = json_path.split('|', 1)
-                            start_index, end_index = str_index.split(':', 1)
-
-                        value = jsonpath.jsonpath(response[int(num)], json_path)
-                        if value:
-                            if start_index is None and end_index is None:
-                                target[key] = value[0]
-                            else:
-                                if isinstance(value[0], str):
-                                    try:
-                                        target[key] = value[0][
-                                                      int(start_index):int(end_index) if end_index != '' else None
-                                                      ]
-                                    except ValueError:
-                                        target[key] = value[0]
-                                else:
-                                    target[key] = value[0]
-                        else:
-                            target[key] = value
-                    elif "{" in data_json[key] and "}" in data_json[key]:
-                        replace_value: str = re.compile(r'{(.*?)}', re.S).findall(data_json[key])[0]
-                        try:
-                            if '.' in replace_value:
-                                func, param = replace_value.split('.', 1)
-                            else:
-                                func, param = replace_value, 1
-
-                            try:
-                                param = int(param)
-                            except TypeError:
-                                param = 1
-
-                            value = faker.faker_data(func=func, param=param)
-                            if value:
-                                value = re.sub(r'{(.*?)}', str(value), data_json[key])
-                                try:
-                                    target[key] = int(value)
-                                except ValueError:
-                                    target[key] = value
-                            else:
-                                target[key] = data_json[key]
-                        except ValueError:
-                            target[key] = data_json[key]
-                    else:
-                        target[key] = data_json[key]
-                else:
-                    target[key] = data_json[key]
+                target[key] = data_json[key]
 
             return target
 
@@ -363,3 +294,106 @@ class RunApi:
         for k, v in case_header.items():
             tmp_header[k] = v
         return tmp_header
+
+
+async def header_srt(x: str, response: list, faker: FakerData, value_type: str = None):
+    """
+    处理数据
+    :param x:
+    :param response:
+    :param faker:
+    :param value_type:
+    :return:
+    """
+    if "{{" in x and "$" in x and "}}" in x:
+        replace_values: List[str] = re.compile(r'{{(.*?)}}', re.S).findall(x)
+        for replace in replace_values:
+            new_value = await _header_str_param(x=replace, response=response)
+
+            if value_type == 'url':
+                x = re.sub("{{(.*?)}}", str(new_value), x, count=1)
+                continue
+
+            if isinstance(new_value, str):
+                x = re.sub("{{(.*?)}}", new_value, x, count=1)
+            else:
+                x = new_value
+
+        return x
+
+    if "{" in x and "}" in x:
+        replace_values: List[str] = re.compile(r'{(.*?)}', re.S).findall(x)
+        for replace in replace_values:
+            new_value = await _header_str_func(x=replace, faker=faker)
+
+            if value_type == 'url':
+                x = re.sub("{(.*?)}", str(new_value), x, count=1)
+                continue
+
+            if isinstance(new_value, str):
+                x = re.sub("{(.*?)}", new_value, x, count=1)
+            else:
+                x = new_value
+        return x
+
+    return x
+
+
+async def _header_str_param(x: str, response: list) -> str:
+    """
+    提取参数：字符串内容
+    :param x:
+    :param response:
+    :return:
+    """
+    num, json_path = x.split('.', 1)
+
+    # 字符串截取
+    start_index, end_index = None, None
+    if "|" in json_path:
+        json_path, str_index = json_path.split('|', 1)
+        start_index, end_index = str_index.split(':', 1)
+
+    value = jsonpath.jsonpath(response[int(num)], json_path)
+    if value:
+        if start_index is None and end_index is None:
+            return value[0]
+        else:
+            if isinstance(value[0], str):
+                try:
+                    return value[0][
+                           int(start_index):int(
+                               end_index) if end_index != '' else None
+                           ]
+                except ValueError:
+                    return value[0]
+            else:
+                return value[0]
+    else:
+        return value
+
+
+async def _header_str_func(x: str, faker: FakerData):
+    """
+    处理随机方法生成的数据
+    :param x:
+    :param faker:
+    :return:
+    """
+    try:
+        if '.' in x:
+            func, param = x.split('.', 1)
+        else:
+            func, param = x, 1
+
+        try:
+            param = int(param)
+        except TypeError:
+            param = 1
+
+        value = faker.faker_data(func=func, param=param)
+
+        return value if value else x
+
+    except ValueError:
+        return x
