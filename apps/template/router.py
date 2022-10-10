@@ -106,7 +106,8 @@ async def get_templates(temp_name: Optional[str] = None, outline: bool = True, d
             'created_at': temp.created_at,
             'updated_at': temp.updated_at,
         } if outline is False else {
-            'temp_name': temp.temp_name
+            'temp_name': temp.temp_name,
+            'id': temp.id,
         }
         temp_info.update(case_info)
         out_info.append(temp_info)

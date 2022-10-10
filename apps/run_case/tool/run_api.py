@@ -330,16 +330,17 @@ async def header_srt(x: str, response: list, faker: FakerData, value_type: str =
                 x = re.sub("{(.*?)}", str(new_value), x, count=1)
                 continue
 
-            if isinstance(new_value, str):
-                x = re.sub("{(.*?)}", new_value, x, count=1)
-            else:
+            if len(replace) + 2 == len(x):
                 x = new_value
+            else:
+                x = re.sub("{(.*?)}", str(new_value), x, count=1)
+
         return x
 
     return x
 
 
-async def _header_str_param(x: str, response: list) -> str:
+async def _header_str_param(x: str, response: list):
     """
     提取参数：字符串内容
     :param x:
