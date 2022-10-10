@@ -84,7 +84,7 @@ async def analysis_file_har(file: UploadFile):
     response_model_exclude_unset=True,
     name='查询模板数据'
 )
-async def get_templates(temp_name: Optional[str] = None, db: Session = Depends(get_db)):
+async def get_templates(temp_name: Optional[str] = None, outline: bool = True, db: Session = Depends(get_db)):
     """
     1、查询已存在的测试模板/场景\n
     2、场景包含的测试用例
@@ -97,7 +97,7 @@ async def get_templates(temp_name: Optional[str] = None, db: Session = Depends(g
 
     out_info = []
     for temp in templates:
-        case_info = await crud.get_temp_case_info(db=db, temp_id=temp.id)
+        case_info = await crud.get_temp_case_info(db=db, temp_id=temp.id, outline=outline)
         temp_info = {
             'temp_name': temp.temp_name,
             'project_name': temp.project_name,
@@ -105,6 +105,8 @@ async def get_templates(temp_name: Optional[str] = None, db: Session = Depends(g
             'api_count': temp.api_count,
             'created_at': temp.created_at,
             'updated_at': temp.updated_at,
+        } if outline is False else {
+            'temp_name': temp.temp_name
         }
         temp_info.update(case_info)
         out_info.append(temp_info)

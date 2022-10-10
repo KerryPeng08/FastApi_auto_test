@@ -17,6 +17,7 @@ async def create_template(db: Session, temp_name: str, project_name: str):
     创建模板信息
     :param db:
     :param temp_name:
+    :param project_name:
     :return:
     """
     db_temp = models.Template(temp_name=temp_name, project_name=project_name)
@@ -63,6 +64,7 @@ async def get_temp_name(db: Session, temp_name: str = None, temp_id: int = None,
     :param db:
     :param temp_name:
     :param temp_id:
+    :param like:
     :return:
     """
     if temp_id:
@@ -77,18 +79,23 @@ async def get_temp_name(db: Session, temp_name: str = None, temp_id: int = None,
     return db.query(models.Template).all()
 
 
-async def get_temp_case_info(db: Session, temp_id: int):
+async def get_temp_case_info(db: Session, temp_id: int, outline: bool):
     """
     查询模板下有多少条用例
     :param db:
     :param temp_id:
+    :param outline:
     :return:
     """
     db_case = db.query(case_models.TestCase).filter(case_models.TestCase.temp_id == temp_id).all()
     case_info = []
     for case in db_case:
-        case_info.append({'id': case.id, 'mode': case.mode, 'name': case.case_name, 'run_num': case.run_order})
-    return {'case_count': len(db_case), 'case_info': case_info}
+        if outline is False:
+            case_info.append({'id': case.id, 'mode': case.mode, 'name': case.case_name, 'run_num': case.run_order})
+        else:
+            case_info.append({'id': case.id, 'name': case.case_name})
+
+    return {'case_count': len(db_case), 'case_info': case_info} if outline is False else {'case_info': case_info}
 
 
 async def get_template_data(db: Session, temp_name: str = None, temp_id: int = None):

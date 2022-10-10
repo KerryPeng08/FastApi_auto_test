@@ -24,17 +24,17 @@ class TempEnum(str, Enum):
 # 模板名称的请求/响应数据模型
 class TemplateIn(BaseModel):
     temp_name: str
-    project_name: TempEnum
+    project_name: TempEnum = None
 
     class Config:
         orm_mode = True
 
 
 class TemplateOut(TemplateIn):
-    id: int
-    api_count: int
-    created_at: datetime
-    updated_at: datetime
+    id: int = None
+    api_count: int = None
+    created_at: datetime = None
+    updated_at: datetime = None
 
     class Config:
         orm_mode = True
@@ -42,16 +42,16 @@ class TemplateOut(TemplateIn):
 
 class TestCase(BaseModel):
     id: int
-    mode: str
+    mode: str  = None
     name: str
-    run_num: int
+    run_num: int = None
 
     class Config:
         orm_mode = True
 
 
 class TempTestCase(TemplateOut):
-    case_count: int
+    case_count: int = None
     case_info: List[TestCase]
 
     class Config:
