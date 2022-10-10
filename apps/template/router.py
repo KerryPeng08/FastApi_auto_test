@@ -93,7 +93,7 @@ async def get_templates(temp_name: Optional[str] = None, db: Session = Depends(g
     if not temp_name:
         templates = await crud.get_temp_name(db=db)
     else:
-        templates = await crud.get_temp_name(db=db, temp_name=temp_name)
+        templates = await crud.get_temp_name(db=db, temp_name=temp_name, like=True)
 
     out_info = []
     for temp in templates:

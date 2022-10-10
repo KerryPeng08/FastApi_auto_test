@@ -57,7 +57,7 @@ async def create_template_data(db: Session, data: schemas.TemplateDataIn, temp_i
     return db_data
 
 
-async def get_temp_name(db: Session, temp_name: str = None, temp_id: int = None):
+async def get_temp_name(db: Session, temp_name: str = None, temp_id: int = None, like: bool = False):
     """
     按模板名称查询数据
     :param db:
@@ -69,7 +69,11 @@ async def get_temp_name(db: Session, temp_name: str = None, temp_id: int = None)
         return db.query(models.Template).filter(models.Template.id == temp_id).all()
 
     if temp_name:
-        return db.query(models.Template).filter(models.Template.temp_name == temp_name).all()
+        if like:
+            return db.query(models.Template).filter(models.Template.temp_name.like(f"%{temp_name}%")).all()
+        else:
+            return db.query(models.Template).filter(models.Template.temp_name == temp_name).all()
+
     return db.query(models.Template).all()
 
 
