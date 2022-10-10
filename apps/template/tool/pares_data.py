@@ -9,8 +9,21 @@
 
 import base64
 import json
+from tools.global_log import logger
 
-filter_url = ['application/javascript', 'text/css', 'image/png']
+FILTER_MIME_TYPE = [
+    'application/javascript',
+    'text/css',
+    'image/png',
+    'image/jpeg',
+    'image/jpg',
+    'image/gif',
+    'image/bmp',
+    'image/webp',
+    'image/x-icon',
+    'image/vnd',
+    'microsoft.icon',
+]
 
 
 class ParseData:
@@ -25,9 +38,11 @@ class ParseData:
         temp_info = []
         api_count = 0
         for data in data_json['log']['entries']:
+            logger.info(f"{'=' * 30}开始解析{api_count}{'=' * 30}")
+            logger.info(f"原始数据: {json.dumps(data, indent=2, ensure_ascii=False)}")
 
             # 过滤文件接口
-            if data['response']['content'].get('mimeType') in filter_url:
+            if data['response']['content'].get('mimeType') in FILTER_MIME_TYPE:
                 continue
 
             host = [x['value'] for x in data['request']['headers'] if x['name'] == 'Host'][0]
@@ -68,6 +83,8 @@ class ParseData:
             }
             api_count += 1
             temp_info.append(new_data)
+            logger.info(f"{'=' * 30}解析完成{api_count}{'=' * 30}")
+
         return temp_info
 
     @classmethod
