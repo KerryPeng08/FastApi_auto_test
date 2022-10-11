@@ -21,6 +21,7 @@ from apps import response_code
 from tools.check_case_json import CheckJson
 from tools import OperationJson
 from setting import ALLURE_PATH
+from .tool.get_case_data_info import GetCaseDataInfo
 
 from apps.template import crud as temp_crud
 from apps.case_service import crud, schemas
@@ -34,6 +35,7 @@ case_service = APIRouter()
     '/init/data/list',
     response_model=schemas.TestCaseDataOut,
     response_class=response_code.MyJSONResponse,
+    response_model_exclude_unset=True,
     name='获取预处理后的模板数据'
 )
 async def test_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = Depends(get_db)):
@@ -45,9 +47,7 @@ async def test_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = D
 
     template_data = await temp_crud.get_template_data(db=db, temp_name=temp_name)
     if template_data:
-        test_data = await GenerateCase().read_template_to_api(temp_name=temp_name, mode=mode,
-                                                              template_data=template_data)
-        return test_data
+        return await GenerateCase().read_template_to_api(temp_name=temp_name, mode=mode, template_data=template_data)
 
     return await response_code.resp_404()
 
@@ -55,7 +55,8 @@ async def test_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = D
 @case_service.get(
     '/download/init/data/json',
     response_model=schemas.TestCaseDataOut,
-    name='下载预处理后的模板数据-json'
+    response_model_exclude_unset=True,
+    name='下载预处理后的模板数据-json',
 )
 async def download_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = Depends(get_db)):
     """
@@ -126,15 +127,54 @@ async def test_case_upload_json(temp_name: str, file: UploadFile,
 
 @case_service.get(
     '/data/{case_id}',
-    response_model=List[schemas.TestCaseDataOut2],
+    response_model=schemas.TestCaseDataOut,
     response_class=response_code.MyJSONResponse,
+    response_model_exclude_unset=True,
     name='查看用例测试数据'
 )
 async def case_data_info(case_id: int, db: Session = Depends(get_db)):
     """
     查看测试数据
     """
-    return await crud.get_case_data(db=db, case_id=case_id) or await response_code.resp_404()
+    case_info = await crud.get_case_name(db=db, case_id=case_id)
+    if not case_info:
+        return await response_code.resp_404()
+    case_data_info = await crud.get_case_data(db=db, case_id=case_id)
+
+    return await GetCaseDataInfo().service(
+        case_info=case_info,
+        case_data_info=case_data_info
+    )
+
+
+@case_service.get(
+    '/download/data/{case_id}',
+    response_model=schemas.TestCaseDataOut,
+    response_class=response_code.MyJSONResponse,
+    response_model_exclude_unset=True,
+    name='下载测试数据-Json'
+)
+async def download_case_data_info(case_id: int, db: Session = Depends(get_db)):
+    """
+    下载测试数据
+    """
+    case_info = await crud.get_case_name(db=db, case_id=case_id)
+    if not case_info:
+        return await response_code.resp_404()
+    case_data_info = await crud.get_case_data(db=db, case_id=case_id)
+
+    case_data = await GetCaseDataInfo().service(
+        case_info=case_info,
+        case_data_info=case_data_info
+    )
+
+    path = f'./files/json/{time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))}.json'
+    await OperationJson.write(path=path, data=case_data)
+    return FileResponse(
+        path=path,
+        filename=f'{case_info[0].case_name}.json',
+        background=BackgroundTask(lambda: os.remove(path))
+    )
 
 
 @case_service.delete(

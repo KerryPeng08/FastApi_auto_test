@@ -35,7 +35,7 @@ class GenerateCase:
                 data = await self._extract_params_keys(param=template_data[num].data, response=response[:num])
 
             case_data = {
-                'number': f'${template_data[num].number}',
+                'number': template_data[num].number,
                 'path': template_data[num].path,
                 'headers': {},
                 'params': params,

@@ -61,7 +61,7 @@ class TestCaseDataIn(BaseModel):
 
 
 class TestCaseData(BaseModel):
-    number: Union[str, int]
+    number: Union[int, str]
     path: str
     headers: Optional[dict] = {}
     params: Optional[dict] = {}
@@ -77,7 +77,8 @@ class TestCaseData(BaseModel):
 
 class TestCaseDataOut(BaseModel):
     tips: dict
-    temp_name: str
+    temp_name: str = None
+    case_name: str = None
     mode: ModeEnum
     data: List[TestCaseData]
 
