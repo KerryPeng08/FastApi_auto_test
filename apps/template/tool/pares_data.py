@@ -61,7 +61,10 @@ class ParseData:
                 body_json = ['body', {}]
 
             if 'application/json' in str(data['response']['content'].get('mimeType')):
-                res_data = json.loads(base64.b64decode(data['response']['content']['text'].encode('utf-8')))
+                if data['response']['content'].get('text'):
+                    res_data = json.loads(base64.b64decode(data['response']['content']['text'].encode('utf-8')))
+                else:
+                    res_data = {}
             elif 'text/json' in str(data['response']['content'].get('mimeType')):
                 res_data = json.loads(data['response']['content']['text'])
             else:
