@@ -115,7 +115,7 @@ async def test_case_upload_json(temp_name: str, file: UploadFile,
         if not case_id:
             return await response_code.resp_400(message='未输入case_id')
 
-        if not await crud.get_case_name(db=db, case_id=case_id):
+        if not await crud.get_case_info(db=db, case_id=case_id):
             return await response_code.resp_404()
 
         return await cover_insert(db=db, case_id=case_id, case_data=case_data)
@@ -136,7 +136,7 @@ async def case_data_info(case_id: int, db: Session = Depends(get_db)):
     """
     查看测试数据
     """
-    case_info = await crud.get_case_name(db=db, case_id=case_id)
+    case_info = await crud.get_case_info(db=db, case_id=case_id)
     if not case_info:
         return await response_code.resp_404()
 
@@ -157,7 +157,7 @@ async def download_case_data_info(case_id: int, db: Session = Depends(get_db)):
     """
     下载测试数据
     """
-    case_info = await crud.get_case_name(db=db, case_id=case_id)
+    case_info = await crud.get_case_info(db=db, case_id=case_id)
     if not case_info:
         return await response_code.resp_404()
 
@@ -175,12 +175,41 @@ async def download_case_data_info(case_id: int, db: Session = Depends(get_db)):
     )
 
 
+@case_service.get(
+    '/data/case/list',
+    response_model=List[schemas.TestCaseInfoOut],
+    response_class=response_code.MyJSONResponse,
+    name='查看测试用例列表'
+)
+async def case_data_list(db: Session = Depends(get_db)):
+    """
+    查看测试用例列表
+    """
+    test_case = await crud.get_case_info(db=db, all=True)
+
+    case_info = []
+    for case in test_case:
+        temp_info = await temp_crud.get_temp_name(db=db, temp_id=case.temp_id)
+        case_info.append(
+            {
+                "name": f"{temp_info[0].project_name}-{temp_info[0].temp_name}-{case.case_name}",
+                "case_id": case.id,
+                "api_count": case.case_count,
+                "run_order": case.run_order,
+                "mode": case.mode,
+                "created_at": case.created_at
+            }
+        )
+
+    return case_info or await response_code.resp_404()
+
+
 @case_service.delete(
     '/del/{case_id}',
     name='删除测试数据'
 )
 async def del_case(case_id: int, db: Session = Depends(get_db)):
-    if not await crud.get_case_name(db=db, case_id=case_id):
+    if not await crud.get_case_info(db=db, case_id=case_id):
         return await response_code.resp_404()
     await crud.del_case_data(db=db, case_id=case_id)
     shutil.rmtree(f"{ALLURE_PATH}/{case_id}", ignore_errors=True)

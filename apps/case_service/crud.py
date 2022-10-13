@@ -68,12 +68,13 @@ async def del_test_case_data(db: Session, case_id: int):
     db.commit()
 
 
-async def get_case_name(db: Session, case_name: str = None, case_id: int = None):
+async def get_case_info(db: Session, case_name: str = None, case_id: int = None, all: bool = False):
     """
     按用例名称查询数据
     :param db:
     :param case_name:
     :param case_id:
+    :param all:
     :return:
     """
     if case_id:
@@ -81,7 +82,9 @@ async def get_case_name(db: Session, case_name: str = None, case_id: int = None)
 
     if case_name:
         return db.query(models.TestCase).filter(models.TestCase.case_name == case_name).all()
-    # return db.query(models.TestCase).all()
+
+    if all:
+        return db.query(models.TestCase).all()
 
 
 async def get_case_data(db: Session, case_id: int):

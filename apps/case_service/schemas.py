@@ -118,3 +118,12 @@ class TestCaseDataOut2(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class TestCaseInfoOut(BaseModel):
+    name: str
+    case_id: int
+    api_count: int
+    run_order: int
+    mode: str
+    created_at: datetime
