@@ -209,7 +209,7 @@ async def download_temp_excel(temp_name: str, db: Session = Depends(get_db)):
 
 @template.get(
     '/diff',
-    name='对比测试模板数据'
+    name='对比测试模板数据-开发中'
 )
 async def diff_template(name: str, db: Session = Depends(get_db)):
     pass

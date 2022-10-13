@@ -179,9 +179,10 @@ async def download_case_data_info(case_id: int, db: Session = Depends(get_db)):
     '/data/case/list',
     response_model=List[schemas.TestCaseInfoOut],
     response_class=response_code.MyJSONResponse,
+    response_model_exclude_unset=True,
     name='查看测试用例列表'
 )
-async def case_data_list(db: Session = Depends(get_db)):
+async def case_data_list(outline: bool = True, db: Session = Depends(get_db)):
     """
     查看测试用例列表
     """
@@ -198,6 +199,9 @@ async def case_data_list(db: Session = Depends(get_db)):
                 "run_order": case.run_order,
                 "mode": case.mode,
                 "created_at": case.created_at
+            } if outline is False else {
+                "name": f"{temp_info[0].project_name}-{temp_info[0].temp_name}-{case.case_name}",
+                "case_id": case.id
             }
         )
 

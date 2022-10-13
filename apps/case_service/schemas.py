@@ -123,7 +123,7 @@ class TestCaseDataOut2(BaseModel):
 class TestCaseInfoOut(BaseModel):
     name: str
     case_id: int
-    api_count: int
-    run_order: int
-    mode: str
-    created_at: datetime
+    api_count: int = None
+    run_order: int = None
+    mode: str = None
+    created_at: datetime = None
