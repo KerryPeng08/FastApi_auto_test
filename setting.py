@@ -10,6 +10,9 @@
 # allure总目录
 ALLURE_PATH = 'D:\\Works\\liweijia\\auto_report'
 
+# host
+HOST = 'http://172.16.100.95:8000/'
+
 # YApi配置信息
 YAPI_INFO = {
     'host': 'http://yapi.liweijia.com',

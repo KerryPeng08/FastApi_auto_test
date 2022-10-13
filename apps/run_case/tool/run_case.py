@@ -16,7 +16,7 @@ from apps.template import crud as temp_crud
 from apps.run_case.tool import RunApi, run
 from tools.load_allure import load_allure_report
 from apps import response_code
-from setting import ALLURE_PATH
+from setting import ALLURE_PATH, HOST
 
 
 async def run_service_case(db: Session, request: Request, case_ids: list):
@@ -52,13 +52,13 @@ async def run_service_case(db: Session, request: Request, case_ids: list):
             await run(
                 test_path='./apps/run_case/test_case/test_service.py',
                 allure_dir=allure_dir,
-                report_url=request.base_url,
+                report_url=HOST,
                 case_name=case,
                 case_id=case_id
             )
             load_allure_report(allure_dir=allure_dir, case_id=case_id, run_order=run_order)
 
-            report.append(f'{request.base_url}allure/{case_id}/{run_order}')
+            report.append(f'{HOST}allure/{case_id}/{run_order}')
         else:
             report.append(f'用例{case_id}不存在')
 

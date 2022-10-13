@@ -139,11 +139,10 @@ async def case_data_info(case_id: int, db: Session = Depends(get_db)):
     case_info = await crud.get_case_name(db=db, case_id=case_id)
     if not case_info:
         return await response_code.resp_404()
-    case_data_info = await crud.get_case_data(db=db, case_id=case_id)
 
     return await GetCaseDataInfo().service(
         case_info=case_info,
-        case_data_info=case_data_info
+        case_data_info=await crud.get_case_data(db=db, case_id=case_id)
     )
 
 
@@ -161,11 +160,10 @@ async def download_case_data_info(case_id: int, db: Session = Depends(get_db)):
     case_info = await crud.get_case_name(db=db, case_id=case_id)
     if not case_info:
         return await response_code.resp_404()
-    case_data_info = await crud.get_case_data(db=db, case_id=case_id)
 
     case_data = await GetCaseDataInfo().service(
         case_info=case_info,
-        case_data_info=case_data_info
+        case_data_info=await crud.get_case_data(db=db, case_id=case_id)
     )
 
     path = f'./files/json/{time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))}.json'
