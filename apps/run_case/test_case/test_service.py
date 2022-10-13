@@ -60,8 +60,21 @@ class TestService:
     @pytest.mark.parametrize(
         'num,url,method,params,data,expect,actual,response,description,config,headers', data_list
     )
-    async def test_service(self, num: int, url: str, method: str, params: dict, data: dict, expect: dict, actual: dict,
-                           response: dict, description: str, config: dict, headers: dict):
+    async def test_service(
+            self,
+            num: int,
+            url: str,
+            method: str,
+            params: dict,
+            data: dict,
+            expect: dict,
+            actual: dict,
+            response: dict,
+            description: str,
+            config: dict,
+            headers: dict
+    ):
+
         allure.dynamic.title(f"{description}\n{url}")
 
         for k, v in expect.items():

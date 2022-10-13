@@ -9,7 +9,7 @@
 
 import uvicorn
 from fastapi import FastAPI, Request
-from setting import ALLURE_PATH, TIPS
+from setting import ALLURE_PATH, TIPS, HOST
 from apps.template.router import template
 from apps.case_service.router import case_service
 from apps.case_ddt.router import case_ddt
@@ -54,8 +54,8 @@ app.include_router(pool, prefix='/YApi', tags=['YApi接口池'])
 
 # 测试报告路径
 @app.get('/allure', name='allure测试报告地址', tags=['测试报告'])
-async def allure(request: Request):
-    return await response_code.resp_200(data={'allure_report': f"{request.url}" + "/{case_id}/{run_order}"})
+async def allure():
+    return await response_code.resp_200(data={'allure_report': f"{HOST}" + "{case_id}/{run_order}"})
 
 
 load_allure_reports(app=app, allure_dir=ALLURE_PATH)
