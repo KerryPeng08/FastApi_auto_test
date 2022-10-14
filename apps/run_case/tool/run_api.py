@@ -319,9 +319,7 @@ async def header_srt(x: str, response: list, faker: FakerData, value_type: str =
             else:
                 x = new_value
 
-        return x
-
-    if "{" in x and "}" in x:
+    if isinstance(x, str) and "{" in x and "}" in x:
         replace_values: List[str] = re.compile(r'{(.*?)}', re.S).findall(x)
         for replace in replace_values:
             new_value = await _header_str_func(x=replace, faker=faker)
@@ -334,8 +332,6 @@ async def header_srt(x: str, response: list, faker: FakerData, value_type: str =
                 x = new_value
             else:
                 x = re.sub("{(.*?)}", str(new_value), x, count=1)
-
-        return x
 
     return x
 
@@ -387,10 +383,10 @@ async def _header_str_func(x: str, faker: FakerData):
         else:
             func, param = x, 1
 
-        try:
-            param = int(param)
-        except TypeError:
-            param = 1
+        # try:
+        #     param = int(param)
+        # except TypeError:
+        #     param = 1
 
         value = faker.faker_data(func=func, param=param)
 

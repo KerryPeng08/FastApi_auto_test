@@ -9,6 +9,7 @@
 
 import time
 import random
+import string
 from faker import Faker
 
 
@@ -45,7 +46,7 @@ class FakerData:
     def _time_int(*args) -> int:
         now_time = int(time.time())
         if isinstance(args, tuple):
-            day = args[0]
+            day = int(args[0])
         else:
             day = args
         if day == 0:
@@ -70,7 +71,35 @@ class FakerData:
     def _time_str(self, *args) -> str:
         return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self._time_int(args[0]) // 1000))
 
-    def faker_data(self, func: str, param: int) -> (str, int):
+    @staticmethod
+    def _random_lower(*args) -> str:
+        length = int(args[0]) if int(args[0]) <= 20 else 20
+        return ''.join(random.sample(string.ascii_lowercase, length))
+
+    @staticmethod
+    def _random_upper(*args) -> str:
+        length = int(args[0]) if int(args[0]) <= 20 else 20
+        return ''.join(random.sample(string.ascii_uppercase, length))
+
+    @staticmethod
+    def _random_letter(*args) -> str:
+        length = int(args[0]) if int(args[0]) <= 20 else 20
+        return ''.join(random.sample(string.ascii_letters, length))
+
+    @staticmethod
+    def _random_cn(*args) -> str:
+        length = int(args[0]) if int(args[0]) <= 20 else 20
+        cn = [chr(random.randint(0x4e00, 0x9fbf)) for _ in range(100)]
+        return ''.join(random.sample(cn, length))
+
+    @staticmethod
+    def _compute(*args) -> (int, float, str):
+        try:
+            return round(eval(args[0]), 6)
+        except SyntaxError:
+            return args[0]
+
+    def faker_data(self, func: str, param: (int, str)) -> (str, int):
         """
         :param func:
         :param param:
@@ -84,8 +113,19 @@ class FakerData:
             'city': self._city,
             'address': self._address,
             'random_int': self._random_int,
+            'random_lower': self._random_lower,
+            'random_upper': self._random_upper,
+            'random_letter': self._random_letter,
+            'random_cn': self._random_cn,
+            'compute': self._compute,
             'time_int': self._time_int,
             'time_str': self._time_str,
         }
         if func_dict.get(func):
             return func_dict[func](param)
+
+
+if __name__ == '__main__':
+    f = FakerData()
+    a = f.faker_data('time_str', 1)
+    print(a)

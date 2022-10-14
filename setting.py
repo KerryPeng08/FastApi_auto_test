@@ -51,6 +51,11 @@ TIPS = {
             ':param 1': '长度为1的随机数字',
             ':param 5': '长度为5的随机数字'
         },
+        'random_lower': '随机小写字母',
+        'random_upper': '随机大写字母',
+        'random_letter': '随机大小写字母',
+        'random_cn': '随机汉字',
+        'compute': '数字计算',
         'time_int': {
             ':param 0': '当前时间',
             ':param -1': '当前时间前一天',

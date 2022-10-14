@@ -64,10 +64,18 @@ async def test():
 # print(res.json())
 # print(res.cookies.get_dict())
 
-
-import jsonpath
-
 import re
-a = '/{{MCH000143}}/{{JS000000195253}}'
-b = '-14:'
-print(re.sub('{{(.*?)}}', '222', a, count=1))
+a = "{time_int.{{2.$.code}}+{{2.$.code}}+{{2.$.code}}}"
+
+b  = re.compile(r'{{(.*?)}}', re.S).findall(a)
+for x in b:
+    print(x)
+    a = re.sub("{{(.*?)}}", str('1'), a, count=1)
+
+
+print(a)
+
+from tools.faker_data import FakerData
+f =FakerData()
+d = f.faker_data('compute', "1+1+1")
+print(d)
