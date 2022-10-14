@@ -24,7 +24,7 @@ YAPI_INFO = {
 TIPS = {
     '1': '编写用例时，只需关注params/data/check',
     '2': 'headers接受键值对输入，有内容则在执行时添加/替换请求头内容',
-    '3': 'is_login标记登录接口，标记后自动获取token/cookie进行替换',
+    '3': 'is_login标记登录接口，标记后自动获取cookie进行替换',
     '4': {
         '请求参数提取': [
             '1.默认会按key-value完全匹配提取上级接口响应数据',

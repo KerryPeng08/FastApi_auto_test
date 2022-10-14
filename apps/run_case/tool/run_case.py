@@ -8,7 +8,7 @@
 """
 
 # from aiohttp.client import ServerDisconnectedError, ServerConnectionError
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError, ReadTimeout, ConnectTimeout
 from sqlalchemy.orm import Session
 from apps.case_service import crud as case_crud
 from apps.template import crud as temp_crud
@@ -40,7 +40,7 @@ async def run_service_case(db: Session, case_ids: list):
                     temp_name=temp_info[0].temp_name
                 )
             # except (ServerDisconnectedError, ServerConnectionError) as e:
-            except (ConnectionError,) as e:
+            except (ConnectionError, ReadTimeout, ConnectTimeout) as e:
                 return await response_code.resp_400(message=f'网络访问失败: {str(e)}')
 
             except IndexError as e:
