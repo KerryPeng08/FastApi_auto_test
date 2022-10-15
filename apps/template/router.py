@@ -9,7 +9,7 @@
 
 import os
 import time
-from typing import List, Optional
+from typing import List
 from fastapi import APIRouter, UploadFile, Depends
 from sqlalchemy.orm import Session
 from starlette.responses import FileResponse
@@ -84,16 +84,19 @@ async def analysis_file_har(file: UploadFile):
     response_model_exclude_unset=True,
     name='查询模板数据'
 )
-async def get_templates(temp_name: Optional[str] = None, outline: bool = True, db: Session = Depends(get_db)):
+async def get_templates(temp_name: str = None, temp_id: int = None, outline: bool = True,
+                        db: Session = Depends(get_db)):
     """
     1、查询已存在的测试模板/场景\n
     2、场景包含的测试用例
     3、默认返回所有模板
     """
-    if not temp_name:
-        templates = await crud.get_temp_name(db=db)
-    else:
+    if temp_id:
+        templates = await crud.get_temp_name(db=db, temp_id=temp_id)
+    elif temp_name:
         templates = await crud.get_temp_name(db=db, temp_name=temp_name, like=True)
+    else:
+        templates = await crud.get_temp_name(db=db)
 
     out_info = []
     for temp in templates:
@@ -121,11 +124,15 @@ async def get_templates(temp_name: Optional[str] = None, outline: bool = True, d
     response_class=response_code.MyJSONResponse,
     name='修改模板名称'
 )
-async def update_name(old_name: str, new_name: str, db: Session = Depends(get_db)):
+async def update_name(new_name: str, old_name: str = None, temp_id: int = None, db: Session = Depends(get_db)):
     """
     修改模板名称
     """
-    return await crud.put_temp_name(db=db, old_name=old_name, new_name=new_name) or await response_code.resp_404()
+    return await crud.put_temp_name(
+        db=db,
+        temp_id=temp_id, old_name=old_name,
+        new_name=new_name
+    ) or await response_code.resp_404()
 
 
 @template.delete(

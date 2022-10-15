@@ -115,15 +115,23 @@ async def get_template_data(db: Session, temp_name: str = None, temp_id: int = N
         return db.query(models.TemplateData).filter(models.TemplateData.temp_id == temp_id).all()
 
 
-async def put_temp_name(db: Session, old_name: str, new_name: str):
+async def put_temp_name(db: Session, new_name: str, temp_id: int = None, old_name: str = None):
     """
     更新模板名称
     :param db:
+    :param temp_id:
     :param old_name:
     :param new_name:
     :return:
     """
-    db_temp = db.query(models.Template).filter(models.Template.temp_name == old_name).first()
+    db_temp = None
+
+    if temp_id:
+        db_temp = db.query(models.Template).filter(models.Template.id == temp_id).first()
+
+    if old_name:
+        db_temp = db.query(models.Template).filter(models.Template.temp_name == old_name).first()
+
     if db_temp:
         db_temp.temp_name = new_name
         db.commit()
