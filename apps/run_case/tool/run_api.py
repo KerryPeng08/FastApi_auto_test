@@ -54,6 +54,12 @@ class RunApi:
 
         result = []
         for num in range(len(temp_data)):
+
+            config: dict = copy.deepcopy(dict(case_data[num].config))
+            if config.get('stop'):
+                logger.info(f"number: {num} 接口配置信息stop = {config['stop']}, 停止后续接口请求")
+                break
+
             logger.info(f"{'=' * 30}开始请求{num}{'=' * 30}")
             try:
                 # 识别url表达式
@@ -84,8 +90,6 @@ class RunApi:
                     temp_data[num].file_data[0]['contentType']
                 )
             } if temp_data[num].file else None
-
-            config = copy.deepcopy(case_data[num].config)
 
             if self.cookies.get(temp_data[num].host):
                 request_info['headers']['Cookie'] = self.cookies[temp_data[num].host]

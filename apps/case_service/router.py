@@ -234,6 +234,7 @@ async def query_urls(url: str = Query(..., min_length=5), db: Session = Depends(
     '/update/urls',
     response_model=List[schemas.TestCaseDataOut2],
     response_class=response_code.MyJSONResponse,
+    response_model_exclude_unset=True,
     name='批量修改url'
 )
 async def update_urls(
@@ -248,6 +249,7 @@ async def update_urls(
     '/query/api/info',
     response_model=schemas.TestCaseDataOut1,
     response_class=response_code.MyJSONResponse,
+    response_model_exclude_unset=True,
     name='按用例/序号查看API数据'
 )
 async def get_api_info(case_id: int, number: int, db: Session = Depends(get_db)):
