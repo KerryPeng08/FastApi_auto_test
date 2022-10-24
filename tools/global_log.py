@@ -13,6 +13,7 @@ import logging.handlers
 import os
 import copy
 
+from setting import LOGGER_LEVEL
 from enum import Enum, unique
 
 __all__ = [
@@ -171,7 +172,7 @@ def _get_logger(level='DEBUG'):
     logging_config = copy.deepcopy(_LOGGING_CONFIG)
 
     # 调整配置内容
-    _adjust_config(logging_config, level, _DirMode.PACKAGE)
+    _adjust_config(logging_config, level, _DirMode.CONFIG)
 
     # 使用调整后配置生成logger
     logging.config.dictConfig(logging_config)
@@ -186,4 +187,4 @@ def _get_logger(level='DEBUG'):
     return res_logger
 
 
-logger = _get_logger(level='INFO')
+logger = _get_logger(level=LOGGER_LEVEL)

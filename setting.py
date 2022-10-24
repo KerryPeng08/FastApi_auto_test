@@ -7,6 +7,9 @@
 @Time: 2022/8/23-12:54
 """
 
+# logger level
+LOGGER_LEVEL = 'INFO'
+
 # allure总目录
 ALLURE_PATH = 'D:\\Works\\liweijia\\auto_report'
 

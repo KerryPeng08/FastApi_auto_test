@@ -35,7 +35,7 @@ def load_allure_reports(app: FastAPI, allure_dir: str):
             allure_url = f"/allure/{case_id}/{run_order}"
             allure_path = f'{allure_dir}/{case_id}/allure_plus/{run_order}'
             app.mount(allure_url, StaticFiles(directory=allure_path, html=True))
-            logger.info(f"加载allure静态报告, url:{allure_url}, path:{allure_path}")
+            logger.debug(f"加载allure静态报告, url:{allure_url}, path:{allure_path}")
 
 
 def load_allure_report(allure_dir: str, case_id: int, run_order: int):
@@ -50,4 +50,4 @@ def load_allure_report(allure_dir: str, case_id: int, run_order: int):
     allure_url = f"/allure/{case_id}/{run_order}"
     allure_path = f'{allure_dir}/{case_id}/allure_plus/{run_order}'
     app.mount(allure_url, StaticFiles(directory=allure_path, html=True))
-    logger.info(f"加载allure静态报告, url:{allure_url}, path:{allure_path}")
+    logger.debug(f"加载allure静态报告, url:{allure_url}, path:{allure_path}")

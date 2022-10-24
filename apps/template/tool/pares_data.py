@@ -38,8 +38,8 @@ class ParseData:
         temp_info = []
         api_count = 0
         for data in data_json['log']['entries']:
-            logger.info(f"{'=' * 30}开始解析{api_count}{'=' * 30}")
-            logger.info(f"原始数据: {json.dumps(data, indent=2, ensure_ascii=False)}")
+            logger.debug(f"{'=' * 30}开始解析{api_count}{'=' * 30}")
+            logger.debug(f"原始数据: {json.dumps(data, indent=2, ensure_ascii=False)}")
 
             # 过滤文件接口
             if data['response']['content'].get('mimeType') in FILTER_MIME_TYPE:
@@ -56,7 +56,7 @@ class ParseData:
 
             # 处理请求中 body和json数据
             if data['request'].get('postData'):
-                body_json = await cls.post_data(data['request']['postData'])
+                body_json = await cls._post_data(data['request']['postData'])
             else:
                 body_json = ['body', {}]
 
@@ -86,12 +86,12 @@ class ParseData:
             }
             api_count += 1
             temp_info.append(new_data)
-            logger.info(f"{'=' * 30}解析完成{api_count}{'=' * 30}")
+            logger.debug(f"{'=' * 30}解析完成{api_count}{'=' * 30}")
 
         return temp_info
 
     @classmethod
-    async def post_data(cls, post_data: dict):
+    async def _post_data(cls, post_data: dict):
         """
         处理请求数据类型
         :param post_data:
