@@ -64,18 +64,30 @@ async def test():
 # print(res.json())
 # print(res.cookies.get_dict())
 
+
+# from apps.case_service.tool.docr import ocr_code
+#
+# code = ocr_code(url='http://test.allinpay.com/sso/captcha.jpg')
+# print(code)
+
+import requests
 import re
-a = "{time_int.{{2.$.code}}+{{2.$.code}}+{{2.$.code}}}"
 
-b  = re.compile(r'{{(.*?)}}', re.S).findall(a)
-for x in b:
-    print(x)
-    a = re.sub("{{(.*?)}}", str('1'), a, count=1)
+headers = {
+    'cookie': 'JSESSIONID=E67BE678CC41EED64F1F33BAD5E133BE'
+}
 
+res = requests.post(url='http://test.allinpay.com/yunst-boss/amsVerificationcode',
+                    data={
+                        "isQuery": 'isQuery',
+                        "createTimeBegin": '2022-10-27',
+                        "phone": '17388829992',
+                        'pageNum': '1',
+                        'numPerPage': '1'
+                    },
+                    headers=headers
+                    )
 
-print(a)
-
-from tools.faker_data import FakerData
-f =FakerData()
-d = f.faker_data('compute', "1+1+1")
-print(d)
+print(res.status_code)
+print(res.text)
+print(re.findall('<td width="130" align="center">(.*?)</td>', res.text, flags=0))

@@ -22,6 +22,7 @@ def mkdir():
     # pathlib.Path(f"{ALLURE_PATH}/allure_plus/1/1").mkdir(parents=True, exist_ok=True)
     pathlib.Path(f'./files/excel').mkdir(parents=True, exist_ok=True)
     pathlib.Path(f'./files/json').mkdir(parents=True, exist_ok=True)
+    pathlib.Path(f'./files/code').mkdir(parents=True, exist_ok=True)
 
 
 mkdir()

@@ -15,7 +15,6 @@ import base64
 import asyncio
 # import aiohttp
 import jsonpath
-# import ujson
 import requests
 from requests.exceptions import RequestException
 from typing import List
@@ -23,6 +22,7 @@ from requests import exceptions
 from sqlalchemy.orm import Session
 from tools import logger, get_cookie
 from tools.faker_data import FakerData
+from apps.run_case.tool.docr import ocr_code
 from apps.template import schemas as temp
 from apps.case_service import schemas as service
 from apps.run_case import crud
@@ -32,6 +32,7 @@ class RunApi:
     def __init__(self):
         # self.sees = aiohttp.client.ClientSession(json_serialize=ujson.dumps)
         self.cookies = {}
+        self.code = None  # 存验证码数据
         self.fk = FakerData()
 
     async def fo_service(
@@ -64,12 +65,25 @@ class RunApi:
             try:
                 # 识别url表达式
                 url = await self._replace_url(
-                    old_str=f"{temp_data[num].host}{case_data[num].path}", response=response, faker=self.fk
+                    old_str=f"{temp_data[num].host}{case_data[num].path}",
+                    response=response,
+                    faker=self.fk,
+                    code=self.code
                 )
                 # 识别params表达式
-                params = await self._replace_params_data(data=case_data[num].params, response=response, faker=self.fk)
+                params = await self._replace_params_data(
+                    data=case_data[num].params,
+                    response=response,
+                    faker=self.fk,
+                    code=self.code
+                )
                 # 识别data表达式
-                data = await self._replace_params_data(data=case_data[num].data, response=response, faker=self.fk)
+                data = await self._replace_params_data(
+                    data=case_data[num].data,
+                    response=response,
+                    faker=self.fk,
+                    code=self.code
+                )
             except IndexError:
                 raise IndexError(f'参数提取错误, 请检查用例编号: {num} 的提取表达式')
             # 替换headers中的内容
@@ -119,6 +133,8 @@ class RunApi:
             request_info['config'] = case_data[num].config
             # res_json = await res.json() if 'application/json' in res.content_type else {}
             try:
+                if config.get('code', 0) == 1:  # 要提取code
+                    self.code = await ocr_code(url)
                 res_json = res.json()
             except exceptions.RequestException:
                 res_json = {}
@@ -239,21 +255,22 @@ class RunApi:
         return res
 
     @staticmethod
-    async def _replace_url(old_str: str, response: list, faker: FakerData) -> str:
+    async def _replace_url(old_str: str, response: list, faker: FakerData, code: str) -> str:
         """
         替换url的值
         :param old_str:
         :param response:
         :return:
         """
-        return await header_srt(x=old_str, response=response, faker=faker, value_type='url')
+        return await header_srt(x=old_str, response=response, faker=faker, value_type='url', code=code)
 
     @staticmethod
-    async def _replace_params_data(data: dict, response: list, faker: FakerData) -> dict:
+    async def _replace_params_data(data: dict, response: list, faker: FakerData, code: str) -> dict:
         """
         替换params和data的值
         :param data:
         :param response:
+        :param code:
         :return:
         """
 
@@ -261,7 +278,7 @@ class RunApi:
             target = {}
             for key in data_json.keys():
                 if isinstance(data_json[key], str):
-                    target[key] = await header_srt(x=data_json[key], response=response, faker=faker)
+                    target[key] = await header_srt(x=data_json[key], response=response, faker=faker, code=code)
                     continue
 
                 if isinstance(data_json[key], dict):
@@ -274,7 +291,7 @@ class RunApi:
                         if isinstance(x, (list, dict)):
                             new_list.append(await handle_value(x))
                         elif isinstance(x, str):
-                            new_list.append(await header_srt(x=x, response=response, faker=faker))
+                            new_list.append(await header_srt(x=x, response=response, faker=faker, code=code))
                         else:
                             new_list.append(x)
 
@@ -300,13 +317,14 @@ class RunApi:
         return tmp_header
 
 
-async def header_srt(x: str, response: list, faker: FakerData, value_type: str = None):
+async def header_srt(x: str, response: list, faker: FakerData, value_type: str = None, code: str = None):
     """
     处理数据
     :param x:
     :param response:
     :param faker:
     :param value_type:
+    :param code:
     :return:
     """
     if "{{" in x and "$" in x and "}}" in x:
@@ -326,16 +344,18 @@ async def header_srt(x: str, response: list, faker: FakerData, value_type: str =
     if isinstance(x, str) and "{" in x and "}" in x:
         replace_values: List[str] = re.compile(r'{(.*?)}', re.S).findall(x)
         for replace in replace_values:
-            new_value = await _header_str_func(x=replace, faker=faker)
-
-            if value_type == 'url':
-                x = re.sub("{(.*?)}", str(new_value), x, count=1)
-                continue
-
-            if len(replace) + 2 == len(x):
-                x = new_value
+            if replace == 'get_code':
+                x = code
             else:
-                x = re.sub("{(.*?)}", str(new_value), x, count=1)
+                new_value = await _header_str_func(x=replace, faker=faker)
+                if value_type == 'url':
+                    x = re.sub("{(.*?)}", str(new_value), x, count=1)
+                    continue
+
+                if len(replace) + 2 == len(x):
+                    x = new_value
+                else:
+                    x = re.sub("{(.*?)}", str(new_value), x, count=1)
 
     return x
 

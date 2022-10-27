@@ -46,7 +46,9 @@ class GenerateCase:
                 'config': {
                     'is_login': True if num == 0 else None,
                     'sleep': 0.3,
-                    'stop': False
+                    'stop': False,
+                    'code': False,
+                    'extract': []
                 }
             }
             case_data_list.append(case_data)

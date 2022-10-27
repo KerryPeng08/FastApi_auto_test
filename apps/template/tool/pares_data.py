@@ -38,12 +38,12 @@ class ParseData:
         temp_info = []
         api_count = 0
         for data in data_json['log']['entries']:
-            logger.debug(f"{'=' * 30}开始解析{api_count}{'=' * 30}")
-            logger.debug(f"原始数据: {json.dumps(data, indent=2, ensure_ascii=False)}")
-
             # 过滤文件接口
             if data['response']['content'].get('mimeType') in FILTER_MIME_TYPE:
                 continue
+
+            logger.debug(f"{'=' * 30}开始解析{api_count}{'=' * 30}")
+            # logger.debug(f"原始数据: {json.dumps(data, indent=2, ensure_ascii=False)}")
 
             host = [x['value'] for x in data['request']['headers'] if x['name'] == 'Host'][0]
             http, path = data['request']['url'].split(host, 1)
@@ -84,9 +84,10 @@ class ParseData:
                 'headers': {header['name']: header['value'] for header in data['request']['headers']},
                 'response': res_data,
             }
-            api_count += 1
             temp_info.append(new_data)
+            logger.debug(f"解析数据: {json.dumps(new_data, indent=2, ensure_ascii=False)}")
             logger.debug(f"{'=' * 30}解析完成{api_count}{'=' * 30}")
+            api_count += 1
 
         return temp_info
 

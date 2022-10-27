@@ -8,7 +8,7 @@
 """
 
 # logger level
-LOGGER_LEVEL = 'INFO'
+LOGGER_LEVEL = 'DEBUG'
 
 # allure总目录
 ALLURE_PATH = 'D:\\Works\\liweijia\\auto_report'
