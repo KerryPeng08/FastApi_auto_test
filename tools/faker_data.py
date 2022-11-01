@@ -127,5 +127,5 @@ class FakerData:
 
 if __name__ == '__main__':
     f = FakerData()
-    a = f.faker_data('time_str', 1)
+    a = f.faker_data('random_int', 2)
     print(a)

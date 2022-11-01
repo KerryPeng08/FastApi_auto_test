@@ -42,7 +42,7 @@ class TemplateOut(TemplateIn):
 
 class TestCase(BaseModel):
     id: int
-    mode: str  = None
+    mode: str = None
     name: str
     run_num: int = None
 
@@ -79,6 +79,7 @@ class TemplateDataIn(BaseModel):
 
 class TemplateDataOut(TemplateDataIn):
     id: int
+    temp_id: int
     created_at: datetime
     updated_at: datetime
 

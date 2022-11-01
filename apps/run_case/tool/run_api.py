@@ -16,13 +16,14 @@ import asyncio
 # import aiohttp
 import jsonpath
 import requests
+import ddddocr
 from requests.exceptions import RequestException
 from typing import List
 from requests import exceptions
 from sqlalchemy.orm import Session
 from tools import logger, get_cookie
 from tools.faker_data import FakerData
-from apps.run_case.tool.docr import ocr_code
+from .extract import extract as my_extract
 from apps.template import schemas as temp
 from apps.case_service import schemas as service
 from apps.run_case import crud
@@ -33,7 +34,9 @@ class RunApi:
         # self.sees = aiohttp.client.ClientSession(json_serialize=ujson.dumps)
         self.cookies = {}
         self.code = None  # 存验证码数据
+        self.extract = None  # 存提取的内容
         self.fk = FakerData()
+        self.session = requests.session()
 
     async def fo_service(
             self,
@@ -68,26 +71,32 @@ class RunApi:
                     old_str=f"{temp_data[num].host}{case_data[num].path}",
                     response=response,
                     faker=self.fk,
-                    code=self.code
+                    code=self.code,
+                    extract=self.extract
                 )
                 # 识别params表达式
                 params = await self._replace_params_data(
                     data=case_data[num].params,
                     response=response,
                     faker=self.fk,
-                    code=self.code
+                    code=self.code,
+                    extract=self.extract
                 )
                 # 识别data表达式
                 data = await self._replace_params_data(
                     data=case_data[num].data,
                     response=response,
                     faker=self.fk,
-                    code=self.code
+                    code=self.code,
+                    extract=self.extract
                 )
             except IndexError:
                 raise IndexError(f'参数提取错误, 请检查用例编号: {num} 的提取表达式')
             # 替换headers中的内容
-            headers = await self._replace_headers(tmp_header=temp_data[num].headers, case_header=case_data[num].headers)
+            headers = await self._replace_headers(
+                tmp_header=temp_data[num].headers,
+                case_header=case_data[num].headers
+            )
 
             request_info = {
                 'url': url,
@@ -124,6 +133,21 @@ class RunApi:
 
             if config['is_login']:
                 self.cookies[temp_data[num].host] = await get_cookie(rep_type='requests', response=res)
+
+            # 提取code
+            if config.get('code'):
+                ocr = ddddocr.DdddOcr(show_ad=False)
+                self.code = ocr.classification(res.content)
+
+            # 从html文本中提取数据
+            if config.get('extract'):
+                _extract = config['extract']
+                self.extract = await my_extract(
+                    pattern=_extract[0],
+                    string=res.text,
+                    index=_extract[1]
+                )
+
             logger.info(f"状态码: {res.status_code}")
 
             # 收集结果
@@ -131,10 +155,7 @@ class RunApi:
             request_info['expect'] = case_data[num].check
             request_info['description'] = case_data[num].description
             request_info['config'] = case_data[num].config
-            # res_json = await res.json() if 'application/json' in res.content_type else {}
             try:
-                if config.get('code', 0) == 1:  # 要提取code
-                    self.code = await ocr_code(url)
                 res_json = res.json()
             except exceptions.RequestException:
                 res_json = {}
@@ -158,8 +179,6 @@ class RunApi:
             logger.info(f"响应信息: {json.dumps(res_json, indent=2, ensure_ascii=False)}")
             logger.info(f"{'=' * 30}结束请求{num}{'=' * 30}")
 
-        # await self.sees.close()
-
         case_info = await crud.update_test_case_order(db=db, case_id=case_id)
 
         await crud.queue_add(db=db, data={
@@ -170,8 +189,8 @@ class RunApi:
         logger.info(f"用例: {temp_pro}-{temp_name}-{case_info.case_name} 执行完成, 进行结果校验, 序号: {case_info.run_order}")
         return f"{temp_pro}-{temp_name}-{case_info.case_name}", case_info.run_order
 
-    @staticmethod
-    async def polling(sleep: int, check: dict, request_info: dict, files):
+    # @staticmethod
+    async def polling(self, sleep: int, check: dict, request_info: dict, files):
         """
         轮询执行接口
         :param sleep:
@@ -187,7 +206,7 @@ class RunApi:
         num = 1
         while True:
             # async with self.sees.request(**request_info, allow_redirects=False) as res:
-            res = requests.request(**request_info, files=files, allow_redirects=False, timeout=120)
+            res = self.session.request(**request_info, files=files, allow_redirects=False, timeout=120)
             if sleep < 5:
                 break
 
@@ -198,7 +217,7 @@ class RunApi:
             try:
                 res_json = res.json()
             except (RequestException,) as e:
-                logger.error(f"错误信息: {str(e)}")
+                logger.error(f"res.json()错误信息: {str(e)}")
                 break
 
             result = []
@@ -255,22 +274,33 @@ class RunApi:
         return res
 
     @staticmethod
-    async def _replace_url(old_str: str, response: list, faker: FakerData, code: str) -> str:
+    async def _replace_url(old_str: str, response: list, faker: FakerData, code: str, extract: str) -> str:
         """
         替换url的值
         :param old_str:
         :param response:
+        :param faker:
+        :param code:
+        :param extract:
         :return:
         """
-        return await header_srt(x=old_str, response=response, faker=faker, value_type='url', code=code)
+        return await header_srt(
+            x=old_str,
+            response=response,
+            faker=faker,
+            value_type='url',
+            code=code,
+            extract=extract
+        )
 
     @staticmethod
-    async def _replace_params_data(data: dict, response: list, faker: FakerData, code: str) -> dict:
+    async def _replace_params_data(data: dict, response: list, faker: FakerData, code: str, extract: str) -> dict:
         """
         替换params和data的值
         :param data:
         :param response:
         :param code:
+        :param extract:
         :return:
         """
 
@@ -278,7 +308,12 @@ class RunApi:
             target = {}
             for key in data_json.keys():
                 if isinstance(data_json[key], str):
-                    target[key] = await header_srt(x=data_json[key], response=response, faker=faker, code=code)
+                    target[key] = await header_srt(
+                        x=data_json[key],
+                        response=response,
+                        faker=faker, code=code,
+                        extract=extract
+                    )
                     continue
 
                 if isinstance(data_json[key], dict):
@@ -291,7 +326,13 @@ class RunApi:
                         if isinstance(x, (list, dict)):
                             new_list.append(await handle_value(x))
                         elif isinstance(x, str):
-                            new_list.append(await header_srt(x=x, response=response, faker=faker, code=code))
+                            new_list.append(await header_srt(
+                                x=x,
+                                response=response,
+                                faker=faker,
+                                code=code,
+                                extract=extract
+                            ))
                         else:
                             new_list.append(x)
 
@@ -317,7 +358,14 @@ class RunApi:
         return tmp_header
 
 
-async def header_srt(x: str, response: list, faker: FakerData, value_type: str = None, code: str = None):
+async def header_srt(
+        x: str,
+        response: list,
+        faker: FakerData,
+        value_type: str = None,
+        code: str = None,
+        extract: str = ''
+):
     """
     处理数据
     :param x:
@@ -325,6 +373,7 @@ async def header_srt(x: str, response: list, faker: FakerData, value_type: str =
     :param faker:
     :param value_type:
     :param code:
+    :param extract:
     :return:
     """
     if "{{" in x and "$" in x and "}}" in x:
@@ -346,6 +395,8 @@ async def header_srt(x: str, response: list, faker: FakerData, value_type: str =
         for replace in replace_values:
             if replace == 'get_code':
                 x = code
+            elif 'get_extract' in replace:
+                x = extract
             else:
                 new_value = await _header_str_func(x=replace, faker=faker)
                 if value_type == 'url':
@@ -406,11 +457,6 @@ async def _header_str_func(x: str, faker: FakerData):
             func, param = x.split('.', 1)
         else:
             func, param = x, 1
-
-        # try:
-        #     param = int(param)
-        # except TypeError:
-        #     param = 1
 
         value = faker.faker_data(func=func, param=param)
 

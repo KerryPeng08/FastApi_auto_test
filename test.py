@@ -74,7 +74,7 @@ import requests
 import re
 
 headers = {
-    'cookie': 'JSESSIONID=E67BE678CC41EED64F1F33BAD5E133BE'
+    'cookie': 'JSESSIONID=C1EADCBF531E0EB2D34775559625C5AC'
 }
 
 res = requests.post(url='http://test.allinpay.com/yunst-boss/amsVerificationcode',
@@ -90,4 +90,4 @@ res = requests.post(url='http://test.allinpay.com/yunst-boss/amsVerificationcode
 
 print(res.status_code)
 print(res.text)
-print(re.findall('<td width="130" align="center">(.*?)</td>', res.text, flags=0))
+print(re.findall('<td width="130" align="center">(.*?)</td>	', res.text))

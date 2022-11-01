@@ -26,6 +26,7 @@ class GenerateCase:
         response = [x.response for x in template_data]
 
         case_data_list = []
+        temp_id = None
         for num in range(len(template_data)):
             if num == 0:
                 params = template_data[num].params
@@ -51,11 +52,13 @@ class GenerateCase:
                     'extract': []
                 }
             }
+            temp_id = template_data[num].temp_id
             case_data_list.append(case_data)
 
         return {
             'tips': TIPS,
             'temp_name': temp_name,
+            'temp_id': temp_id,
             'mode': mode,
             'data': case_data_list
         }
