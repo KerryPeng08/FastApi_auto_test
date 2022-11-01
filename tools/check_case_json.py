@@ -46,6 +46,9 @@ class CheckJson:
                 continue
 
             for k, v in check.items():
+                if v is None:
+                    continue
+
                 if isinstance(v, (int, float, str, bool, dict)):
                     continue
 
@@ -64,7 +67,9 @@ class CheckJson:
                         msg_list.append(f"用例${x}比较类型不匹配: {k}: {v}")
                         continue
 
-                    if v[0] in ['==', '!='] and not isinstance(v[1], (bool, str, dict, int, float, list)):
+                    if v[0] in ['==', '!='] and not isinstance(
+                            v[1], (bool, str, dict, int, float, list)
+                    ) and v[1] is not None:
                         msg_list.append(f"用例${x}比较类型不匹配: {k}: {v}")
                         continue
 
