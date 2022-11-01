@@ -399,6 +399,9 @@ async def header_srt(
                 x = extract
             else:
                 new_value = await _header_str_func(x=replace, faker=faker)
+                if new_value is None:
+                    return x
+
                 if value_type == 'url':
                     x = re.sub("{(.*?)}", str(new_value), x, count=1)
                     continue
@@ -459,6 +462,8 @@ async def _header_str_func(x: str, faker: FakerData):
             func, param = x, 1
 
         value = faker.faker_data(func=func, param=param)
+        if value is None:
+            return None
 
         return value if value else x
 

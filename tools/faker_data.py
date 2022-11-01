@@ -39,7 +39,7 @@ class FakerData:
     @staticmethod
     def _random_int(*args) -> int:
         length = int(args[0]) if int(args[0]) <= 20 else 20
-        i = [str(x) for x in range(9)]
+        i = [str(x) for x in range(1, 9)]
         return int(''.join(random.sample(i, length)))
 
     @staticmethod
