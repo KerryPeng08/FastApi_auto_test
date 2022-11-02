@@ -124,12 +124,13 @@ class RunApi:
             logger.info(f"请求信息: {json.dumps(request_info, indent=2, ensure_ascii=False)}")
 
             # 轮询执行接口
-            res = await self.polling(
+            response_info = await self.polling(
                 sleep=config['sleep'],
                 check=case_data[num].check,
                 request_info=request_info,
                 files=files
             )
+            res, is_fail = response_info
 
             if config['is_login']:
                 self.cookies[temp_data[num].host] = await get_cookie(rep_type='requests', response=res)
@@ -178,6 +179,9 @@ class RunApi:
             result.append(request_info)
             logger.info(f"响应信息: {json.dumps(res_json, indent=2, ensure_ascii=False)}")
             logger.info(f"{'=' * 30}结束请求{num}{'=' * 30}")
+            if is_fail:
+                logger.info(f"编号: {num} 校验错误-退出执行")
+                break
 
         case_info = await crud.update_test_case_order(db=db, case_id=case_id)
 
@@ -203,17 +207,21 @@ class RunApi:
         check = copy.deepcopy(check)
         del check['status_code']
 
+        is_fail = False  # 标记是否失败
         num = 1
         while True:
             # async with self.sees.request(**request_info, allow_redirects=False) as res:
             res = self.session.request(**request_info, files=files, allow_redirects=False, timeout=120)
+
+            if res.status_code not in [200, 302]:
+                is_fail = True
+                logger.error(f"状态码: {res.status_code}")
+                break
+
             if sleep < 5:
                 break
 
             logger.info(f"循环{num + 1}次: {request_info['url']}")
-            if res.status_code != 200:
-                logger.error(f"状态码: {res.status_code}")
-                break
             try:
                 res_json = res.json()
             except (RequestException,) as e:
@@ -265,13 +273,16 @@ class RunApi:
                             result.append({k: value})
             logger.info(f"匹配结果: {result}")
             if len(result) == len(check):
+                is_fail = False
                 break
+            else:
+                is_fail = True
 
             await asyncio.sleep(5)
             sleep -= 5
             num += 1
 
-        return res
+        return res, is_fail
 
     @staticmethod
     async def _replace_url(old_str: str, response: list, faker: FakerData, code: str, extract: str) -> str:
