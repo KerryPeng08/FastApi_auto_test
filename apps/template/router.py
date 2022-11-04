@@ -32,8 +32,12 @@ template = APIRouter()
     response_model_exclude_unset=True,
     name='上传Charles的har文件-先解析-再写入'
 )
-async def upload_file_har(temp_name: str, project_name: schemas.TempEnum, file: UploadFile,
-                          db: Session = Depends(get_db)):
+async def upload_file_har(
+        temp_name: str,
+        project_name: schemas.TempEnum,
+        file: UploadFile,
+        db: Session = Depends(get_db)
+):
     """
     1、上传文件后，解析数据，形成模板数据\n
     2、自动过滤掉'js','css','image'\n
@@ -84,8 +88,12 @@ async def analysis_file_har(file: UploadFile):
     response_model_exclude_unset=True,
     name='查询模板数据'
 )
-async def get_templates(temp_name: str = None, temp_id: int = None, outline: bool = True,
-                        db: Session = Depends(get_db)):
+async def get_templates(
+        temp_name: str = None,
+        temp_id: int = None,
+        outline: bool = True,
+        db: Session = Depends(get_db)
+):
     """
     1、查询已存在的测试模板/场景\n
     2、场景包含的测试用例
@@ -213,10 +221,9 @@ async def download_temp_excel(temp_name: str, db: Session = Depends(get_db)):
         )
     return await response_code.resp_404()
 
-
-@template.get(
-    '/diff',
-    name='对比测试模板数据-开发中'
-)
-async def diff_template(name: str, db: Session = Depends(get_db)):
-    pass
+# @template.get(
+#     '/diff',
+#     name='对比测试模板数据-开发中'
+# )
+# async def diff_template(name: str, db: Session = Depends(get_db)):
+#     pass

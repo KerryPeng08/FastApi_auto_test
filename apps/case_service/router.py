@@ -38,7 +38,12 @@ case_service = APIRouter()
     response_model_exclude_unset=True,
     name='获取预处理后的模板数据'
 )
-async def test_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = Depends(get_db)):
+async def test_case_data(
+        temp_name: str,
+        mode: schemas.ModeEnum,
+        fail_stop: bool,
+        db: Session = Depends(get_db)
+):
     """
     自动处理部分接口数据上下级关联数据
     """
@@ -47,7 +52,12 @@ async def test_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = D
 
     template_data = await temp_crud.get_template_data(db=db, temp_name=temp_name)
     if template_data:
-        return await GenerateCase().read_template_to_api(temp_name=temp_name, mode=mode, template_data=template_data)
+        return await GenerateCase().read_template_to_api(
+            temp_name=temp_name,
+            mode=mode,
+            fail_stop=fail_stop,
+            template_data=template_data
+        )
 
     return await response_code.resp_404()
 
@@ -58,7 +68,12 @@ async def test_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = D
     response_model_exclude_unset=True,
     name='下载预处理后的模板数据-json',
 )
-async def download_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session = Depends(get_db)):
+async def download_case_data(
+        temp_name: str,
+        mode: schemas.ModeEnum,
+        fail_stop: bool,
+        db: Session = Depends(get_db)
+):
     """
     自动处理部分接口上下级关联数据\n
     json格式化数据下载
@@ -68,8 +83,12 @@ async def download_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session
 
     template_data = await temp_crud.get_template_data(db=db, temp_name=temp_name)
     if template_data:
-        test_data = await GenerateCase().read_template_to_api(temp_name=temp_name, mode=mode,
-                                                              template_data=template_data)
+        test_data = await GenerateCase().read_template_to_api(
+            temp_name=temp_name,
+            mode=mode,
+            fail_stop=fail_stop,
+            template_data=template_data
+        )
         path = f'./files/json/{time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))}.json'
         await OperationJson.write(path=path, data=test_data)
         return FileResponse(
@@ -87,9 +106,14 @@ async def download_case_data(temp_name: str, mode: schemas.ModeEnum, db: Session
     response_class=response_code.MyJSONResponse,
     name='上传测试数据-json'
 )
-async def test_case_upload_json(temp_name: str, file: UploadFile,
-                                case_id: int = None, case_name: str = None, cover: bool = False,
-                                db: Session = Depends(get_db)):
+async def test_case_upload_json(
+        temp_name: str,
+        file: UploadFile,
+        case_id: int = None,
+        case_name: str = None,
+        cover: bool = False,
+        db: Session = Depends(get_db)
+):
     """
     上传json文件，解析后储存测试数据
     """

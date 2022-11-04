@@ -24,6 +24,7 @@ from sqlalchemy.orm import Session
 from tools import logger, get_cookie
 from tools.faker_data import FakerData
 from .extract import extract as my_extract
+from setting import GLOBAL_FAIL_STOP
 from apps.template import schemas as temp
 from apps.case_service import schemas as service
 from apps.run_case import crud
@@ -179,8 +180,11 @@ class RunApi:
             result.append(request_info)
             logger.info(f"响应信息: {json.dumps(res_json, indent=2, ensure_ascii=False)}")
             logger.info(f"{'=' * 30}结束请求{num}{'=' * 30}")
-            if is_fail:
+
+            # 失败停止的判断
+            if GLOBAL_FAIL_STOP and is_fail:
                 logger.info(f"编号: {num} 校验错误-退出执行")
+                logger.info(f"{'=' * 30}结束请求{num}{'=' * 30}")
                 break
 
         case_info = await crud.update_test_case_order(db=db, case_id=case_id)

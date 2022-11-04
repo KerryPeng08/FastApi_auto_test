@@ -8,23 +8,26 @@
 """
 
 # logger level
-LOGGER_LEVEL = 'INFO'
+LOGGER_LEVEL: str = 'INFO'
 
 # allure总目录
-ALLURE_PATH = 'D:\\Works\\liweijia\\auto_report'
+ALLURE_PATH: str = 'D:\\Works\\liweijia\\auto_report'
 
 # host
-HOST = 'http://172.16.100.95:8000/'
+HOST: str = 'http://172.16.100.95:8000/'
 
 # YApi配置信息
-YAPI_INFO = {
+YAPI_INFO: dict = {
     'host': 'http://yapi.liweijia.com',
     'email': 'yangjie@liweijia.com',
     'password': 'liweijia666'
 }
 
+# 失败即刻停止执行
+GLOBAL_FAIL_STOP: bool = True
+
 # TIPS
-TIPS = {
+TIPS: dict = {
     '1': '编写用例时，只需关注path/params/data/check',
     '2': 'headers接受键值对输入，有内容则在执行时添加/替换请求头内容',
     '3': 'is_login标记登录接口，标记后自动获取cookie进行替换',

@@ -45,7 +45,8 @@ class TestCaseConfig(BaseModel):
     sleep: float = 0.3
     stop: bool = None
     code: bool = None
-    extract: list = None
+    extract: list = None,
+    fail_stop: bool = None
 
 
 class TestCaseDataIn(BaseModel):

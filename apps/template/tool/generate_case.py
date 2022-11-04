@@ -15,7 +15,13 @@ from setting import TIPS
 
 class GenerateCase:
 
-    async def read_template_to_api(self, temp_name: str, mode: str, template_data: List[schemas.TemplateDataOut]):
+    async def read_template_to_api(
+            self,
+            temp_name: str,
+            mode: str,
+            fail_stop: bool,
+            template_data: List[schemas.TemplateDataOut]
+    ):
         """
         读取模板生成准测试数据
         :param temp_name:
@@ -49,7 +55,8 @@ class GenerateCase:
                     'sleep': 0.3,
                     'stop': False,
                     'code': False,
-                    'extract': []
+                    'extract': [],
+                    'fail_stop': fail_stop
                 }
             }
             temp_id = template_data[num].temp_id
