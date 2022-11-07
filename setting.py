@@ -51,7 +51,8 @@ TIPS: dict = {
             'sleep': '接口的等待时间, 默认0.3',
             'stop': '主动停止执行, 默认false',
             'code': '是否识别验证码, 默认false, 需要和假数据表达式{get_code}配合使用',
-            'extract': '正则提取表达式[pattern,string], 默认[], 需要和假数据表达式{extract}配合使用'
+            'extract': '正则提取表达式[pattern,string], 默认[], 需要和假数据表达式{extract}配合使用',
+            'fail_stop': 'True表示用例执行失败，则停止继续执行'
         }
     },
     '8': {'假数据工具-function': {
