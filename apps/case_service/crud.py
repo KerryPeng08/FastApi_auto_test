@@ -78,13 +78,14 @@ async def get_case_info(db: Session, case_name: str = None, case_id: int = None,
     :return:
     """
     if case_id:
-        return db.query(models.TestCase).filter(models.TestCase.id == case_id).all()
+        return db.query(models.TestCase).filter(models.TestCase.id == case_id).order_by(models.TestCase.id).all()
 
     if case_name:
-        return db.query(models.TestCase).filter(models.TestCase.case_name == case_name).all()
-
+        return db.query(models.TestCase).filter(models.TestCase.case_name == case_name).order_by(
+            models.TestCase.id
+        ).all()
     if all:
-        return db.query(models.TestCase).all()
+        return db.query(models.TestCase).order_by(models.TestCase.id).all()
 
 
 async def get_case_data(db: Session, case_id: int):
@@ -94,7 +95,9 @@ async def get_case_data(db: Session, case_id: int):
     :param case_id:
     :return:
     """
-    return db.query(models.TestCaseData).filter(models.TestCaseData.case_id == case_id).all()
+    return db.query(models.TestCaseData).filter(models.TestCaseData.case_id == case_id).order_by(
+        models.TestCaseData.number
+    ).all()
 
 
 async def del_case_data(db: Session, case_id: int):
@@ -126,7 +129,7 @@ async def get_case_ids(db: Session, temp_id: int):
     :param temp_id:
     :return:
     """
-    return db.query(models.TestCase.id).filter(models.TestCase.temp_id == temp_id).all()
+    return db.query(models.TestCase.id).filter(models.TestCase.temp_id == temp_id).order_by(models.TestCase.id).all()
 
 
 async def get_urls(db: Session, url: str):
@@ -136,7 +139,9 @@ async def get_urls(db: Session, url: str):
     :param url:
     :return:
     """
-    return db.query(models.TestCaseData).filter(models.TestCaseData.path.like(f"{url}%")).all()
+    return db.query(models.TestCaseData).filter(models.TestCaseData.path.like(f"{url}%")).order_by(
+        models.TestCaseData.number
+    ).all()
 
 
 async def update_urls(db: Session, old_url: str, new_url: str):
@@ -150,7 +155,9 @@ async def update_urls(db: Session, old_url: str, new_url: str):
     if not await get_urls(db=db, url=old_url):
         return None
 
-    db_info = db.query(models.TestCaseData).filter(models.TestCaseData.path.like(f"{old_url}%")).all()
+    db_info = db.query(models.TestCaseData).filter(models.TestCaseData.path.like(f"{old_url}%")).order_by(
+        models.TestCaseData.number
+    ).all()
 
     url_info = []
     for info in db_info:

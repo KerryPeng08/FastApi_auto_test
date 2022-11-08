@@ -68,15 +68,19 @@ async def get_temp_name(db: Session, temp_name: str = None, temp_id: int = None,
     :return:
     """
     if temp_id:
-        return db.query(models.Template).filter(models.Template.id == temp_id).all()
+        return db.query(models.Template).filter(models.Template.id == temp_id).order_by(models.Template.id.desc()).all()
 
     if temp_name:
         if like:
-            return db.query(models.Template).filter(models.Template.temp_name.like(f"%{temp_name}%")).all()
+            return db.query(models.Template).filter(models.Template.temp_name.like(f"%{temp_name}%")).order_by(
+                models.Template.id.desc()
+            ).all()
         else:
-            return db.query(models.Template).filter(models.Template.temp_name == temp_name).all()
+            return db.query(models.Template).filter(models.Template.temp_name == temp_name).order_by(
+                models.Template.id.desc()
+            ).all()
 
-    return db.query(models.Template).all()
+    return db.query(models.Template).order_by(models.Template.id.desc()).all()
 
 
 async def get_temp_case_info(db: Session, temp_id: int, outline: bool):
@@ -87,7 +91,9 @@ async def get_temp_case_info(db: Session, temp_id: int, outline: bool):
     :param outline:
     :return:
     """
-    db_case = db.query(case_models.TestCase).filter(case_models.TestCase.temp_id == temp_id).all()
+    db_case = db.query(case_models.TestCase).filter(case_models.TestCase.temp_id == temp_id).order_by(
+        case_models.TestCase.id
+    ).all()
     case_info = []
     for case in db_case:
         if outline is False:
@@ -109,10 +115,14 @@ async def get_template_data(db: Session, temp_name: str = None, temp_id: int = N
     if temp_name:
         db_temp = db.query(models.Template).filter(models.Template.temp_name == temp_name).first()
         if db_temp:
-            return db.query(models.TemplateData).filter(models.TemplateData.temp_id == db_temp.id).all()
+            return db.query(models.TemplateData).filter(models.TemplateData.temp_id == db_temp.id).order_by(
+                models.TemplateData.number
+            ).all()
 
     if temp_id:
-        return db.query(models.TemplateData).filter(models.TemplateData.temp_id == temp_id).all()
+        return db.query(models.TemplateData).filter(models.TemplateData.temp_id == temp_id).order_by(
+            models.TemplateData.number
+        ).all()
 
 
 async def put_temp_name(db: Session, new_name: str, temp_id: int = None, old_name: str = None):

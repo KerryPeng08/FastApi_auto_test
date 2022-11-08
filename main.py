@@ -8,7 +8,7 @@
 """
 
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from setting import ALLURE_PATH, TIPS, HOST
 from apps.template.router import template
 from apps.case_service.router import case_service
