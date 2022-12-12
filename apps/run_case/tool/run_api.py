@@ -444,6 +444,25 @@ async def _header_str_param(x: str, response: list):
         json_path, str_index = json_path.split('|', 1)
         start_index, end_index = str_index.split(':', 1)
 
+    if ',' in json_path:
+        json_path, seek_list = json_path.split(',', 1)
+        extract_key = json_path.split('.')[-1]
+        seek_list = seek_list.split(',')
+
+        value = set()
+        for seek in seek_list:
+            seek_value, compare, seek_name = seek.strip().split(' ')
+            value_set = await _header_adjoin(seek_name, seek_value, compare, extract_key, response[int(num)])
+            if value_set:
+                if not value:
+                    value = value_set
+                value = value & value_set
+
+        if value:
+            return list(value)[0]
+        else:
+            return False
+
     value = jsonpath.jsonpath(response[int(num)], json_path)
     if value:
         if start_index is None and end_index is None:
@@ -461,6 +480,39 @@ async def _header_str_param(x: str, response: list):
                 return value[0]
     else:
         return value
+
+
+async def _header_adjoin(seek_name: str, seek_value: str, compare: str, extract_key: str, response_data):
+    """
+
+    :param seek_name: 相邻的key
+    :param seek_value: 相邻的key的内容
+    :param compare: 比较符
+    :param extract_key: 需要提取的字段
+    :param response_data: 响应内容
+    :return:
+    """
+    path_list = jsonpath.jsonpath(response_data, f'$..{seek_name}', result_type='IPATH')
+
+    if not path_list:
+        return []
+
+    value_list = []
+    for path in path_list:
+        json_data = jsonpath.jsonpath(response_data, f"$.{'.'.join(path)}")
+        if compare == 'in' and json_data and seek_value in json_data[0]:
+            path[-1] = extract_key
+            data = jsonpath.jsonpath(response_data, f"$.{'.'.join(path)}")
+            value_list.append(data[0] if data else None)
+            continue
+
+        if compare == '==' and json_data and seek_value == json_data[0]:
+            path[-1] = extract_key
+            data = jsonpath.jsonpath(response_data, f"$.{'.'.join(path)}")
+            value_list.append(data[0] if data else None)
+            continue
+
+    return set(value_list)
 
 
 async def _header_str_func(x: str, faker: FakerData):
