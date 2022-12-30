@@ -13,13 +13,12 @@ import copy
 import json
 import base64
 import asyncio
-# import aiohttp
 import jsonpath
-import requests
 import ddddocr
-from requests.exceptions import RequestException
+import aiohttp
+from aiohttp import FormData
+from aiohttp import client_exceptions
 from typing import List
-from requests import exceptions
 from sqlalchemy.orm import Session
 from tools import logger, get_cookie
 from tools.faker_data import FakerData
@@ -32,12 +31,13 @@ from apps.run_case import crud
 
 class RunApi:
     def __init__(self):
-        # self.sees = aiohttp.client.ClientSession(json_serialize=ujson.dumps)
+        timeout = aiohttp.ClientTimeout(total=120)
+        self.sees = aiohttp.client.ClientSession(timeout=timeout)
         self.cookies = {}
         self.code = None  # 存验证码数据
         self.extract = None  # 存提取的内容
         self.fk = FakerData()
-        self.session = requests.session()
+        # self.session = requests.session()
 
     async def fo_service(
             self,
@@ -62,10 +62,11 @@ class RunApi:
 
             config: dict = copy.deepcopy(dict(case_data[num].config))
             if config.get('stop'):
-                logger.info(f"number: {num} 接口配置信息stop = {config['stop']}, 停止后续接口请求")
+                logger.info(f"case_id:{case_id},number:{num} 接口配置信息stop = {config['stop']}, 停止后续接口请求")
+                await self.sees.close()
                 break
 
-            logger.info(f"{'=' * 30}开始请求{num}{'=' * 30}")
+            logger.info(f"{'=' * 30}case_id:{case_id},开始请求,number:{num}{'=' * 30}")
             try:
                 # 识别url表达式
                 url = await self._replace_url(
@@ -92,7 +93,8 @@ class RunApi:
                     extract=self.extract
                 )
             except IndexError:
-                raise IndexError(f'参数提取错误, 请检查用例编号: {num} 的提取表达式')
+                await self.sees.close()
+                raise IndexError(f'case_id:{case_id},参数提取错误, 请检查用例编号: {num} 的提取表达式')
             # 替换headers中的内容
             headers = await self._replace_headers(
                 tmp_header=temp_data[num].headers,
@@ -106,35 +108,35 @@ class RunApi:
                 'params': params,
                 f"{'json' if temp_data[num].json_body == 'json' else 'data'}": data,
             }
-            # 上传附件
-            files = {
-                f"{temp_data[num].file_data[0]['name']}": (
-                    temp_data[num].file_data[0]['fileName'],
-                    base64.b64decode(temp_data[num].file_data[0]['value'].encode('utf-8')),
-                    temp_data[num].file_data[0]['contentType']
-                )
-            } if temp_data[num].file else None
 
             if self.cookies.get(temp_data[num].host):
-                request_info['headers']['Cookie'] = self.cookies[temp_data[num].host]
+                if request_info['headers'].get('Cookie'):
+                    request_info['headers']['Cookie'] = self.cookies[temp_data[num].host]
+                if request_info['headers'].get('cookie'):
+                    request_info['headers']['cookie'] = self.cookies[temp_data[num].host]
 
             # 有附件时，要删除Content-Type
-            if files:
+            if temp_data[num].file:
                 del request_info['headers']['Content-Type']
 
-            logger.info(f"请求信息: {json.dumps(request_info, indent=2, ensure_ascii=False)}")
+            # aiohttp 需要删除Content-Length
+            if request_info['headers'].get('Content-Length'):
+                del request_info['headers']['Content-Length']
+
+            logger.info(f"case_id:{case_id},请求信息: {json.dumps(request_info, indent=2, ensure_ascii=False)}")
 
             # 轮询执行接口
             response_info = await self.polling(
+                case_id=case_id,
                 sleep=config['sleep'],
                 check=case_data[num].check,
                 request_info=request_info,
-                files=files
+                files=temp_data[num].file_data
             )
             res, is_fail = response_info
 
             if config['is_login']:
-                self.cookies[temp_data[num].host] = await get_cookie(rep_type='requests', response=res)
+                self.cookies[temp_data[num].host] = await get_cookie(rep_type='aiohttp', response=res)
 
             # 提取code
             if config.get('code'):
@@ -146,11 +148,11 @@ class RunApi:
                 _extract = config['extract']
                 self.extract = await my_extract(
                     pattern=_extract[0],
-                    string=res.text,
+                    string=await res.text(encoding='utf-8'),
                     index=_extract[1]
                 )
 
-            logger.info(f"状态码: {res.status_code}")
+            logger.info(f"case_id:{case_id},状态码: {res.status}")
 
             # 收集结果
             request_info['file'] = True if temp_data[num].file else False
@@ -158,33 +160,35 @@ class RunApi:
             request_info['description'] = case_data[num].description
             request_info['config'] = case_data[num].config
             try:
-                res_json = res.json()
-            except exceptions.RequestException:
+                res_json = await res.json(content_type='application/json' if not temp_data[num].file else None)
+                res_json = {} if res_json is None else res_json
+            except (client_exceptions.ContentTypeError, json.decoder.JSONDecodeError):
                 res_json = {}
             request_info['response'] = res_json
             response.append(res_json)
 
             # 判断响应结果，调整校验内容收集
-            if res.status_code != case_data[num].check['status_code']:
-                request_info['actual'] = {'status_code': [res.status_code]}
+            if res.status != case_data[num].check['status_code']:
+                request_info['actual'] = {'status_code': [res.status]}
             else:
                 new_check = copy.deepcopy(case_data[num].check)
                 del new_check['status_code']
                 request_info['actual'] = {
-                    **{'status_code': [res.status_code]},
+                    **{'status_code': [res.status]},
                     **{k: jsonpath.jsonpath(res_json, f'$..{k}') for k in new_check}
                 }
 
             config['sleep'] = 0.3
             await asyncio.sleep(config['sleep'])
             result.append(request_info)
-            logger.info(f"响应信息: {json.dumps(res_json, indent=2, ensure_ascii=False)}")
-            logger.info(f"{'=' * 30}结束请求{num}{'=' * 30}")
+            logger.info(f"case_id:{case_id},响应信息: {json.dumps(res_json, indent=2, ensure_ascii=False)}")
+            logger.info(f"{'=' * 30}case_id:{case_id},结束请求,number:{num}{'=' * 30}")
 
             # 失败停止的判断
             if GLOBAL_FAIL_STOP and is_fail:
-                logger.info(f"编号: {num} 校验错误-退出执行")
-                logger.info(f"{'=' * 30}结束请求{num}{'=' * 30}")
+                await self.sees.close()
+                logger.info(f"case_id:{case_id},编号: {num} 校验错误-退出执行")
+                logger.info(f"{'=' * 30}case_id:{case_id},结束请求,number:{num}{'=' * 30}")
                 break
 
         case_info = await crud.update_test_case_order(db=db, case_id=case_id)
@@ -195,12 +199,14 @@ class RunApi:
             'case_data': result
         })
         logger.info(f"用例: {temp_pro}-{temp_name}-{case_info.case_name} 执行完成, 进行结果校验, 序号: {case_info.run_order}")
+        await self.sees.close()
         return f"{temp_pro}-{temp_name}-{case_info.case_name}", case_info.run_order
 
     # @staticmethod
-    async def polling(self, sleep: int, check: dict, request_info: dict, files):
+    async def polling(self, case_id: int, sleep: int, check: dict, request_info: dict, files):
         """
         轮询执行接口
+        :param case_id:
         :param sleep:
         :param check:
         :param request_info:
@@ -214,21 +220,41 @@ class RunApi:
         is_fail = False  # 标记是否失败
         num = 1
         while True:
-            # async with self.sees.request(**request_info, allow_redirects=False) as res:
-            res = self.session.request(**request_info, files=files, allow_redirects=False, timeout=120)
+            if files:
+                files_data = FormData()
+                for file in files:
+                    files_data.add_field(
+                        name=file['name'],
+                        value=base64.b64decode(file['value'].encode('utf-8')),
+                        content_type=file['contentType'],
+                        filename=file['fileName']
+                    )
+                request_info['data'] = files_data
 
-            if res.status_code not in [200, 302]:
+            res = await self.sees.request(**request_info, allow_redirects=False)
+
+            if files:
+                request_info['data'] = [
+                    {
+                        'name': file['name'],
+                        'content_type': file['contentType'],
+                        'filename': file['fileName']
+
+                    } for file in files
+                ]
+
+            if res.status not in [200, 302]:
                 is_fail = True
-                logger.error(f"状态码: {res.status_code}")
+                logger.error(f"状态码: {res.status}")
                 break
 
-            if sleep < 5:
+            if sleep < 5 or not check:
                 break
 
-            logger.info(f"循环{num + 1}次: {request_info['url']}")
+            logger.info(f"循环case_id:{case_id},{num + 1}次: {request_info['url']}")
             try:
-                res_json = res.json()
-            except (RequestException,) as e:
+                res_json = await res.json(content_type='application/json' if not files else None)
+            except (client_exceptions.ContentTypeError, json.decoder.JSONDecodeError) as e:
                 logger.error(f"res.json()错误信息: {str(e)}")
                 break
 
@@ -275,7 +301,7 @@ class RunApi:
                     elif v[0] == 'notin':
                         if value not in v[1]:
                             result.append({k: value})
-            logger.info(f"匹配结果: {result}")
+            logger.info(f"case_id:{case_id},匹配结果: {result}")
             if len(result) == len(check):
                 is_fail = False
                 break

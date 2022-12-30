@@ -7,8 +7,7 @@
 @Time: 2022/9/28-17:15
 """
 
-# from aiohttp.client import ServerDisconnectedError, ServerConnectionError
-from requests.exceptions import ConnectionError, ReadTimeout, ConnectTimeout
+from aiohttp.client_exceptions import ServerTimeoutError, ServerConnectionError, ServerDisconnectedError
 from sqlalchemy.orm import Session
 from apps.case_service import crud as case_crud
 from apps.template import crud as temp_crud
@@ -19,7 +18,7 @@ from setting import ALLURE_PATH, HOST
 
 
 async def run_service_case(db: Session, case_ids: list):
-    report = []
+    report = {}
     for case_id in case_ids:
         case_info = await case_crud.get_case_info(db=db, case_id=case_id)
         if case_info:
@@ -39,8 +38,7 @@ async def run_service_case(db: Session, case_ids: list):
                     temp_pro=temp_info[0].project_name,
                     temp_name=temp_info[0].temp_name
                 )
-            # except (ServerDisconnectedError, ServerConnectionError) as e:
-            except (ConnectionError, ReadTimeout, ConnectTimeout) as e:
+            except (ServerTimeoutError, ServerConnectionError, ServerDisconnectedError) as e:
                 return await response_code.resp_400(message=f'网络访问失败: {str(e)}')
 
             except IndexError as e:
@@ -55,10 +53,10 @@ async def run_service_case(db: Session, case_ids: list):
                 case_name=case,
                 case_id=case_id
             )
-            load_allure_report(allure_dir=allure_dir, case_id=case_id, run_order=run_order)
+            await load_allure_report(allure_dir=allure_dir, case_id=case_id, run_order=run_order)
 
-            report.append(f'{HOST}allure/{case_id}/{run_order}')
+            report[case_id] = f'{HOST}allure/{case_id}/{run_order}'
         else:
-            report.append(f'用例{case_id}不存在')
+            report[case_id] = f'用例{case_id}不存在'
 
-    return await response_code.resp_200(data={'allure_report': report})
+    return report

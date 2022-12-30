@@ -38,7 +38,7 @@ def load_allure_reports(app: FastAPI, allure_dir: str):
             logger.debug(f"加载allure静态报告, url:{allure_url}, path:{allure_path}")
 
 
-def load_allure_report(allure_dir: str, case_id: int, run_order: int):
+async def load_allure_report(allure_dir: str, case_id: int, run_order: int):
     """
     加载单个allure测试报告
     :param allure_dir: 测试报告目录

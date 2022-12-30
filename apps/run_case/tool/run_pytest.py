@@ -34,7 +34,7 @@ async def run(test_path: str, allure_dir: str, report_url, case_name: str, case_
     command = f"allure generate {allure_path} -o {os.path.join(allure_plus_dir, str(build_order))} --clean"
     os.system(command)
     # 执行完毕后再调用update_trend_data()
-    update_trend_data(allure_plus_dir, build_order, old_data, report_url, case_name, case_id)
+    await update_trend_data(allure_plus_dir, build_order, old_data, report_url, case_name, case_id)
 
 
 def get_dirname(allure_plus_dir):
@@ -53,8 +53,8 @@ def get_dirname(allure_plus_dir):
         return 1, None
 
 
-def update_trend_data(allure_plus_dir: str, dirname: int, old_data: list, report_url: str, case_name: str,
-                      case_id: int):
+async def update_trend_data(allure_plus_dir: str, dirname: int, old_data: list, report_url: str, case_name: str,
+                            case_id: int):
     """
     dirname：构建次数
     old_data：备份的数据

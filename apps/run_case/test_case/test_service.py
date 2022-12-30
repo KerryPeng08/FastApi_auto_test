@@ -75,7 +75,7 @@ class TestService:
             headers: dict
     ):
 
-        allure.dynamic.title(f"{description}\n{url}")
+        allure.dynamic.title(f"{description}\n/{url.split('/', 3)[3]}")
 
         for k, v in expect.items():
             await self.assert_value(k, v, actual_value=actual)
