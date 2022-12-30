@@ -92,13 +92,23 @@ class RunApi:
                     code=self.code,
                     extract=self.extract
                 )
+                # 识别headers中的表达式
+                case_header = await self._replace_params_data(
+                    data=case_data[num].headers,
+                    response=response,
+                    faker=self.fk
+                )
+
             except IndexError:
                 await self.sees.close()
                 raise IndexError(f'case_id:{case_id},参数提取错误, 请检查用例编号: {num} 的提取表达式')
+
             # 替换headers中的内容
             headers = await self._replace_headers(
                 tmp_header=temp_data[num].headers,
-                case_header=case_data[num].headers
+                case_header=case_header,
+                tmp_host=temp_data[num].host,
+                tmp_file=temp_data[num].file
             )
 
             request_info = {
@@ -108,20 +118,6 @@ class RunApi:
                 'params': params,
                 f"{'json' if temp_data[num].json_body == 'json' else 'data'}": data,
             }
-
-            if self.cookies.get(temp_data[num].host):
-                if request_info['headers'].get('Cookie'):
-                    request_info['headers']['Cookie'] = self.cookies[temp_data[num].host]
-                if request_info['headers'].get('cookie'):
-                    request_info['headers']['cookie'] = self.cookies[temp_data[num].host]
-
-            # 有附件时，要删除Content-Type
-            if temp_data[num].file:
-                del request_info['headers']['Content-Type']
-
-            # aiohttp 需要删除Content-Length
-            if request_info['headers'].get('Content-Length'):
-                del request_info['headers']['Content-Length']
 
             logger.info(f"case_id:{case_id},请求信息: {json.dumps(request_info, indent=2, ensure_ascii=False)}")
 
@@ -202,7 +198,6 @@ class RunApi:
         await self.sees.close()
         return f"{temp_pro}-{temp_name}-{case_info.case_name}", case_info.run_order
 
-    # @staticmethod
     async def polling(self, case_id: int, sleep: int, check: dict, request_info: dict, files):
         """
         轮询执行接口
@@ -335,7 +330,13 @@ class RunApi:
         )
 
     @staticmethod
-    async def _replace_params_data(data: dict, response: list, faker: FakerData, code: str, extract: str) -> dict:
+    async def _replace_params_data(
+            data: dict,
+            response: list,
+            faker: FakerData,
+            code: str = None,
+            extract: str = ''
+    ) -> dict:
         """
         替换params和data的值
         :param data:
@@ -347,12 +348,15 @@ class RunApi:
 
         async def handle_value(data_json):
             target = {}
+            if not data_json:
+                return target
             for key in data_json.keys():
                 if isinstance(data_json[key], str):
                     target[key] = await header_srt(
                         x=data_json[key],
                         response=response,
-                        faker=faker, code=code,
+                        faker=faker,
+                        code=code,
                         extract=extract
                     )
                     continue
@@ -386,8 +390,7 @@ class RunApi:
 
         return await handle_value(data)
 
-    @staticmethod
-    async def _replace_headers(tmp_header: dict, case_header: dict) -> dict:
+    async def _replace_headers(self, tmp_header: dict, case_header: dict, tmp_host: str, tmp_file: bool) -> dict:
         """
         替换headers中的内容
         :param tmp_header:
@@ -396,6 +399,22 @@ class RunApi:
         """
         for k, v in case_header.items():
             tmp_header[k] = v
+
+        # 替换cookie
+        if self.cookies.get(tmp_host):
+            if tmp_header.get('Cookie'):
+                tmp_header['Cookie'] = self.cookies[tmp_host]
+            if tmp_header.get('cookie'):
+                tmp_header['cookie'] = self.cookies[tmp_host]
+
+        # 有附件时，要删除Content-Type
+        if tmp_file:
+            del tmp_header['Content-Type']
+
+        # aiohttp 需要删除Content-Length
+        if tmp_header.get('Content-Length'):
+            del tmp_header['Content-Length']
+
         return tmp_header
 
 
