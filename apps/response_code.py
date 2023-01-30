@@ -51,7 +51,7 @@ async def resp_200(*, data: Union[list, dict, str, int, float] = '', message: st
     )
 
 
-async def resp_400(*, data: str = '', message: str = "操作失败") -> Response:
+async def resp_400(*, data: Union[list, dict, str, int, float] = '', message: str = "操作失败") -> Response:
     return MyJSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={
@@ -62,7 +62,7 @@ async def resp_400(*, data: str = '', message: str = "操作失败") -> Response
     )
 
 
-async def resp_404(*, data: str = '', message: str = "未获取到内容") -> Response:
+async def resp_404(*, data: Union[list, dict, str, int, float] = '', message: str = "未获取到内容") -> Response:
     return MyJSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
         content={

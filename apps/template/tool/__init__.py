@@ -9,3 +9,4 @@
 
 from .pares_data import ParseData
 from .generate_case import GenerateCase
+from .check_num_list import check_num

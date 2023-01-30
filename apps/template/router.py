@@ -10,7 +10,7 @@
 import os
 import time
 from typing import List
-from fastapi import APIRouter, UploadFile, Depends
+from fastapi import APIRouter, UploadFile, Depends, Form, File, Query
 from sqlalchemy.orm import Session
 from starlette.responses import FileResponse
 from starlette.background import BackgroundTask
@@ -19,7 +19,7 @@ from depends import get_db
 
 from apps.template import crud, schemas
 from apps.case_service import crud as case_crud
-from apps.template.tool import ParseData
+from apps.template.tool import ParseData, check_num
 from tools import CreateExcel
 
 template = APIRouter()
@@ -68,7 +68,7 @@ async def upload_file_har(
     response_class=response_code.MyJSONResponse,
     response_model_exclude_unset=True,
     name='上传Charles的har文件-仅解析-不写入',
-    response_model_exclude=['headers', 'file_data', 'response']
+    response_model_exclude=['headers', 'file_data']
 )
 async def analysis_file_har(file: UploadFile):
     """
@@ -79,6 +79,50 @@ async def analysis_file_har(file: UploadFile):
         return await response_code.resp_400(message=f'文件类型错误，只支持har格式文件')
 
     return await ParseData.pares_data(har_data=file.file.read())
+
+
+@template.post(
+    '/insert/har',
+    response_model=List[schemas.TemplateDataIn],
+    response_class=response_code.MyJSONResponse,
+    response_model_exclude_unset=True,
+    name='插入原始数据到模板中',
+    response_model_exclude=['headers', 'file_data']
+
+)
+async def insert_har(temp_id: int = Query(description='模板id'),
+                     numbers: str = Form(description='整数列表,使用英文逗号隔开', min_length=1),
+                     file: UploadFile = File(description='上传Har文件'),
+                     db: Session = Depends(get_db)):
+    """
+    按num序号，按顺序插入原始数据到模板中
+    """
+    if file.content_type != 'application/har+json':
+        return await response_code.resp_400(message=f'文件类型错误，只支持har格式文件')
+
+    har_data = await ParseData.pares_data(har_data=file.file.read())
+    template_data = await crud.get_template_data(db=db, temp_id=temp_id)
+    if not template_data:
+        return await response_code.resp_404(message='没有获取到这个模板id')
+
+    num_list = []
+    try:
+        num_list = await check_num(nums=numbers, har_data=har_data, template_data=template_data)
+    except ValueError as e:
+        return await response_code.resp_400(
+            message=f'序号校验错误, 错误:{e}',
+            data={
+                'numbers': numbers,
+                'har_length': len(har_data),
+            }
+        )
+
+    if len(num_list) == 1:
+        pass
+    else:
+        pass
+
+    return har_data
 
 
 @template.get(
@@ -96,7 +140,7 @@ async def get_templates(
 ):
     """
     1、查询已存在的测试模板/场景\n
-    2、场景包含的测试用例
+    2、场景包含的测试用例\n
     3、默认返回所有模板
     """
     if temp_id:

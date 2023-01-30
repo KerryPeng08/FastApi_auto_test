@@ -7,7 +7,8 @@
 @Time: 2022/9/28-17:15
 """
 
-from aiohttp.client_exceptions import ServerTimeoutError, ServerConnectionError, ServerDisconnectedError
+from aiohttp.client_exceptions import ServerTimeoutError, ServerConnectionError, ServerDisconnectedError,\
+    ClientConnectorError
 from sqlalchemy.orm import Session
 from apps.case_service import crud as case_crud
 from apps.template import crud as temp_crud
@@ -38,7 +39,7 @@ async def run_service_case(db: Session, case_ids: list):
                     temp_pro=temp_info[0].project_name,
                     temp_name=temp_info[0].temp_name
                 )
-            except (ServerTimeoutError, ServerConnectionError, ServerDisconnectedError) as e:
+            except (ServerTimeoutError, ServerConnectionError, ServerDisconnectedError, ClientConnectorError) as e:
                 return await response_code.resp_400(message=f'网络访问失败: {str(e)}')
 
             except IndexError as e:

@@ -14,7 +14,7 @@ LOGGER_LEVEL: str = 'INFO'
 ALLURE_PATH: str = 'D:\\Works\\liweijia\\auto_report'
 
 # host
-HOST: str = 'http://172.16.100.95:8000/'
+HOST: str = 'http://172.16.100.121:8000/'
 
 # YApi配置信息
 YAPI_INFO: dict = {
@@ -36,8 +36,7 @@ TIPS: dict = {
             '1.默认会按key-value完全匹配提取上级接口响应数据',
             "2.参数提取表达式-1'{{number.$.jsonPath表达式}}'",
             "3.参数提取表达式-2'{{number.$.jsonPath表达式}}|index:index'",
-            "4.参数提取表达式-3'{{number.$.jsonPath表达式}},string in key,string == key",
-            "5.假数据使用表达式'{function.int}'"
+            "4.参数提取表达式-3'{{number.$.jsonPath表达式}},string in key,string == key"
         ],
         '响应数据校验': [
             '1.key为要校验的字段，value为校验的值',
@@ -57,7 +56,7 @@ TIPS: dict = {
             'fail_stop': 'True表示用例执行失败，则停止继续执行'
         }
     },
-    '8': {'假数据工具-function': {
+    '8': {"假数据使用表达式'{function.int}'": {
         'name': '名称',
         'ssn': '身份证',
         'phone_number': '电话',

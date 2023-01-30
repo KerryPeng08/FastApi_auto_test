@@ -25,7 +25,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(
     docs_url='/',
     include_in_=True,
-    title='一个基于FastApi实现的纯后端 接口测试平台'
+    title='随便测测'
 )
 
 
@@ -44,10 +44,10 @@ async def help_info():
     })
 
 
-app.include_router(template, prefix='/template', tags=['测试场景'])
-app.include_router(case_service, prefix='/caseService', tags=['业务接口测试用例'])
-app.include_router(case_ddt, prefix='/caseDdt', tags=['数据驱动测试用例'])
-app.include_router(case_perf, prefix='/casePerf', tags=['性能测试用例'])
+app.include_router(template, prefix='/template', tags=['[模板]测试场景'])
+app.include_router(case_service, prefix='/caseService', tags=['[用例]业务接口'])
+app.include_router(case_ddt, prefix='/caseDdt', tags=['[用例]数据驱动'])
+app.include_router(case_perf, prefix='/casePerf', tags=['[用例]性能测试'])
 app.include_router(run_case, prefix='/runCase', tags=['执行测试'])
 app.include_router(pool, prefix='/YApi', tags=['YApi接口池'])
 
