@@ -39,13 +39,22 @@ async def run_case_name(case_ids: List[int], db: Session = Depends(get_db)):
 )
 async def run_case_name(temp_ids: List[int], db: Session = Depends(get_db)):
     case_list = [await case_crud.get_case_ids(db=db, temp_id=x) for x in temp_ids]
-    case_list = [[y[0] for y in x] for x in case_list]
 
-    # 按模板并发
-    if not case_list:
+    all_case_list = []
+    temp_info = {}
+    for x in range(len(case_list)):
+        temp_info[temp_ids[x]] = [i[0] for i in case_list[x]]
+        for y in case_list[x]:
+            all_case_list.append(y[0])
+
+    if not all_case_list:
         return await response_code.resp_404()
 
-    tasks = [asyncio.create_task(run_service_case(db=db, case_ids=case_ids)) for case_ids in case_list]
+    # 按模板并发
+    tasks = [asyncio.create_task(run_service_case(db=db, case_ids=[case_id])) for case_id in all_case_list]
     result = await asyncio.gather(*tasks)
-    result = {k: v for k, v in zip(temp_ids, result)}
-    return await response_code.resp_200(data={'allure_report': result})
+
+    new_result = {}
+    for x in result:
+        new_result.update(x)
+    return await response_code.resp_200(data={'allure_report': new_result, "temp_info": temp_info})

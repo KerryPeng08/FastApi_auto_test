@@ -44,9 +44,7 @@ async def queue_query(db: Session):
     :param db:
     :return:
     """
-    return db.query(queue.RunCaseQueue).order_by(queue.RunCaseQueue.start_time).order_by(
-        queue.RunCaseQueue.start_time
-    ).all()
+    return db.query(queue.RunCaseQueue).order_by(queue.RunCaseQueue.start_time).all()
 
 
 async def queue_del(db: Session, queue_id: int):

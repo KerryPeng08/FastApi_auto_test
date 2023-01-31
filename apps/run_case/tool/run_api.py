@@ -54,9 +54,10 @@ class RunApi:
         2.拿表达式从response里面提取出来值
         2.拿到值，直接替换
         """
+        temp_data = copy.deepcopy(temp_data)
+        case_data = copy.deepcopy(case_data)
         # 返回结果收集
         response = []
-
         result = []
         for num in range(len(temp_data)):
 

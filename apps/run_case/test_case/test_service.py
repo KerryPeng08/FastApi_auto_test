@@ -11,29 +11,26 @@ import asyncio
 import allure
 import pytest
 import typing
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker
 from tools.database import engine
 from apps.run_case import crud
 
-# 建立数据库连接
-SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False, expire_on_commit=True)
-session = SessionLocal()
 
+async def get_case_info():
+    # 建立数据库连接
+    session_local = sessionmaker(bind=engine, autocommit=False, autoflush=False, expire_on_commit=True)
+    session = session_local()
 
-async def get_case_info(db: Session):
     # 获取数据
-    queue_info = await crud.queue_query(db=db)
-    case_data = queue_info[0].case_data
-    case_name = queue_info[0].case_name
-    queue_id = queue_info[0].id
+    queue_info = await crud.queue_query(db=session)
 
     # 删除数据
-    await crud.queue_del(db=db, queue_id=queue_id)
-    return case_name, case_data
+    await crud.queue_del(db=session, queue_id=queue_info[0].id)
+    return queue_info[0].case_name, queue_info[0].case_data
 
 
 loop = asyncio.get_event_loop()
-case_name, case_data = loop.run_until_complete(get_case_info(session))
+case_name, case_data = loop.run_until_complete(get_case_info())
 
 data_list = [
     [
