@@ -1,4 +1,4 @@
-### 随便测测平台(Swagger-Ui)
+### 随便测测(Swagger-Ui)
 
 * FastApi框架
 
