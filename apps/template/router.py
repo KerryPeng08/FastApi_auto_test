@@ -60,7 +60,7 @@ async def upload_file_har(
     # 批量写入数据
     for temp in temp_info:
         await crud.create_template_data(db=db, data=schemas.TemplateDataIn(**temp), temp_id=db_template.id)
-    return await crud.update_template(db=db, temp_name=db_template.temp_name, api_count=len(temp_info))
+    return await crud.update_template(db=db, temp_id=db_template.id, api_count=len(temp_info))
 
 
 @template.post(

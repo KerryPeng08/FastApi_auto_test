@@ -55,6 +55,9 @@ class InsertTempData:
                         new_number=i.number + len(har_data)
                     )
 
+        # 更新api_count
+        await crud.update_template(db=db, temp_id=temp_id, api_count=len(template_data) + len(har_data))
+
     @classmethod
     async def many_data(
             cls,
@@ -108,3 +111,6 @@ class InsertTempData:
                 new_number=num
             )
             num += 1
+
+        # 更新api_count
+        await crud.update_template(db=db, temp_id=temp_id, api_count=len(old_template_data))

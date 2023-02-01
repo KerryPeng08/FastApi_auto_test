@@ -27,15 +27,15 @@ async def create_template(db: Session, temp_name: str, project_name: str):
     return db_temp
 
 
-async def update_template(db: Session, temp_name: str, api_count: int = None):
+async def update_template(db: Session, temp_id: int, api_count: int = None):
     """
     更新模板信息
     :param db:
-    :param temp_name:
+    :param temp_id:
     :param api_count:
     :return:
     """
-    db_temp = db.query(models.Template).filter(models.Template.temp_name == temp_name).first()
+    db_temp = db.query(models.Template).filter(models.Template.id == temp_id).first()
     if db_temp:
         db_temp.api_count = api_count
         db.commit()
