@@ -21,6 +21,7 @@ from apps.template import crud, schemas
 from apps.case_service import crud as case_crud
 from apps.template.tool import ParseData, check_num
 from tools import CreateExcel
+from .tool import InsertTempData
 
 template = APIRouter()
 
@@ -91,7 +92,7 @@ async def analysis_file_har(file: UploadFile):
 
 )
 async def insert_har(temp_id: int = Query(description='模板id'),
-                     numbers: str = Form(description='整数列表,使用英文逗号隔开', min_length=1),
+                     numbers: str = Form(description='索引-整数列表,使用英文逗号隔开', min_length=1),
                      file: UploadFile = File(description='上传Har文件'),
                      db: Session = Depends(get_db)):
     """
@@ -105,7 +106,6 @@ async def insert_har(temp_id: int = Query(description='模板id'),
     if not template_data:
         return await response_code.resp_404(message='没有获取到这个模板id')
 
-    num_list = []
     try:
         num_list = await check_num(nums=numbers, har_data=har_data, template_data=template_data)
     except ValueError as e:
@@ -116,11 +116,23 @@ async def insert_har(temp_id: int = Query(description='模板id'),
                 'har_length': len(har_data),
             }
         )
-
-    if len(num_list) == 1:
-        pass
     else:
-        pass
+        if len(num_list) == 1:
+            await InsertTempData.one_data(
+                db=db,
+                temp_id=temp_id,
+                num_list=num_list,
+                har_data=har_data,
+                template_data=template_data
+            )
+        else:
+            await InsertTempData.many_data(
+                db=db,
+                temp_id=temp_id,
+                num_list=num_list,
+                har_data=har_data,
+                template_data=template_data
+            )
 
     return har_data
 

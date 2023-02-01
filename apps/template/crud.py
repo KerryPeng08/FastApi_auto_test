@@ -58,6 +58,34 @@ async def create_template_data(db: Session, data: schemas.TemplateDataIn, temp_i
     return db_data
 
 
+async def update_template_data(db: Session, temp_id: int, id_: int, new_number: int, old_number: int = None):
+    """
+    更新模板信息
+    :param db:
+    :param temp_id:
+    :param old_number:
+    :param new_number:
+    :param id_:
+    :return:
+    """
+    if old_number:
+        db_temp = db.query(models.TemplateData).filter(
+            models.TemplateData.id == id_,
+            models.TemplateData.temp_id == temp_id,
+            models.TemplateData.number == old_number
+        ).first()
+    else:
+        db_temp = db.query(models.TemplateData).filter(
+            models.TemplateData.id == id_,
+            models.TemplateData.temp_id == temp_id,
+        ).first()
+    if db_temp:
+        db_temp.number = new_number
+        db.commit()
+        db.refresh(db_temp)
+        return db_temp
+
+
 async def get_temp_name(db: Session, temp_name: str = None, temp_id: int = None, like: bool = False):
     """
     按模板名称查询数据

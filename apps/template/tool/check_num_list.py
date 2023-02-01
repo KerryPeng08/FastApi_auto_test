@@ -29,6 +29,9 @@ async def check_num(nums: str, har_data: list, template_data: List[schemas.Templ
         raise ValueError('当需要插入2条及以上数量的数据时，numbers的数量需要同插入数据的数量一致')
 
     if [num for num in num_list if num not in [data.number for data in template_data]]:
-        raise ValueError('numbers的插入序号大于了现有模板的序列序号')
+        raise ValueError('numbers的插入序号超出了现有模板的序列序号范围')
+
+    if [x for x in num_list if int(x) < 0]:
+        raise ValueError('numbers的插入序号不能小于0')
 
     return num_list

@@ -22,7 +22,8 @@ run_case = APIRouter()
 @run_case.post(
     '/case',
     response_class=response_code.MyJSONResponse,
-    name='按用例Id执行'
+    name='按用例Id执行',
+    description='按用例ID的顺序执行'
 )
 async def run_case_name(case_ids: List[int], db: Session = Depends(get_db)):
     if not case_ids:
@@ -35,7 +36,8 @@ async def run_case_name(case_ids: List[int], db: Session = Depends(get_db)):
 @run_case.post(
     '/temp',
     response_class=response_code.MyJSONResponse,
-    name='按模板Id执行'
+    name='按模板Id执行',
+    description='按模板ID查询出关联的用例，再异步执行所有用例，收集结果集'
 )
 async def run_case_name(temp_ids: List[int], db: Session = Depends(get_db)):
     case_list = [await case_crud.get_case_ids(db=db, temp_id=x) for x in temp_ids]

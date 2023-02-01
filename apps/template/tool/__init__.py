@@ -10,3 +10,4 @@
 from .pares_data import ParseData
 from .generate_case import GenerateCase
 from .check_num_list import check_num
+from .insert_temp_data import InsertTempData
