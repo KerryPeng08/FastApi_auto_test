@@ -177,9 +177,9 @@ async def put_temp_name(db: Session, new_name: str, temp_id: int = None, old_nam
         return db_temp
 
 
-async def del_template_data(db: Session, temp_name: str = None, temp_id: int = None):
+async def del_template_data_all(db: Session, temp_name: str = None, temp_id: int = None):
     """
-    删除模板数据
+    删除所有模板数据
     :param db:
     :param temp_name:
     :param temp_id:
@@ -197,3 +197,17 @@ async def del_template_data(db: Session, temp_name: str = None, temp_id: int = N
         db.query(models.Template).filter(models.Template.id == db_temp.id).delete()
         db.commit()
         return db_temp
+
+
+async def del_template_data(db: Session, temp_id: int, number: int):
+    """
+    删除部分数据
+    :param db:
+    :param temp_id:
+    :param number:
+    :return:
+    """
+    db.query(models.TemplateData).filter(
+        models.TemplateData.temp_id == temp_id,
+        models.TemplateData.number == number
+    ).delete()

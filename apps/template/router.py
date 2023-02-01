@@ -21,7 +21,7 @@ from apps.template import crud, schemas
 from apps.case_service import crud as case_crud
 from apps.template.tool import ParseData, check_num
 from tools import CreateExcel
-from .tool import InsertTempData
+from .tool import InsertTempData, DelTempData
 
 template = APIRouter()
 
@@ -82,7 +82,7 @@ async def analysis_file_har(file: UploadFile):
     return await ParseData.pares_data(har_data=file.file.read())
 
 
-@template.post(
+@template.put(
     '/insert/har',
     response_model=List[schemas.TemplateDataIn],
     response_class=response_code.MyJSONResponse,
@@ -91,10 +91,12 @@ async def analysis_file_har(file: UploadFile):
     response_model_exclude=['headers', 'file_data']
 
 )
-async def insert_har(temp_id: int = Query(description='模板id'),
-                     numbers: str = Form(description='索引-整数列表,使用英文逗号隔开', min_length=1),
-                     file: UploadFile = File(description='上传Har文件'),
-                     db: Session = Depends(get_db)):
+async def insert_har(
+        temp_id: int = Query(description='模板id'),
+        numbers: str = Form(description='索引-整数列表,使用英文逗号隔开', min_length=1),
+        file: UploadFile = File(description='上传Har文件'),
+        db: Session = Depends(get_db)
+):
     """
     按num序号，按顺序插入原始数据到模板中
     """
@@ -135,6 +137,71 @@ async def insert_har(temp_id: int = Query(description='模板id'),
             )
 
     return har_data
+
+
+@template.delete(
+    '/del/part',
+    response_model=List[schemas.TemplateDataIn],
+    response_class=response_code.MyJSONResponse,
+    response_model_exclude_unset=True,
+    name='删除部分模板数据',
+    response_model_exclude=['headers', 'file_data']
+)
+async def del_har(
+        temp_id: int = Query(description='模板id'),
+        numbers: str = Form(description='索引-整数列表,使用英文逗号隔开', min_length=1),
+        db: Session = Depends(get_db)
+):
+    template_data = await crud.get_template_data(db=db, temp_id=temp_id)
+    if not template_data:
+        return await response_code.resp_404(message='没有获取到这个模板id')
+
+    try:
+        num_list = await check_num(nums=numbers, template_data=template_data)
+    except ValueError as e:
+        return await response_code.resp_400(
+            message=f'序号校验错误, 错误:{e}',
+            data={
+                'numbers': numbers,
+            }
+        )
+    else:
+        await DelTempData.del_data(
+            db=db,
+            temp_id=temp_id,
+            num_list=num_list,
+            template_data=template_data
+        )
+        return await response_code.resp_200(
+            data={
+                'numbers': numbers,
+            }
+        )
+
+
+@template.delete(
+    '/del/all',
+    name='删除全部模板数据'
+)
+async def delete_name(temp_id: int, db: Session = Depends(get_db)):
+    """
+    删除模板数据
+    """
+
+    temp_info = await crud.get_temp_name(db=db, temp_id=temp_id)
+
+    if temp_info:
+        case_info = await case_crud.get_case(db=db, temp_id=temp_info[0].id)
+        if case_info:
+            return await response_code.resp_400(message='模板下还存在用例')
+        else:
+            template_data = await crud.del_template_data_all(db=db, temp_id=temp_info[0].id)
+            if template_data:
+                return await response_code.resp_200(message='删除成功')
+            else:
+                return await response_code.resp_400()
+    else:
+        return await response_code.resp_404()
 
 
 @template.get(
@@ -197,33 +264,6 @@ async def update_name(new_name: str, old_name: str = None, temp_id: int = None, 
         temp_id=temp_id, old_name=old_name,
         new_name=new_name
     ) or await response_code.resp_404()
-
-
-@template.delete(
-    '/name/del',
-    name='删除模板数据'
-)
-async def delete_name(temp_name: str = None, temp_id: int = None, db: Session = Depends(get_db)):
-    """
-    删除模板数据
-    """
-    if not temp_name and not temp_id:
-        return await response_code.resp_400()
-
-    temp_info = await crud.get_temp_name(db=db, temp_name=temp_name, temp_id=temp_id)
-
-    if temp_info:
-        case_info = await case_crud.get_case(db=db, temp_id=temp_info[0].id)
-        if case_info:
-            return await response_code.resp_400(message='模板下还存在用例')
-        else:
-            template_data = await crud.del_template_data(db=db, temp_id=temp_info[0].id)
-            if template_data:
-                return await response_code.resp_200(message='删除成功')
-            else:
-                return await response_code.resp_400()
-    else:
-        return await response_code.resp_404()
 
 
 @template.get(
