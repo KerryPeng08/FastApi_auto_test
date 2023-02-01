@@ -29,7 +29,7 @@ class CheckJson:
         """
         temp_info = await crud.get_temp_name(db=db, temp_name=temp_name)
         if temp_info[0].api_count != len(case_data):
-            return [f'用例api数量: {temp_info[0].api_count}, 与模板api数量: {len(case_data)}, 不一致']
+            return [f'模板api数量: {temp_info[0].api_count}, 与用例api数量: {len(case_data)}, 不一致']
 
         keys = ['number', 'path', 'headers', 'params', 'data', 'file', 'check', 'description', 'config']
         msg_list = []

@@ -132,12 +132,13 @@ async def get_temp_case_info(db: Session, temp_id: int, outline: bool):
     return {'case_count': len(db_case), 'case_info': case_info} if outline is False else {'case_info': case_info}
 
 
-async def get_template_data(db: Session, temp_name: str = None, temp_id: int = None):
+async def get_template_data(db: Session, temp_name: str = None, temp_id: int = None, numbers: list = None):
     """
     查询模板数据
     :param db:
     :param temp_name:
     :param temp_id:
+    :param numbers:
     :return:
     """
     if temp_name:
@@ -146,6 +147,14 @@ async def get_template_data(db: Session, temp_name: str = None, temp_id: int = N
             return db.query(models.TemplateData).filter(models.TemplateData.temp_id == db_temp.id).order_by(
                 models.TemplateData.number
             ).all()
+
+    if temp_id and numbers:
+        return db.query(models.TemplateData).filter(
+            models.TemplateData.temp_id == temp_id,
+            models.TemplateData.number.in_(numbers),
+        ).order_by(
+            models.TemplateData.number
+        ).all()
 
     if temp_id:
         return db.query(models.TemplateData).filter(models.TemplateData.temp_id == temp_id).order_by(

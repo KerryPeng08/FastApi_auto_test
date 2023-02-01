@@ -18,9 +18,10 @@ from apps import response_code
 from depends import get_db
 
 from apps.template import crud, schemas
+from apps.case_service import schemas as case_schemas
 from apps.case_service import crud as case_crud
-from apps.template.tool import ParseData, check_num
-from tools import CreateExcel
+from apps.template.tool import ParseData, check_num, GenerateCase
+from tools import CreateExcel, OperationJson
 from .tool import InsertTempData, DelTempData
 
 template = APIRouter()
@@ -84,12 +85,11 @@ async def analysis_file_har(file: UploadFile):
 
 @template.put(
     '/insert/har',
-    response_model=List[schemas.TemplateDataIn],
-    response_class=response_code.MyJSONResponse,
+    response_model=case_schemas.TestCaseDataOut,
+    # response_class=response_code.MyJSONResponse,
     response_model_exclude_unset=True,
-    name='插入原始数据到模板中',
-    response_model_exclude=['headers', 'file_data']
-
+    name='插入原始数据到模板中，并提供插入数据的预处理数据下载',
+    # response_model_exclude=['headers', 'file_data']
 )
 async def insert_har(
         temp_id: int = Query(description='模板id'),
@@ -120,7 +120,7 @@ async def insert_har(
         )
     else:
         if len(num_list) == 1:
-            await InsertTempData.one_data(
+            new_numbers = await InsertTempData.one_data(
                 db=db,
                 temp_id=temp_id,
                 num_list=num_list,
@@ -128,7 +128,7 @@ async def insert_har(
                 template_data=template_data
             )
         else:
-            await InsertTempData.many_data(
+            new_numbers = await InsertTempData.many_data(
                 db=db,
                 temp_id=temp_id,
                 num_list=num_list,
@@ -136,7 +136,20 @@ async def insert_har(
                 template_data=template_data
             )
 
-    return har_data
+    test_data = await GenerateCase().read_template_to_api(
+        temp_name=str(temp_id),
+        mode=case_schemas.ModeEnum.service,
+        fail_stop=True,
+        template_data=await crud.get_template_data(db=db, temp_id=temp_id, numbers=new_numbers)
+    )
+
+    path = f'./files/json/{time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))}.json'
+    await OperationJson.write(path=path, data=test_data)
+    return FileResponse(
+        path=path,
+        filename=f'模板{temp_id}_新增数据.json',
+        background=BackgroundTask(lambda: os.remove(path))
+    )
 
 
 @template.delete(
