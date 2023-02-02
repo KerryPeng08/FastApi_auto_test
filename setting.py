@@ -26,6 +26,13 @@ YAPI_INFO: dict = {
 # 失败即刻停止执行
 GLOBAL_FAIL_STOP: bool = True
 
+# 自动匹配参数的模式
+# all： 按key和value比较，不区分大小写 [推荐]
+# all-diff：按key和value比较，区分大小写
+# key：按key值比较
+# value： 按value值比较 [不推荐]
+AUTO_EXTRACT: str = 'value'
+
 # TIPS
 TIPS: dict = {
     '1': '编写用例时，只需关注path/params/data/check',

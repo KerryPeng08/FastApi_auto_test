@@ -8,7 +8,7 @@
 """
 
 import jsonpath
-from typing import List
+from typing import List, Any
 from apps.template import schemas
 from setting import TIPS
 
@@ -26,6 +26,7 @@ class GenerateCase:
         读取模板生成准测试数据
         :param temp_name:
         :param mode:
+        :param fail_stop:
         :param template_data:
         :return:
         """
@@ -116,3 +117,44 @@ class GenerateCase:
 
     async def read_template_to_perf(self):
         pass
+
+
+async def _auto_extract(
+        x: int,
+        ipath: str,
+        auto_extract: str,
+        left_key: str,
+        right_key: str,
+        lift_value: Any,
+        right_value: Any
+):
+    """
+    按不同模式进行匹配
+    :param x:
+    :param ipath:
+    :param auto_extract:
+    :param left_key:
+    :param right_key:
+    :param lift_value:
+    :param right_value:
+    :return:
+    """
+    if auto_extract == 'all':
+        if left_key.lower() == right_key.lower() and lift_value == right_value and right_value:
+            return "{{" + f"{x}.$.{'.'.join(ipath)}" + "}}"
+        return ''
+
+    if auto_extract == 'all-diff':
+        if left_key == right_key and lift_value == right_value and right_value:
+            return "{{" + f"{x}.$.{'.'.join(ipath)}" + "}}"
+        return ''
+
+    if auto_extract == 'key':
+        if left_key == right_key and right_value:
+            return "{{" + f"{x}.$.{'.'.join(ipath)}" + "}}"
+        return ''
+
+    if auto_extract == 'value':
+        if lift_value == right_value and right_value:
+            return "{{" + f"{x}.$.{'.'.join(ipath)}" + "}}"
+        return ''
