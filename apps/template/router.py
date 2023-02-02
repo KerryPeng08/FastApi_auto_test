@@ -152,6 +152,87 @@ async def insert_har(
     )
 
 
+@template.put(
+    '/swap/one',
+    name='编排模板数据的顺序-单次'
+)
+async def swap_data_one(
+        temp_id: int,
+        old_number: int,
+        new_number: int,
+        db: Session = Depends(get_db)
+):
+    """
+    单次替换模板中API的顺序-索引号
+    """
+    template_data = await crud.get_template_data(db=db, temp_id=temp_id)
+    if not template_data:
+        return await response_code.resp_404(message='没有获取到这个模板id')
+
+    # 判断序号
+    numbers = {x.number: x.id for x in template_data}
+    null_num = [num for num in [old_number, new_number] if num not in [x for x in numbers]]
+    if null_num:
+        return await response_code.resp_400(message=f'序号{null_num} 不在该模板的序号中')
+
+    # 替换number序号
+    id_ = numbers[old_number]
+    await crud.update_template_data(db=db, temp_id=temp_id, id_=id_, new_number=new_number)
+    id_ = numbers[new_number]
+    await crud.update_template_data(db=db, temp_id=temp_id, id_=id_, new_number=old_number)
+
+    return await response_code.resp_200(
+        data={
+            'old_number': old_number,
+            'new_number': new_number
+        }
+    )
+
+
+@template.put(
+    '/swap/many',
+    name='编排模板数据的顺序-全部'
+)
+async def swap_data_many(
+        temp_id: int,
+        new_numbers: List[int],
+        db: Session = Depends(get_db)
+):
+    """
+    依次替换模板中API的顺序-索引号
+    """
+    template_data = await crud.get_template_data(db=db, temp_id=temp_id)
+    if not template_data:
+        return await response_code.resp_404(message='没有获取到这个模板id')
+
+    if len(set(new_numbers)) != len(template_data):
+        return await response_code.resp_400(
+            message=f'new_numbers长度：{len(set(new_numbers))}，与数据库中的numbers长度：{len(template_data)}，不一致'
+        )
+
+    # 判断序号
+    numbers = {x.number: x.id for x in template_data}
+    null_num = [num for num in new_numbers if num not in [x for x in numbers]]
+    if null_num:
+        return await response_code.resp_400(message=f'序号{null_num} 不在该模板的序号中')
+
+    # 替换number序号
+    num_info = False
+    for x in range(len(new_numbers)):
+        if x != new_numbers[x]:
+            await crud.update_template_data(db=db, temp_id=temp_id, id_=numbers[x], new_number=new_numbers[x])
+            num_info = True
+
+    return await response_code.resp_200(
+        data={
+            'old_number': [x for x in numbers],
+            'new_number': new_numbers
+        }
+    ) if num_info else await response_code.resp_200(
+        message='数据无变化'
+    )
+
+
 @template.delete(
     '/del/part',
     response_model=List[schemas.TemplateDataIn],
