@@ -198,3 +198,24 @@ async def update_api_info(db: Session, api_info: schemas.TestCaseDataOut1):
     ).update(api_info.dict())
     db.commit()
     return True
+
+
+async def update_api_number(db: Session, case_id: int, id_: int, new_number: int):
+    """
+    更新用例的number
+    :param db:
+    :param case_id:
+    :param id_:
+    :param new_number:
+    :return:
+    """
+    db_temp = db.query(models.TestCaseData).filter(
+        models.TestCaseData.id == id_,
+        models.TestCaseData.case_id == case_id,
+    ).first()
+
+    if db_temp:
+        db_temp.number = new_number
+        db.commit()
+        db.refresh(db_temp)
+        return db_temp

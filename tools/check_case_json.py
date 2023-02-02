@@ -19,15 +19,15 @@ class CheckJson:
     """
 
     @classmethod
-    async def check_to_service(cls, db: Session, temp_name: str, case_data: List[schemas.TestCaseData]):
+    async def check_to_service(cls, db: Session, temp_id: int, case_data: List[schemas.TestCaseData]):
         """
         校验数据
         :param db:
-        :param temp_name:
+        :param temp_id:
         :param case_data:
         :return:
         """
-        temp_info = await crud.get_temp_name(db=db, temp_name=temp_name)
+        temp_info = await crud.get_temp_name(db=db, temp_id=temp_id)
         if temp_info[0].api_count != len(case_data):
             return [f'模板api数量: {temp_info[0].api_count}, 与用例api数量: {len(case_data)}, 不一致']
 
