@@ -26,6 +26,16 @@ YAPI_INFO: dict = {
 # 失败即刻停止执行
 GLOBAL_FAIL_STOP: bool = True
 
+# 数据库配置
+DB_CONFIG = {
+    'host': '172.16.100.7',
+    'user': 'read',
+    'password': '87654321',
+    # 'database': '',
+    'port': 8066,
+    'charset': 'utf8'
+}
+
 # 自动匹配参数的模式
 # all： 按key和value比较，不区分大小写 [推荐]
 # all-diff：按key和value比较，区分大小写

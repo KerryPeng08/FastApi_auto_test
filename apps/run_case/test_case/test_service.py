@@ -14,6 +14,8 @@ import typing
 from sqlalchemy.orm import sessionmaker
 from tools.database import engine
 from apps.run_case import crud
+from tools import AsyncMySql
+from setting import DB_CONFIG
 
 
 async def get_case_info():
@@ -75,7 +77,11 @@ class TestService:
         allure.dynamic.title(f"{description}\n/{url.split('/', 3)[3]}")
 
         for k, v in expect.items():
-            await self.assert_value(k, v, actual_value=actual)
+            if isinstance(v, list) and 'sql_' == k[:4]:
+                sql_data = await self._sql_data(v[1])
+                await self.assert_value(k, v[0], actual_value={k: [sql_data[0], None]})
+            else:
+                await self.assert_value(k, v, actual_value=actual)
 
     @staticmethod
     async def assert_value(k: str, v: typing.Any, actual_value: dict):
@@ -110,3 +116,14 @@ class TestService:
                 assert value not in v[1]
             else:
                 assert 1 == 0, '未匹配到比较符'
+
+    @staticmethod
+    async def _sql_data(sql: str):
+        """
+        从数据库查询数据
+        :param sql:
+        :return:
+        """
+        async with AsyncMySql(DB_CONFIG) as s:
+            sql_data = await s.select(sql=sql)
+        return [x[0] for x in sql_data] if sql_data else False

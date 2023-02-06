@@ -73,6 +73,13 @@ class CheckJson:
                         msg_list.append(f"用例${x}比较类型不匹配: {k}: {v}")
                         continue
 
+                if isinstance(v, list) and k[:4] == 'sql_':
+                    if len(v) < 2:
+                        msg_list.append(f"用例${x}查询内容不足: {k}: {v}")
+
+                    if 'select' not in v[1]:
+                        msg_list.append(f"用例${x}查询条件不足: {k}: {v}")
+
         return msg_list
 
     @classmethod

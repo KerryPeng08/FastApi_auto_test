@@ -14,16 +14,16 @@ import json
 import base64
 import asyncio
 import jsonpath
-import ddddocr
+# import ddddocr
 import aiohttp
 from aiohttp import FormData
 from aiohttp import client_exceptions
 from typing import List
 from sqlalchemy.orm import Session
-from tools import logger, get_cookie
+from tools import logger, get_cookie, AsyncMySql
 from tools.faker_data import FakerData
-from .extract import extract as my_extract
-from setting import GLOBAL_FAIL_STOP
+# from .extract import extract as my_extract
+from setting import GLOBAL_FAIL_STOP, DB_CONFIG
 from apps.template import schemas as temp
 from apps.case_service import schemas as service
 from apps.run_case import crud
@@ -62,11 +62,6 @@ class RunApi:
         for num in range(len(temp_data)):
 
             config: dict = copy.deepcopy(dict(case_data[num].config))
-            if config.get('stop'):
-                logger.info(f"case_id:{case_id},number:{num} 接口配置信息stop = {config['stop']}, 停止后续接口请求")
-                await self.sees.close()
-                break
-
             logger.info(f"{'=' * 30}case_id:{case_id},开始请求,number:{num}{'=' * 30}")
             try:
                 # 识别url表达式
@@ -128,7 +123,7 @@ class RunApi:
                 sleep=config['sleep'],
                 check=case_data[num].check,
                 request_info=request_info,
-                files=temp_data[num].file_data
+                files=temp_data[num].file_data,
             )
             res, is_fail = response_info
 
@@ -136,18 +131,18 @@ class RunApi:
                 self.cookies[temp_data[num].host] = await get_cookie(rep_type='aiohttp', response=res)
 
             # 提取code
-            if config.get('code'):
-                ocr = ddddocr.DdddOcr(show_ad=False)
-                self.code = ocr.classification(res.content)
-
-            # 从html文本中提取数据
-            if config.get('extract'):
-                _extract = config['extract']
-                self.extract = await my_extract(
-                    pattern=_extract[0],
-                    string=await res.text(encoding='utf-8'),
-                    index=_extract[1]
-                )
+            # if config.get('code'):
+            #     ocr = ddddocr.DdddOcr(show_ad=False)
+            #     self.code = ocr.classification(res.content)
+            #
+            # # 从html文本中提取数据
+            # if config.get('extract'):
+            #     _extract = config['extract']
+            #     self.extract = await my_extract(
+            #         pattern=_extract[0],
+            #         string=await res.text(encoding='utf-8'),
+            #         index=_extract[1]
+            #     )
 
             logger.info(f"case_id:{case_id},状态码: {res.status}")
 
@@ -186,6 +181,11 @@ class RunApi:
                 await self.sees.close()
                 logger.info(f"case_id:{case_id},编号: {num} 校验错误-退出执行")
                 logger.info(f"{'=' * 30}case_id:{case_id},结束请求,number:{num}{'=' * 30}")
+                break
+
+            if config.get('stop'):
+                logger.info(f"case_id:{case_id},number:{num} 接口配置信息stop = {config['stop']}, 停止后续接口请求")
+                await self.sees.close()
                 break
 
         case_info = await crud.update_test_case_order(db=db, case_id=case_id)
@@ -256,7 +256,13 @@ class RunApi:
 
             result = []
             for k, v in check.items():
-                # 获取需要的值
+                # 从数据库获取需要的值
+                if isinstance(v, list) and 'sql_' == k[:4]:
+                    sql_data = await self._sql_data(v[1])
+                    if v[0] == sql_data[0]:
+                        result.append({k: sql_data[0]})
+                    continue
+                # 从响应信息获取需要的值
                 value = jsonpath.jsonpath(res_json, f'$..{k}')
 
                 if value:
@@ -309,6 +315,17 @@ class RunApi:
             num += 1
 
         return res, is_fail
+
+    @staticmethod
+    async def _sql_data(sql: str):
+        """
+        从数据库查询数据
+        :param sql:
+        :return:
+        """
+        async with AsyncMySql(DB_CONFIG) as s:
+            sql_data = await s.select(sql=sql)
+            return [x[0] for x in sql_data] if sql_data else False
 
     @staticmethod
     async def _replace_url(old_str: str, response: list, faker: FakerData, code: str, extract: str) -> str:

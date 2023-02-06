@@ -12,6 +12,7 @@ from .excel import CreateExcel
 from .operation_json import OperationJson
 from .global_log import logger
 from .aiohttp_get_cookie import get_cookie
+from .my_sql import AsyncMySql
 
 
 def mkdir():

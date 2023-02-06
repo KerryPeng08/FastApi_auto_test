@@ -12,3 +12,4 @@ Faker~=14.2.0
 ujson~=5.4.0
 
 ddddocr~=1.4.7
+aiomysql~=0.0.21

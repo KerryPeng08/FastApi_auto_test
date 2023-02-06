@@ -7,7 +7,7 @@
 @Time: 2022/9/28-17:15
 """
 
-from aiohttp.client_exceptions import ServerTimeoutError, ServerConnectionError, ServerDisconnectedError,\
+from aiohttp.client_exceptions import ServerTimeoutError, ServerConnectionError, ServerDisconnectedError, \
     ClientConnectorError
 from sqlalchemy.orm import Session
 from apps.case_service import crud as case_crud
