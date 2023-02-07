@@ -118,7 +118,7 @@ class RunApi:
             logger.info(f"case_id:{case_id},请求信息: {json.dumps(request_info, indent=2, ensure_ascii=False)}")
 
             # 轮询执行接口
-            response_info = await self.polling(
+            response_info = await self._polling(
                 case_id=case_id,
                 sleep=config['sleep'],
                 check=case_data[num].check,
@@ -167,7 +167,8 @@ class RunApi:
                 del new_check['status_code']
                 request_info['actual'] = {
                     **{'status_code': [res.status]},
-                    **{k: jsonpath.jsonpath(res_json, f'$..{k}') for k in new_check}
+                    **{k: jsonpath.jsonpath(res_json, f'$..{k}') for k in new_check if 'sql_' not in k},
+                    **{k: new_check[k][1] for k in new_check if 'sql_' in k}
                 }
 
             config['sleep'] = 0.3
@@ -199,7 +200,7 @@ class RunApi:
         await self.sees.close()
         return f"{temp_pro}-{temp_name}-{case_info.case_name}", case_info.run_order
 
-    async def polling(self, case_id: int, sleep: int, check: dict, request_info: dict, files):
+    async def _polling(self, case_id: int, sleep: int, check: dict, request_info: dict, files):
         """
         轮询执行接口
         :param case_id:
@@ -210,7 +211,8 @@ class RunApi:
         :return:
         """
 
-        check = copy.deepcopy(check)
+        # check = copy.deepcopy(check)
+        status_code = check['status_code']
         del check['status_code']
 
         is_fail = False  # 标记是否失败
@@ -260,8 +262,10 @@ class RunApi:
                 if isinstance(v, list) and 'sql_' == k[:4]:
                     sql_data = await self._sql_data(v[1])
                     if v[0] == sql_data[0]:
+                        check[k][1] = sql_data[0]
                         result.append({k: sql_data[0]})
                     continue
+
                 # 从响应信息获取需要的值
                 value = jsonpath.jsonpath(res_json, f'$..{k}')
 
@@ -303,7 +307,7 @@ class RunApi:
                     elif v[0] == 'notin':
                         if value not in v[1]:
                             result.append({k: value})
-            logger.info(f"case_id:{case_id},匹配结果: {result}")
+            logger.info(f"循环case_id:{case_id},{num + 1}次匹配结果: {result}")
             if len(result) == len(check):
                 is_fail = False
                 break
@@ -314,6 +318,7 @@ class RunApi:
             sleep -= 5
             num += 1
 
+        check['status_code'] = status_code
         return res, is_fail
 
     @staticmethod

@@ -78,8 +78,7 @@ class TestService:
 
         for k, v in expect.items():
             if isinstance(v, list) and 'sql_' == k[:4]:
-                sql_data = await self._sql_data(v[1])
-                await self.assert_value(k, v[0], actual_value={k: [sql_data[0], None]})
+                await self.assert_value(k, v[0], actual_value={k: [v[1], None]})
             else:
                 await self.assert_value(k, v, actual_value=actual)
 
