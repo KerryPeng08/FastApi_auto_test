@@ -59,6 +59,10 @@ TIPS: dict = {
             '1.key为要校验的字段，value为校验的值',
             '2.若value数据类型为: string/integer/float/bool/dict, 按 == 直接进行校验',
             '3.若value数据类型为: list, 索引0应填写比较符: <,<=,==,!=,>=,>,in,not in; 索引1填写比较的值'
+        ],
+        '数据库校验': [
+            '1.key 以 "sql_" 标记开头的字段则需要执行数据库校验',
+            '2.value 以 ["期望值", "select查询语句"] 表达式',
         ]
     },
     '5': 'description: 单接口用例描述信息',

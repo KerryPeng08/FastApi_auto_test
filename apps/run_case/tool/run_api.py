@@ -168,7 +168,7 @@ class RunApi:
                 request_info['actual'] = {
                     **{'status_code': [res.status]},
                     **{k: jsonpath.jsonpath(res_json, f'$..{k}') for k in new_check if 'sql_' not in k},
-                    **{k: new_check[k][1] for k in new_check if 'sql_' in k}
+                    **{k: [new_check[k][1]] for k in new_check if 'sql_' in k}
                 }
 
             config['sleep'] = 0.3
@@ -216,7 +216,7 @@ class RunApi:
         del check['status_code']
 
         is_fail = False  # 标记是否失败
-        num = 1
+        num = 0
         while True:
             if files:
                 files_data = FormData()
@@ -262,8 +262,8 @@ class RunApi:
                 if isinstance(v, list) and 'sql_' == k[:4]:
                     sql_data = await self._sql_data(v[1])
                     if v[0] == sql_data[0]:
-                        check[k][1] = sql_data[0]
                         result.append({k: sql_data[0]})
+                    check[k][1] = sql_data[0]
                     continue
 
                 # 从响应信息获取需要的值
@@ -307,7 +307,10 @@ class RunApi:
                     elif v[0] == 'notin':
                         if value not in v[1]:
                             result.append({k: value})
-            logger.info(f"循环case_id:{case_id},{num + 1}次匹配结果: {result}")
+
+            logger.info(f"第{num + 1}次匹配")
+            logger.info(f"实际-{result}")
+            logger.info(f"预期-{check}")
             if len(result) == len(check):
                 is_fail = False
                 break
