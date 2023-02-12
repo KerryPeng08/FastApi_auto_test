@@ -68,36 +68,74 @@ async def del_test_case_data(db: Session, case_id: int):
     db.commit()
 
 
-async def get_case_info(db: Session, case_name: str = None, case_id: int = None, all: bool = False):
+async def get_case_info(db: Session, case_name: str = None, case_id: int = None, all_: bool = False):
     """
     按用例名称查询数据
     :param db:
     :param case_name:
     :param case_id:
-    :param all:
+    :param all_:
     :return:
     """
     if case_id:
-        return db.query(models.TestCase).filter(models.TestCase.id == case_id).order_by(models.TestCase.id).all()
+        return db.query(models.TestCase).filter(models.TestCase.id == case_id).order_by(models.TestCase.id.desc()).all()
 
     if case_name:
         return db.query(models.TestCase).filter(models.TestCase.case_name == case_name).order_by(
-            models.TestCase.id
+            models.TestCase.id.desc()
         ).all()
-    if all:
-        return db.query(models.TestCase).order_by(models.TestCase.id).all()
+    if all_:
+        return db.query(models.TestCase).order_by(models.TestCase.id.desc()).all()
 
 
-async def get_case_data(db: Session, case_id: int):
+async def get_case_data(db: Session, case_id: int, number: int = None):
     """
     查询测试用例数据
     :param db:
     :param case_id:
+    :param number:
     :return:
     """
-    return db.query(models.TestCaseData).filter(models.TestCaseData.case_id == case_id).order_by(
-        models.TestCaseData.number
-    ).all()
+
+    if number:
+        return db.query(models.TestCaseData).filter(
+            models.TestCaseData.case_id == case_id,
+            models.TestCaseData.number == number
+        ).order_by(
+            models.TestCaseData.number
+        ).all()
+    else:
+        return db.query(models.TestCaseData).filter(models.TestCaseData.case_id == case_id).order_by(
+            models.TestCaseData.number
+        ).all()
+
+
+async def set_case_config(db: Session, case_id: int, number: int, config: dict):
+    """
+    设置用例的配置项
+    :param db:
+    :param case_id:
+    :param number:
+    :param config:
+    :return:
+    """
+    db_temp = db.query(models.TestCaseData).filter(
+        models.TestCaseData.case_id == case_id,
+        models.TestCaseData.number == number,
+    ).first()
+
+    if db_temp:
+        new_config = {}
+        for k, v in db_temp.config.items():
+            if k in config.keys():
+                new_config[k] = config.get(k)
+            else:
+                new_config[k] = v
+
+        db_temp.config = new_config
+        db.commit()
+        db.refresh(db_temp)
+        return db_temp
 
 
 async def del_case_data(db: Session, case_id: int):

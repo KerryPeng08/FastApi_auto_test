@@ -523,6 +523,7 @@ async def _header_str_param(x: str, response: list):
         value = set()
         for seek in seek_list:
             seek_value, compare, seek_name = seek.strip().split(' ')
+            # 同级相邻
             value_set = await _header_adjoin(seek_name, seek_value, compare, extract_key, response[int(num)])
             if value_set:
                 if not value:

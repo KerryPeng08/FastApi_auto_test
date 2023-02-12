@@ -16,11 +16,8 @@ from apps.case_ddt.router import case_ddt
 from apps.case_perf.router import case_perf
 from apps.api_pool.router import pool
 from apps.run_case.router import run_case
-# from tools.database import Base, engine
 from tools.load_allure import load_allure_reports
 from apps import response_code
-
-# Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     docs_url='/',

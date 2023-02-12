@@ -210,7 +210,7 @@ async def case_data_list(outline: bool = True, db: Session = Depends(get_db)):
     """
     查看测试用例列表
     """
-    test_case = await crud.get_case_info(db=db, all=True)
+    test_case = await crud.get_case_info(db=db, all_=True)
 
     case_info = []
     for case in test_case:
@@ -372,3 +372,28 @@ async def swap_many(
     ) if num_info else await response_code.resp_200(
         message='数据无变化'
     )
+
+
+@case_service.put(
+    '/set/api/config',
+    name='设置用例配置'
+)
+async def set_api_config(case_id: int, number: int, config: dict, db: Session = Depends(get_db)):
+    """
+    设置每个接口的配置信息
+    """
+    if not config:
+        return await response_code.resp_400(message='无效配置内容')
+
+    case_data = await crud.get_case_data(db=db, case_id=case_id, number=number)
+    if not case_data:
+        return await response_code.resp_404(message='没有获取到这个用例配置')
+
+    case_config: dict = case_data[0].config
+    for k in config.keys():
+        if k not in case_config.keys():
+            return await response_code.resp_400(message=f'无效的key: {k}')
+
+    await crud.set_case_config(db=db, case_id=case_id, number=number, config=config)
+
+    return await response_code.resp_200()
