@@ -389,9 +389,8 @@ async def set_api_config(case_id: int, number: int, config: dict, db: Session = 
     if not case_data:
         return await response_code.resp_404(message='没有获取到这个用例配置')
 
-    case_config: dict = case_data[0].config
     for k in config.keys():
-        if k not in case_config.keys():
+        if k not in schemas.TestCaseConfig.__fields__.keys():
             return await response_code.resp_400(message=f'无效的key: {k}')
 
     await crud.set_case_config(db=db, case_id=case_id, number=number, config=config)

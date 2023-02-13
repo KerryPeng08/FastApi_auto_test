@@ -6,6 +6,8 @@
 @File: crud.py
 @Time: 2022/8/20-21:59
 """
+
+from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.orm import Session
 from apps.case_service import models, schemas
 
@@ -125,14 +127,10 @@ async def set_case_config(db: Session, case_id: int, number: int, config: dict):
     ).first()
 
     if db_temp:
-        new_config = {}
-        for k, v in db_temp.config.items():
-            if k in config.keys():
-                new_config[k] = config.get(k)
-            else:
-                new_config[k] = v
+        for k, v in config.items():
+            db_temp.config[k] = v
 
-        db_temp.config = new_config
+        flag_modified(db_temp, "config")
         db.commit()
         db.refresh(db_temp)
         return db_temp

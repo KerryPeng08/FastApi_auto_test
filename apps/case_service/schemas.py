@@ -45,7 +45,7 @@ class TestCaseConfig(BaseModel):
     sleep: float = 0.3
     stop: bool = None
     code: bool = None
-    extract: Union[list] = []
+    extract: Union[list, None] = []
     fail_stop: bool = None
 
 
