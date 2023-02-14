@@ -56,7 +56,8 @@ async def run_service_case(db: Session, case_ids: list):
             )
             await load_allure_report(allure_dir=allure_dir, case_id=case_id, run_order=run_order)
 
-            report[case_id] = f'{HOST}allure/{case_id}/{run_order}'
+            # report[case_id] = f'{HOST}allure/{case_id}/{run_order}'
+            report[case_id] = f'/allure/{case_id}/{run_order}'
         else:
             report[case_id] = f'用例{case_id}不存在'
 

@@ -11,7 +11,7 @@ import os
 import json
 import time
 import shutil
-from typing import List
+from typing import List, Any
 from fastapi import APIRouter, UploadFile, Depends, Query
 from sqlalchemy.orm import Session
 from starlette.responses import FileResponse
@@ -19,7 +19,7 @@ from starlette.background import BackgroundTask
 from depends import get_db
 from apps import response_code
 from tools.check_case_json import CheckJson
-from tools import OperationJson
+from tools import OperationJson, ExtractParamsPath
 from setting import ALLURE_PATH
 from .tool.get_case_data_info import GetCaseDataInfo
 
@@ -396,3 +396,22 @@ async def set_api_config(case_id: int, number: int, config: dict, db: Session = 
     await crud.set_case_config(db=db, case_id=case_id, number=number, config=config)
 
     return await response_code.resp_200()
+
+
+@case_service.get(
+    '/response/jsonpath/list',
+    name='从原始数据response中获取jsonpath表达式',
+)
+async def get_jsonpath(case_id: int, extract_contents: Any, db: Session = Depends(get_db)):
+    """
+    通过用例id获取jsonpath表达式
+    """
+    case_info = await crud.get_case_info(db=db, case_id=case_id)
+    if not case_info:
+        return await response_code.resp_404(message='没有获取到这个用例id')
+
+    temp_data = await temp_crud.get_template_data(db=db, temp_id=case_info[0].temp_id)
+    value_list = ExtractParamsPath.get_value_path(extract_contents=extract_contents, temp_data=temp_data)
+    return await response_code.resp_200(
+        data=value_list
+    ) if value_list.get(extract_contents) else await response_code.resp_404()

@@ -17,10 +17,11 @@ from apps.case_perf.router import case_perf
 from apps.api_pool.router import pool
 from apps.run_case.router import run_case
 from tools.load_allure import load_allure_reports
+from fastapi.staticfiles import StaticFiles
 from apps import response_code
 
 app = FastAPI(
-    docs_url='/',
+    # docs_url='/',
     include_in_=True,
     title='随便测测'
 )
@@ -54,6 +55,8 @@ app.include_router(pool, prefix='/YApi', tags=['YApi接口池'])
 async def allure():
     return await response_code.resp_200(data={'allure_report': f"{HOST}" + "{case_id}/{run_order}"})
 
+
+app.mount('/index.html', StaticFiles(directory='static', html=True))
 
 load_allure_reports(app=app, allure_dir=ALLURE_PATH)
 
