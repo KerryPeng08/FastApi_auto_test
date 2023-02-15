@@ -19,7 +19,7 @@ from starlette.background import BackgroundTask
 from depends import get_db
 from apps import response_code
 from tools.check_case_json import CheckJson
-from tools import OperationJson, ExtractParamsPath
+from tools import OperationJson, ExtractParamsPath, RepData
 from setting import ALLURE_PATH
 from .tool.get_case_data_info import GetCaseDataInfo
 
@@ -402,16 +402,67 @@ async def set_api_config(case_id: int, number: int, config: dict, db: Session = 
     '/response/jsonpath/list',
     name='从原始数据response中获取jsonpath表达式',
 )
-async def get_jsonpath(case_id: int, extract_contents: Any, db: Session = Depends(get_db)):
+async def get_response_json_path(case_id: int, extract_contents: Any, db: Session = Depends(get_db)):
     """
-    通过用例id获取jsonpath表达式
+    通过用例id从原始数据中获取jsonpath表达式
     """
     case_info = await crud.get_case_info(db=db, case_id=case_id)
     if not case_info:
         return await response_code.resp_404(message='没有获取到这个用例id')
 
     temp_data = await temp_crud.get_template_data(db=db, temp_id=case_info[0].temp_id)
-    value_list = ExtractParamsPath.get_value_path(extract_contents=extract_contents, temp_data=temp_data)
+    value_list = ExtractParamsPath.get_value_path(
+        extract_contents=extract_contents,
+        my_data=temp_data,
+        type_='response'
+    )
     return await response_code.resp_200(
         data=value_list
-    ) if value_list.get(extract_contents) else await response_code.resp_404()
+    ) if value_list.get('extract_contents') else await response_code.resp_404()
+
+
+@case_service.get(
+    '/casedata/jsonpath/list',
+    name='从测试数据中获取会被替换的数据'
+)
+async def get_case_data_json_path(case_id: int, extract_contents: Any, new_str: str, db: Session = Depends(get_db)):
+    """
+    通过用例id从测试数据url、params、data中预览会被替换的数据
+    """
+    if "{{" not in new_str and "}}" not in new_str and "$" not in new_str:
+        return await response_code.resp_400(message='表达式格式有误')
+
+    case_info = await crud.get_case_info(db=db, case_id=case_id)
+    if not case_info:
+        return await response_code.resp_404(message='没有获取到这个用例id')
+
+    case_data = await crud.get_case_data(db=db, case_id=case_id)
+
+    # 预览查询================================#
+    url_list = ExtractParamsPath.get_url_path(
+        extract_contents=extract_contents,
+        my_data=case_data,
+    )
+    params_list = ExtractParamsPath.get_value_path(
+        extract_contents=extract_contents,
+        my_data=case_data,
+        type_='params'
+    )
+    data_list = ExtractParamsPath.get_value_path(
+        extract_contents=extract_contents,
+        my_data=case_data,
+        type_='data'
+    )
+    # 预览查询================================#
+    RepData.rep_url(url_list=url_list, new_str=new_str, extract_contents=extract_contents)
+    # 对比数据================================#
+    RepData.rep_json(json_data=params_list, case_data=case_data, new_str=new_str, type_='params')
+    # 对比数据================================#
+    RepData.rep_json(json_data=data_list, case_data=case_data, new_str=new_str, type_='data')
+    return await response_code.resp_200(
+        data={
+            'url_list': url_list,
+            'params_list': params_list,
+            'data_list': data_list,
+        }
+    )

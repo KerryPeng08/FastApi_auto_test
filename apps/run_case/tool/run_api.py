@@ -246,7 +246,7 @@ class RunApi:
                 logger.error(f"状态码: {res.status}")
                 break
 
-            if sleep < 5 or not check:
+            if (sleep < 5 and is_fail) or not check:
                 break
 
             logger.info(f"循环case_id:{case_id},{num + 1}次: {request_info['url']}")
