@@ -7,6 +7,7 @@
 @Time: 2022/8/20-22:00
 """
 
+import re
 import os
 import json
 import time
@@ -429,8 +430,8 @@ async def get_case_data_json_path(case_id: int, extract_contents: Any, new_str: 
     """
     通过用例id从测试数据url、params、data中预览会被替换的数据
     """
-    if "{{" not in new_str and "}}" not in new_str and "$" not in new_str:
-        return await response_code.resp_400(message='表达式格式有误')
+    # if "{{" not in new_str and "}}" not in new_str and "$" not in new_str:
+    #     return await response_code.resp_400(message='表达式格式有误')
 
     case_info = await crud.get_case_info(db=db, case_id=case_id)
     if not case_info:
@@ -454,6 +455,7 @@ async def get_case_data_json_path(case_id: int, extract_contents: Any, new_str: 
         type_='data'
     )
     # 预览查询================================#
+
     RepData.rep_url(url_list=url_list, new_str=new_str, extract_contents=extract_contents)
     # 对比数据================================#
     RepData.rep_json(json_data=params_list, case_data=case_data, new_str=new_str, type_='params')
@@ -466,3 +468,39 @@ async def get_case_data_json_path(case_id: int, extract_contents: Any, new_str: 
             'data_list': data_list,
         }
     )
+
+
+@case_service.post(
+    '/replace/one/casedata',
+    name='替换单个测试数据'
+)
+async def replace_one_casedata(case_id: int, number: int, old_data: str, new_data: str, rep: bool, data_type: str,
+                               db: Session = Depends(get_db)):
+    """
+    单个用例替换单条api数据
+    """
+    case_info = await crud.get_case_data(db=db, case_id=case_id)
+    if not case_info:
+        return await response_code.resp_404(message='没有获取到这个用例id')
+
+    if number not in [x.number for x in case_info]:
+        return await response_code.resp_404(message='这个用例没有这个number')
+
+    if rep:
+        await crud.set_case_data(
+            db=db,
+            case_id=case_id,
+            number=number,
+            old_data=old_data,
+            new_data=new_data,
+            type_=data_type
+        )
+    else:
+        await crud.set_case_data(
+            db=db,
+            case_id=case_id,
+            number=number,
+            old_data=new_data,
+            new_data=old_data,
+            type_=data_type
+        )

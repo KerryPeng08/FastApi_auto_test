@@ -7,6 +7,7 @@
 @Time: 2022/8/20-21:59
 """
 
+from tools import rep_value, rep_url
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.orm import Session
 from apps.case_service import models, schemas
@@ -131,6 +132,52 @@ async def set_case_config(db: Session, case_id: int, number: int, config: dict):
             db_temp.config[k] = v
 
         flag_modified(db_temp, "config")
+        db.commit()
+        db.refresh(db_temp)
+        return db_temp
+
+
+async def set_case_data(
+        db: Session,
+        case_id: int,
+        number: int,
+        old_data: str,
+        new_data: str,
+        type_: str
+):
+    """
+    替换测试数据
+    :param db:
+    :param case_id:
+    :param number:
+    :param old_data:
+    :param new_data:
+    :param json_path:
+    :param type_:
+    :return:
+    """
+    db_temp = db.query(models.TestCaseData).filter(
+        models.TestCaseData.case_id == case_id,
+        models.TestCaseData.number == number,
+    ).first()
+
+    if type_ == 'data':
+        new_json = rep_value(json_data=db_temp.data, old_str=old_data, new_str=new_data)
+        db_temp.data = new_json
+        flag_modified(db_temp, "data")
+        db.commit()
+        db.refresh(db_temp)
+        return db_temp
+    elif type_ == 'params':
+        new_json = rep_value(json_data=db_temp.params, old_str=old_data, new_str=new_data)
+        db_temp.params = new_json
+        flag_modified(db_temp, "params")
+        db.commit()
+        db.refresh(db_temp)
+        return db_temp
+    else:
+        new_url = rep_url(url=db_temp.path, old_str=old_data, new_str=new_data)
+        db_temp.path = new_url
         db.commit()
         db.refresh(db_temp)
         return db_temp

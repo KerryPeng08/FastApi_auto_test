@@ -142,9 +142,11 @@ class RepData:
         """
         # new_url_list = []
         for url in url_list['extract_contents']:
+            number, json_path = url['jsonpath'].split('.', 1)
             url['old_data'] = extract_contents
-            url['new_data'] = re.sub(extract_contents, new_str, url['jsonpath'].split('.')[1])
+            url['new_data'] = re.sub(extract_contents, new_str, json_path)
             url['jsonpath'] = 're.sub(extract_contents, jsonpath, old_data)'
+            url['number'] = int(number)
         return url_list
 
     @classmethod
@@ -167,5 +169,6 @@ class RepData:
                 old_data = jsonpath.jsonpath(case_data[int(number)].data, f"{json_path}")
                 data['old_data'] = old_data[0] if len(old_data) > 0 else False
             data['new_data'] = new_str
+            data['number'] = int(number)
 
         return json_data

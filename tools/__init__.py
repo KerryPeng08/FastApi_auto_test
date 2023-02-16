@@ -14,6 +14,7 @@ from .global_log import logger
 from .aiohttp_get_cookie import get_cookie
 from .my_sql import AsyncMySql
 from .get_value_path import ExtractParamsPath, RepData
+from .rep_case_data_value import rep_value, rep_url
 
 
 def mkdir():
