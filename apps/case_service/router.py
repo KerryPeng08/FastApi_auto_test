@@ -150,6 +150,49 @@ async def test_case_upload_json(
 
 
 @case_service.get(
+    '/temp/to/case',
+    name='模板转为用例'
+)
+async def temp_to_case(
+        temp_id: int,
+        case_id: int = None,
+        case_name: str = None,
+        cover: bool = False,
+        fail_stop: bool = True,
+        db: Session = Depends(get_db)
+):
+    db_temp = await temp_crud.get_temp_name(db=db, temp_id=temp_id)
+    if not db_temp:
+        return await response_code.resp_404(message='模板不存在')
+
+    template_data = await temp_crud.get_template_data(db=db, temp_name=db_temp[0].temp_name)
+    test_data = await GenerateCase().read_template_to_api(
+        temp_name=db_temp[0].temp_name,
+        mode='service',
+        fail_stop=fail_stop,
+        template_data=template_data
+    )
+
+    if not cover:  # 覆盖
+        if not case_id:
+            return await response_code.resp_400(message='未输入case_id')
+
+        case_info = await crud.get_case_info(db=db, case_id=case_id)
+        if not case_info:
+            return await response_code.resp_404(message='没有这个case_id')
+        if case_info[0].temp_id != temp_id:
+            return await response_code.resp_404(message='这个case_id没有绑定到这个模板')
+
+        await cover_insert(db=db, case_id=case_id, case_data=test_data)
+        return await response_code.resp_200(message='覆盖成功', data={'case_id': case_id})
+    else:  # 新增
+        if not case_name:
+            return await response_code.resp_400(message='未输入case_name')
+        new_case_info = await insert(db=db, case_name=case_name, temp_id=db_temp[0].id, case_data=test_data)
+        return await response_code.resp_200(message='新增成功', data={'case_id': new_case_info.id})
+
+
+@case_service.get(
     '/data/{case_id}',
     response_model=schemas.TestCaseDataOut,
     response_class=response_code.MyJSONResponse,
@@ -485,6 +528,9 @@ async def replace_one_casedata(
     """
     单个用例替换单条api数据
     """
+    if not old_data or not new_data:
+        return await response_code.resp_400(message='字符串不能为空')
+
     if data_type not in ['url', 'data', 'params']:
         return await response_code.resp_400(message='不支持这个data_type')
 

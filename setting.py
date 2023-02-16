@@ -58,7 +58,7 @@ TIPS: dict = {
             '1.默认会按key-value完全匹配提取上级接口响应数据',
             "2.参数提取表达式-1'{{number.$.jsonPath表达式}}'",
             "3.参数提取表达式-2'{{number.$.jsonPath表达式}}|index:index'",
-            "4.参数提取表达式-3'{{number.$.jsonPath表达式}},string in key,string == key"
+            "4.参数提取表达式-3'{{number.$.jsonPath表达式}},string in key,string == key'"
         ],
         '响应数据校验': [
             '1.key为要校验的字段，value为校验的值',

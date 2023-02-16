@@ -355,7 +355,8 @@ async def update_name(new_name: str, old_name: str = None, temp_id: int = None, 
     """
     return await crud.put_temp_name(
         db=db,
-        temp_id=temp_id, old_name=old_name,
+        temp_id=temp_id,
+        old_name=old_name,
         new_name=new_name
     ) or await response_code.resp_404()
 
