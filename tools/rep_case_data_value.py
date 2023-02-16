@@ -51,4 +51,7 @@ def rep_url(url: str, old_str: str, new_str: str, ) -> str:
     :param url:
     :return:
     """
+    if '$' in old_str:
+        str1, str2 = old_str.split('$')
+        old_str = str1 + '\$' + str2
     return re.sub(old_str, new_str, url)

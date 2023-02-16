@@ -152,7 +152,6 @@ async def set_case_data(
     :param number:
     :param old_data:
     :param new_data:
-    :param json_path:
     :param type_:
     :return:
     """
@@ -176,6 +175,7 @@ async def set_case_data(
         db.refresh(db_temp)
         return db_temp
     else:
+
         new_url = rep_url(url=db_temp.path, old_str=old_data, new_str=new_data)
         db_temp.path = new_url
         db.commit()

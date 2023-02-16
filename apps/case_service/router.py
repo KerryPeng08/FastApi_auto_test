@@ -7,7 +7,6 @@
 @Time: 2022/8/20-22:00
 """
 
-import re
 import os
 import json
 import time
@@ -474,8 +473,15 @@ async def get_case_data_json_path(case_id: int, extract_contents: Any, new_str: 
     '/replace/one/casedata',
     name='替换单个测试数据'
 )
-async def replace_one_casedata(case_id: int, number: int, old_data: str, new_data: str, rep: bool, data_type: str,
-                               db: Session = Depends(get_db)):
+async def replace_one_casedata(
+        case_id: int,
+        number: int,
+        old_data: str,
+        new_data: str,
+        rep: bool,
+        data_type: str,
+        db: Session = Depends(get_db)
+):
     """
     单个用例替换单条api数据
     """
@@ -504,3 +510,5 @@ async def replace_one_casedata(case_id: int, number: int, old_data: str, new_dat
             new_data=old_data,
             type_=data_type
         )
+
+    return await response_code.resp_200()
