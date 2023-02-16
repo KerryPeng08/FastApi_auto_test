@@ -23,6 +23,11 @@ YAPI_INFO: dict = {
     'password': 'liweijia666'
 }
 
+# 自动添加校验字段（统一响应字段）
+AUTO_CHECK = {
+    'code': 0
+}
+
 # 失败即刻停止执行
 GLOBAL_FAIL_STOP: bool = True
 

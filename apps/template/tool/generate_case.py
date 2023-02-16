@@ -10,7 +10,7 @@
 import jsonpath
 from typing import List, Any
 from apps.template import schemas
-from setting import TIPS
+from setting import TIPS, AUTO_CHECK
 
 
 class GenerateCase:
@@ -49,7 +49,10 @@ class GenerateCase:
                 'params': params,
                 'data': data,
                 'file': True if template_data[num].file else False,
-                'check': {'status_code': template_data[num].code},
+                'check': {
+                    **{'status_code': template_data[num].code},
+                    **{k: v for k, v in AUTO_CHECK.items() if template_data[num].response.get(k) == v}
+                },
                 'description': '',
                 'config': {
                     'is_login': True if num == 0 else None,

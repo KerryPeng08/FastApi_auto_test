@@ -485,6 +485,9 @@ async def replace_one_casedata(
     """
     单个用例替换单条api数据
     """
+    if data_type not in ['url', 'data', 'params']:
+        return await response_code.resp_400(message='不支持这个data_type')
+
     case_info = await crud.get_case_data(db=db, case_id=case_id)
     if not case_info:
         return await response_code.resp_404(message='没有获取到这个用例id')
