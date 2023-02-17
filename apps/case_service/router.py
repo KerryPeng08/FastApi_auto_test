@@ -441,6 +441,26 @@ async def set_api_config(case_id: int, number: int, config: dict, db: Session = 
     return await response_code.resp_200()
 
 
+@case_service.put(
+    '/set/api/description',
+    name='设置描述信息'
+)
+async def set_api_description(case_id: int, number: int, description: str, db: Session = Depends(get_db)):
+    """
+    设置每个接口的描述信息
+    """
+    if not description:
+        return await response_code.resp_400(message='无效描述内容')
+
+    case_data = await crud.get_case_data(db=db, case_id=case_id, number=number)
+    if not case_data:
+        return await response_code.resp_404(message='没有获取到这个用例描述')
+
+    await crud.set_case_description(db=db, case_id=case_id, number=number, description=description)
+
+    return await response_code.resp_200()
+
+
 @case_service.get(
     '/response/jsonpath/list',
     name='从原始数据response中获取jsonpath表达式',

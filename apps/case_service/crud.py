@@ -137,6 +137,27 @@ async def set_case_config(db: Session, case_id: int, number: int, config: dict):
         return db_temp
 
 
+async def set_case_description(db: Session, case_id: int, number: int, description: str):
+    """
+    设置用例描述信息
+    :param db:
+    :param case_id:
+    :param number:
+    :param description:
+    :return:
+    """
+    db_temp = db.query(models.TestCaseData).filter(
+        models.TestCaseData.case_id == case_id,
+        models.TestCaseData.number == number,
+    ).first()
+
+    if db_temp:
+        db_temp.description = description
+        db.commit()
+        db.refresh(db_temp)
+        return db_temp
+
+
 async def set_case_data(
         db: Session,
         case_id: int,
