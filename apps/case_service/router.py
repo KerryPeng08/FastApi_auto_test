@@ -561,3 +561,36 @@ async def replace_one_casedata(
         )
 
     return await response_code.resp_200()
+
+
+@case_service.get(
+    '/copy/case',
+    name='复制测试用例数据，形成新的测试用例'
+)
+async def copy_case(case_id: int, db: Session = Depends(get_db)):
+    """
+    复制测试用例，形成新的测试用例
+    """
+    case_info = await crud.get_case_info(db=db, case_id=case_id)
+    if not case_info:
+        return await response_code.resp_404(message='没有获取到这个用例id')
+
+    case_name = case_info[0].case_name + ' - 副本'
+    case_data = await crud.get_case_data(db=db, case_id=case_id)
+    case_data = [{
+        'number': x.number,
+        'path': x.path,
+        'headers': x.headers,
+        'params': x.params,
+        'data': x.data,
+        'file': x.file,
+        'check': x.check,
+        'description': x.description,
+        'config': x.config,
+    } for x in case_data]
+
+    case_data = {
+        'mode': 'service',
+        'data': case_data
+    }
+    return await insert(db=db, case_name=case_name, temp_id=case_info[0].temp_id, case_data=dict(**case_data))
