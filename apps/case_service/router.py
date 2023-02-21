@@ -465,7 +465,13 @@ async def set_api_description(case_id: int, number: int, description: str, db: S
     '/response/jsonpath/list',
     name='从原始数据response中获取jsonpath表达式',
 )
-async def get_response_json_path(case_id: int, extract_contents: Any, db: Session = Depends(get_db)):
+async def get_response_json_path(
+        case_id: int,
+        extract_contents: Any,
+        key_value: schemas.KeyValueType,
+        ext_type: schemas.ExtType,
+        db: Session = Depends(get_db)
+):
     """
     通过用例id从原始数据中获取jsonpath表达式
     """
@@ -477,7 +483,9 @@ async def get_response_json_path(case_id: int, extract_contents: Any, db: Sessio
     value_list = ExtractParamsPath.get_value_path(
         extract_contents=extract_contents,
         my_data=temp_data,
-        type_='response'
+        type_=schemas.RepType.response,
+        key_value=key_value,
+        ext_type=ext_type
     )
     return await response_code.resp_200(
         data=value_list
@@ -488,12 +496,16 @@ async def get_response_json_path(case_id: int, extract_contents: Any, db: Sessio
     '/casedata/jsonpath/list',
     name='从测试数据中获取会被替换的数据'
 )
-async def get_case_data_json_path(case_id: int, extract_contents: Any, new_str: str, db: Session = Depends(get_db)):
+async def get_case_data_json_path(
+        case_id: int,
+        extract_contents: Any,
+        new_str: str,
+        key_value: schemas.KeyValueType,
+        ext_type: schemas.ExtType,
+        db: Session = Depends(get_db)):
     """
     通过用例id从测试数据url、params、data中预览会被替换的数据
     """
-    # if "{{" not in new_str and "}}" not in new_str and "$" not in new_str:
-    #     return await response_code.resp_400(message='表达式格式有误')
 
     case_info = await crud.get_case_info(db=db, case_id=case_id)
     if not case_info:
@@ -509,12 +521,16 @@ async def get_case_data_json_path(case_id: int, extract_contents: Any, new_str: 
     params_list = ExtractParamsPath.get_value_path(
         extract_contents=extract_contents,
         my_data=case_data,
-        type_='params'
+        type_=schemas.RepType.params,
+        key_value=key_value,
+        ext_type=ext_type
     )
     data_list = ExtractParamsPath.get_value_path(
         extract_contents=extract_contents,
         my_data=case_data,
-        type_='data'
+        type_=schemas.RepType.data,
+        key_value=key_value,
+        ext_type=ext_type
     )
     # 预览查询================================#
 

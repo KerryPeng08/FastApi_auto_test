@@ -19,6 +19,22 @@ class ModeEnum(str, Enum):
     perf = 'perf'
 
 
+class KeyValueType(str, Enum):
+    key = 'key'
+    value = 'value'
+
+
+class RepType(str, Enum):
+    params = 'params'
+    data = 'data'
+    response = 'response'
+
+
+class ExtType(str, Enum):
+    equal = '=='
+    contain = 'in'
+
+
 # 用例名称的请求/响应数据模型
 class TestCaseIn(BaseModel):
     case_name: str
