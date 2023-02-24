@@ -85,3 +85,12 @@ class TemplateDataOut(TemplateDataIn):
 
     class Config:
         orm_mode = True
+
+
+class TempChangeParams(BaseModel):
+    temp_id: int
+    temp_name: str
+    number: int
+    path: str
+    params: dict
+    data: dict

@@ -7,8 +7,6 @@
 @Time: 2023/2/16-10:28
 """
 
-import re
-
 
 def rep_value(json_data: dict, old_str: str, new_str: str) -> dict:
     """
@@ -51,7 +49,4 @@ def rep_url(url: str, old_str: str, new_str: str, ) -> str:
     :param url:
     :return:
     """
-    if '$' in old_str:
-        str1, str2 = old_str.split('$')
-        old_str = str1 + '\$' + str2
-    return re.sub(old_str, new_str, url)
+    return url.replace(old_str, new_str)

@@ -412,9 +412,23 @@ async def download_temp_excel(temp_name: str, db: Session = Depends(get_db)):
         )
     return await response_code.resp_404()
 
-# @template.get(
-#     '/diff',
-#     name='对比测试模板数据-开发中'
-# )
-# async def diff_template(name: str, db: Session = Depends(get_db)):
-#     pass
+
+@template.get(
+    '/url/for/data',
+    name='通过url+method查找相同接口数据',
+    response_model=List[schemas.TempChangeParams]
+    # response_model_exclude=['headers', 'file_data', 'response'],
+)
+async def url_for_data(method: str, path: str, db: Session = Depends(get_db)):
+    """
+    通过url+method，查询出模板的信息，以及关联的用例信息
+    """
+    temp_info = await crud.get_all_url_method(db=db, method=method.upper(), path=path)
+    return [{
+        'temp_id': x[0],
+        'temp_name': x[1],
+        'number': x[2],
+        'path': x[3],
+        'params': x[4],
+        'data': x[5],
+    } for x in temp_info] if temp_info else await response_code.resp_404()
