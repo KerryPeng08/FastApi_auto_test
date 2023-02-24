@@ -432,3 +432,21 @@ async def url_for_data(method: str, path: str, db: Session = Depends(get_db)):
         'params': x[4],
         'data': x[5],
     } for x in temp_info] if temp_info else await response_code.resp_404()
+
+
+@template.get(
+    '/temp/for/casedata',
+    name='通过模板id和number获取用例id和number和其他信息'
+)
+async def temp_for_case_data(temp_id: int, number: int, db: Session = Depends(get_db)):
+    """
+    通过模板id和number获取用例信息
+    """
+    db_info = await crud.get_temp_fo_case_info(db=db, temp_id=temp_id, number=number)
+    return [{
+        'case_id': x[0],
+        'number': x[1],
+        'path': x[2],
+        'params': x[3],
+        'data': x[4],
+    } for x in db_info] if db_info else await response_code.resp_400()
