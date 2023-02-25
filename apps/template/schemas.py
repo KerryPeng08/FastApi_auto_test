@@ -94,3 +94,20 @@ class TempChangeParams(BaseModel):
     path: str
     params: dict
     data: dict
+
+
+class SwapDataOne(BaseModel):
+    temp_id: int
+    old_number: int
+    new_number: int
+
+
+class SwapDataMany(BaseModel):
+    temp_id: int
+    new_numbers: List[int]
+
+
+class UpdateName(BaseModel):
+    new_name: str
+    old_name: str = None
+    temp_id: int = None
