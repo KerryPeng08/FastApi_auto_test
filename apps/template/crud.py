@@ -222,32 +222,6 @@ async def del_template_data(db: Session, temp_id: int, number: int):
     ).delete()
 
 
-async def get_all_url_method(db: Session, method: str, path: str):
-    """
-    通过url查询全部的接口数据
-    :param db:
-    :param method:
-    :param path:
-    :return:
-    """
-    db_temp = db.query(
-        models.Template.id,
-        models.Template.temp_name,
-        models.TemplateData.number,
-        models.TemplateData.path,
-        models.TemplateData.params,
-        models.TemplateData.data,
-    ).filter(
-        models.TemplateData.method == method,
-        models.TemplateData.path.like(f'{path}%'),
-    ).filter(
-        models.TemplateData.temp_id == models.Template.id
-    ).order_by(
-        models.TemplateData.temp_id
-    ).limit(50).all()
-    return db_temp
-
-
 async def get_all_temp_name(db: Session, temp_ids):
     """
     获取所有的模板名称
@@ -259,30 +233,5 @@ async def get_all_temp_name(db: Session, temp_ids):
         models.Template.temp_name
     ).filter(
         models.Template.id.in_(temp_ids)
-    ).all()
-    return db_temp
-
-
-async def get_temp_fo_case_info(db: Session, temp_id: int, number: int):
-    """
-    通过模板id获取case的信息
-    :param db:
-    :param temp_id:
-    :param number:
-    :return:
-    """
-    db_temp = db.query(
-        case_models.TestCaseData.case_id,
-        case_models.TestCaseData.number,
-        case_models.TestCaseData.path,
-        case_models.TestCaseData.params,
-        case_models.TestCaseData.data,
-    ).filter(
-        models.TemplateData.temp_id == temp_id,
-        models.TemplateData.number == number
-    ).filter(
-        models.TemplateData.temp_id == case_models.TestCase.temp_id,
-        case_models.TestCase.id == case_models.TestCaseData.case_id,
-        models.TemplateData.number == case_models.TestCaseData.number
     ).all()
     return db_temp
