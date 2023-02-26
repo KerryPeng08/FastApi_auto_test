@@ -7,9 +7,8 @@
 @Time: 2023/2/25-21:07
 """
 
-from pydantic import BaseModel
-from typing import Optional, List, Union
-from enum import Enum
+from pydantic import BaseModel, Field
+from typing import Optional
 
 
 class UrlEdit(BaseModel):
@@ -17,8 +16,8 @@ class UrlEdit(BaseModel):
     case_id: Optional[int] = None
     number: int
     rep_url: bool
-    old_url: str
-    new_url: str
+    old_url: str = Field(..., min_length=5)
+    new_url: str = Field(..., min_length=5)
 
 
 class ParamsAdd(BaseModel):
@@ -26,7 +25,7 @@ class ParamsAdd(BaseModel):
     case_id: Optional[int] = None
     number: int
     rep_params_add: bool
-    key: str
+    key: str = Field(..., min_length=1)
     value: Optional[str] = None
 
 
@@ -35,8 +34,8 @@ class ParamsEdit(BaseModel):
     case_id: Optional[int] = None
     number: int
     rep_params_edit: bool
-    old_key: str
-    new_key: str
+    old_key: str = Field(..., min_length=1)
+    new_key: str = Field(..., min_length=1)
     value: Optional[str] = None
 
 
@@ -45,7 +44,7 @@ class ParamsDel(BaseModel):
     case_id: Optional[int] = None
     number: int
     rep_params_del: bool
-    key: str
+    key: str = Field(..., min_length=1)
 
 
 class DataAdd(BaseModel):
@@ -53,7 +52,7 @@ class DataAdd(BaseModel):
     case_id: Optional[int] = None
     number: int
     rep_data_add: bool
-    key: str
+    key: str = Field(..., min_length=1)
     value: Optional[str] = None
 
 
@@ -62,8 +61,8 @@ class DataEdit(BaseModel):
     case_id: Optional[int] = None
     number: int
     rep_data_edit: bool
-    old_key: str
-    new_key: str
+    old_key: str = Field(..., min_length=1)
+    new_key: str = Field(..., min_length=1)
     value: Optional[str] = None
 
 
@@ -72,4 +71,4 @@ class DataDel(BaseModel):
     case_id: Optional[int] = None
     number: int
     rep_data_del: bool
-    key: str
+    key: str = Field(..., min_length=1)

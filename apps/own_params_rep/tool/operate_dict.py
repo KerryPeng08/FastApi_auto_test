@@ -10,15 +10,39 @@
 from typing import Any
 
 
-def dict_add(json_path: str, dict_data: dict, value: Any = None):
+def dict_add(seek_key: str, insert_key: str, dict_data: dict, value: Any = None):
     """
     对字典进行添加操作
-    :param json_path:
+    :param seek_key:
+    :param insert_key:
     :param value:
     :param dict_data:
     :return:
     """
-    key_list = [x for x in json_path.split('.') if x and x != '$']
+    if seek_key is None:
+        dict_data[insert_key] = value
+        return dict_data
+
+    def handle_value(data_json):
+        target = {}
+        for k, v in data_json.items():
+            target[k] = v
+            if k == seek_key:
+                if isinstance(v, list) and isinstance(v[0], dict):
+                    x_list = []
+                    for x in v:
+                        if insert_key not in x.keys():
+                            x[insert_key] = value
+                        x_list.append(x)
+                    target[k] = x_list
+
+                elif isinstance(v, dict):
+                    if insert_key not in v.keys():
+                        v[insert_key] = value
+
+        return target
+
+    return handle_value(dict_data)
 
 
 def dict_edit(old_key: str, new_key: str, dict_data: dict, value: Any = None):
