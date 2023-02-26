@@ -8,16 +8,17 @@
 """
 
 from typing import List
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from apps import response_code
-from depends import get_db
 
+from apps import response_code
+from apps.case_service import crud as c_crud
+from apps.own_params_rep import schemas, crud
 from apps.template import crud as t_crud
 from apps.template import schemas as t_schemas
-from apps.case_service import crud as c_crud
-
-from apps.own_params_rep import schemas, crud
+from depends import get_db
+from .tool import dict_add, dict_edit, dict_del
 
 own_rep = APIRouter()
 
@@ -64,14 +65,13 @@ async def temp_for_case_data(temp_id: int, number: int, db: Session = Depends(ge
 @own_rep.put(
     '/url/edit',
     name='修改url',
-
 )
 async def url_edit(ue: schemas.UrlEdit, db: Session = Depends(get_db)):
     if ue.temp_id and ue.case_id:
         return await response_code.resp_400(message='temp_id和case_id不能同时存在')
 
     if ue.temp_id:
-        template_data = await t_crud.get_template_data(db=db, temp_id=ue.temp_id)
+        template_data = await t_crud.get_temp_name(db=db, temp_id=ue.temp_id)
         if not template_data:
             return await response_code.resp_404(message='没有获取到这个模板id')
 
@@ -117,3 +117,234 @@ async def url_edit(ue: schemas.UrlEdit, db: Session = Depends(get_db)):
             )
 
         return await response_code.resp_200()
+
+
+@own_rep.put(
+    '/params/add',
+    name='params添加字段'
+)
+async def params_add(pa: schemas.ParamsAdd, db: Session = Depends(get_db)):
+    if pa.temp_id and pa.case_id:
+        return await response_code.resp_400(message='temp_id和case_id不能同时存在')
+
+    if pa.temp_id:
+        template_data = await t_crud.get_template_data(db=db, temp_id=pa.temp_id)
+        if not template_data:
+            return await response_code.resp_404(message='没有获取到这个模板id')
+
+        if pa.rep_params_add:
+            dict_add(json_path=pa.key, value=pa.value, dict_data=template_data[pa.number].params)
+        else:
+            return await response_code.resp_400(message='操作不可逆')
+
+    if pa.case_id:
+        case_data = await c_crud.get_case_data(db=db, case_id=pa.case_id)
+        if not case_data:
+            return await response_code.resp_404(message='没有获取到这个用例id')
+
+        if pa.rep_params_add:
+            dict_add(json_path=pa.key, value=pa.value, dict_data=case_data[pa.number].params)
+        else:
+            return await response_code.resp_400(message='操作不可逆')
+
+
+@own_rep.put(
+    '/params/edit',
+    name='params修改字段'
+)
+async def params_edit(pe: schemas.ParamsEdit, db: Session = Depends(get_db)):
+    if pe.temp_id and pe.case_id:
+        return await response_code.resp_400(message='temp_id和case_id不能同时存在')
+
+    if pe.temp_id:
+        template_data = await t_crud.get_template_data(db=db, temp_id=pe.temp_id)
+        if not template_data:
+            return await response_code.resp_404(message='没有获取到这个模板id')
+
+        if pe.rep_params_edit:
+            new_params = dict_edit(
+                old_key=pe.old_key,
+                new_key=pe.new_key,
+                dict_data=template_data[pe.number].params,
+                value=pe.value
+            )
+        else:
+            new_params = dict_edit(
+                old_key=pe.new_key,
+                new_key=pe.old_key,
+                dict_data=template_data[pe.number].params,
+                value=pe.value
+            )
+
+        await crud.temp_set_json(db=db, temp_id=pe.temp_id, number=pe.number, params=new_params)
+        return await response_code.resp_200()
+
+    if pe.case_id:
+        case_data = await c_crud.get_case_data(db=db, case_id=pe.case_id)
+        if not case_data:
+            return await response_code.resp_404(message='没有获取到这个用例id')
+
+        if pe.rep_params_edit:
+            new_params = dict_edit(
+                old_key=pe.old_key,
+                new_key=pe.new_key,
+                dict_data=case_data[pe.number].params,
+                value=pe.value
+            )
+        else:
+            new_params = dict_edit(
+                old_key=pe.new_key,
+                new_key=pe.old_key,
+                dict_data=case_data[pe.number].params,
+                value=pe.value
+            )
+
+        await crud.case_set_json(db=db, case_id=pe.case_id, number=pe.number, params=new_params)
+        return await response_code.resp_200()
+
+
+@own_rep.put(
+    '/params/del',
+    name='params删除字段'
+)
+async def params_del(pd: schemas.ParamsDel, db: Session = Depends(get_db)):
+    if pd.temp_id and pd.case_id:
+        return await response_code.resp_400(message='temp_id和case_id不能同时存在')
+
+    if pd.temp_id:
+        template_data = await t_crud.get_template_data(db=db, temp_id=pd.temp_id)
+        if not template_data:
+            return await response_code.resp_404(message='没有获取到这个模板id')
+
+        if pd.rep_params_del:
+            new_params = dict_del(old_key=pd.key, dict_data=template_data[pd.number].params)
+            await crud.temp_set_json(db=db, temp_id=pd.temp_id, number=pd.number, params=new_params)
+        else:
+            return await response_code.resp_400(message='操作不可逆')
+
+    if pd.case_id:
+        case_data = await c_crud.get_case_data(db=db, case_id=pd.case_id)
+        if not case_data:
+            return await response_code.resp_404(message='没有获取到这个用例id')
+
+        if pd.rep_params_del:
+            new_params = dict_del(old_key=pd.key, dict_data=case_data[pd.number].params)
+            await crud.case_set_json(db=db, case_id=pd.case_id, number=pd.number, params=new_params)
+        else:
+            return await response_code.resp_400(message='操作不可逆')
+
+
+#######################################################################################################################
+
+@own_rep.put(
+    '/data/add',
+    name='data添加字段'
+)
+async def data_add(pa: schemas.DataAdd, db: Session = Depends(get_db)):
+    if pa.temp_id and pa.case_id:
+        return await response_code.resp_400(message='temp_id和case_id不能同时存在')
+
+    if pa.temp_id:
+        template_data = await t_crud.get_template_data(db=db, temp_id=pa.temp_id)
+        if not template_data:
+            return await response_code.resp_404(message='没有获取到这个模板id')
+
+        if pa.rep_data_add:
+            dict_add(json_path=pa.key, value=pa.value, dict_data=template_data[pa.number].data)
+        else:
+            return await response_code.resp_400(message='操作不可逆')
+
+    if pa.case_id:
+        case_data = await c_crud.get_case_data(db=db, case_id=pa.case_id)
+        if not case_data:
+            return await response_code.resp_404(message='没有获取到这个用例id')
+
+        if pa.rep_data_add:
+            dict_add(json_path=pa.key, value=pa.value, dict_data=case_data[pa.number].data)
+        else:
+            return await response_code.resp_400(message='操作不可逆')
+
+
+@own_rep.put(
+    '/data/edit',
+    name='data修改字段'
+)
+async def data_edit(pe: schemas.DataEdit, db: Session = Depends(get_db)):
+    if pe.temp_id and pe.case_id:
+        return await response_code.resp_400(message='temp_id和case_id不能同时存在')
+
+    if pe.temp_id:
+        template_data = await t_crud.get_template_data(db=db, temp_id=pe.temp_id)
+        if not template_data:
+            return await response_code.resp_404(message='没有获取到这个模板id')
+
+        if pe.rep_data_edit:
+            new_data = dict_edit(
+                old_key=pe.old_key,
+                new_key=pe.new_key,
+                dict_data=template_data[pe.number].data,
+                value=pe.value
+            )
+        else:
+            new_data = dict_edit(
+                old_key=pe.new_key,
+                new_key=pe.old_key,
+                dict_data=template_data[pe.number].data,
+                value=pe.value
+            )
+
+        await crud.temp_set_json(db=db, temp_id=pe.temp_id, number=pe.number, data=new_data)
+        return await response_code.resp_200()
+
+    if pe.case_id:
+        case_data = await c_crud.get_case_data(db=db, case_id=pe.case_id)
+        if not case_data:
+            return await response_code.resp_404(message='没有获取到这个用例id')
+
+        if pe.rep_data_edit:
+            new_data = dict_edit(
+                old_key=pe.old_key,
+                new_key=pe.new_key,
+                dict_data=case_data[pe.number].data,
+                value=pe.value
+            )
+        else:
+            new_data = dict_edit(
+                old_key=pe.new_key,
+                new_key=pe.old_key,
+                dict_data=case_data[pe.number].data,
+                value=pe.value
+            )
+        await crud.case_set_json(db=db, case_id=pe.case_id, number=pe.number, data=new_data)
+        return await response_code.resp_200()
+
+
+@own_rep.put(
+    '/data/del',
+    name='data删除字段'
+)
+async def data_del(pd: schemas.DataDel, db: Session = Depends(get_db)):
+    if pd.temp_id and pd.case_id:
+        return await response_code.resp_400(message='temp_id和case_id不能同时存在')
+
+    if pd.temp_id:
+        template_data = await t_crud.get_template_data(db=db, temp_id=pd.temp_id)
+        if not template_data:
+            return await response_code.resp_404(message='没有获取到这个模板id')
+
+        if pd.rep_data_del:
+            new_data = dict_del(old_key=pd.key, dict_data=template_data[pd.number].data)
+            await crud.temp_set_json(db=db, temp_id=pd.temp_id, number=pd.number, data=new_data)
+        else:
+            return await response_code.resp_400(message='操作不可逆')
+
+    if pd.case_id:
+        case_data = await c_crud.get_case_data(db=db, case_id=pd.case_id)
+        if not case_data:
+            return await response_code.resp_404(message='没有获取到这个用例id')
+
+        if pd.rep_data_del:
+            new_data = dict_del(old_key=pd.key, dict_data=case_data[pd.number].data)
+            await crud.case_set_json(db=db, case_id=pd.case_id, number=pd.number, data=new_data)
+        else:
+            return await response_code.resp_400(message='操作不可逆')
