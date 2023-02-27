@@ -353,7 +353,6 @@ async def update_name(un: schemas.UpdateName, db: Session = Depends(get_db)):
     return await crud.put_temp_name(
         db=db,
         temp_id=un.temp_id,
-        old_name=un.old_name,
         new_name=un.new_name
     ) or await response_code.resp_404()
 

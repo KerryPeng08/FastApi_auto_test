@@ -28,7 +28,6 @@ class ExtractParamsPath:
         从url字段中获取数据
         :param extract_contents:
         :param my_data:
-        :param key_value:
         :return:
         """
         return {

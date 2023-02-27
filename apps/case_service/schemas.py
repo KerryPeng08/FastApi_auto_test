@@ -148,6 +148,8 @@ class TestCaseDataOut2(BaseModel):
 
 class TestCaseInfoOut(BaseModel):
     name: str
+    case_name: str
+    temp_name: str
     case_id: int
     api_count: int = None
     run_order: int = None
@@ -170,3 +172,8 @@ class SetApiConfig(BaseModel):
     case_id: int
     number: int
     config: dict
+
+
+class UpdateName(BaseModel):
+    new_name: str
+    case_id: int = None

@@ -322,3 +322,23 @@ async def update_api_number(db: Session, case_id: int, id_: int, new_number: int
         db.commit()
         db.refresh(db_temp)
         return db_temp
+
+
+async def put_case_name(db: Session, case_id: int, new_name: str):
+    """
+    更新用例名称
+    :param db:
+    :param case_id:
+    :param new_name:
+    :return:
+    """
+    db_temp = None
+
+    if case_id:
+        db_temp = db.query(models.TestCase).filter(models.TestCase.id == case_id).first()
+
+    if db_temp:
+        db_temp.case_name = new_name
+        db.commit()
+        db.refresh(db_temp)
+        return db_temp

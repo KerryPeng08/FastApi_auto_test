@@ -109,5 +109,4 @@ class SwapDataMany(BaseModel):
 
 class UpdateName(BaseModel):
     new_name: str
-    old_name: str = None
     temp_id: int = None

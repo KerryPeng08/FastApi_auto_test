@@ -261,6 +261,8 @@ async def case_data_list(outline: bool = True, db: Session = Depends(get_db)):
         case_info.append(
             {
                 "name": f"{temp_info[0].project_name}-{temp_info[0].temp_name}-{case.case_name}",
+                "case_name": f"{case.case_name}",
+                "temp_name": f"{temp_info[0].project_name}-{temp_info[0].temp_name}",
                 "case_id": case.id,
                 "api_count": case.case_count,
                 "run_order": case.run_order,
@@ -268,10 +270,11 @@ async def case_data_list(outline: bool = True, db: Session = Depends(get_db)):
                 "created_at": case.created_at
             } if outline is False else {
                 "name": f"{temp_info[0].project_name}-{temp_info[0].temp_name}-{case.case_name}",
+                "case_name": f"{case.case_name}",
+                "temp_name": f"{temp_info[0].project_name}-{temp_info[0].temp_name}",
                 "case_id": case.id
             }
         )
-
     return case_info or await response_code.resp_404()
 
 
@@ -310,6 +313,21 @@ async def update_urls(
         db: Session = Depends(get_db)
 ):
     return await crud.update_urls(db=db, old_url=old_url, new_url=new_url) or await response_code.resp_404()
+
+
+@case_service.put(
+    '/name/edit',
+    name='修改用例名称'
+)
+async def name_edit(un: schemas.UpdateName, db: Session = Depends(get_db)):
+    """
+    修改用例名称
+    """
+    return await crud.put_case_name(
+        db=db,
+        case_id=un.case_id,
+        new_name=un.new_name
+    ) or await response_code.resp_404()
 
 
 @case_service.get(
