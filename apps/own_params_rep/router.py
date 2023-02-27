@@ -118,6 +118,8 @@ async def url_edit(ue: schemas.UrlEdit, db: Session = Depends(get_db)):
 
         return await response_code.resp_200()
 
+    return await response_code.resp_400(message='操作无效')
+
 
 @own_rep.put(
     '/params/add',
@@ -168,6 +170,8 @@ async def params_add(pa: schemas.ParamsAdd, db: Session = Depends(get_db)):
             return await response_code.resp_200()
         else:
             return await response_code.resp_400(message='操作不可逆')
+
+    return await response_code.resp_400(message='操作无效')
 
 
 @own_rep.put(
@@ -224,6 +228,8 @@ async def params_edit(pe: schemas.ParamsEdit, db: Session = Depends(get_db)):
         await crud.case_set_json(db=db, case_id=pe.case_id, number=pe.number, params=new_params)
         return await response_code.resp_200()
 
+    return await response_code.resp_400(message='操作无效')
+
 
 @own_rep.put(
     '/params/del',
@@ -241,6 +247,7 @@ async def params_del(pd: schemas.ParamsDel, db: Session = Depends(get_db)):
         if pd.rep_params_del:
             new_params = dict_del(old_key=pd.key, dict_data=template_data[pd.number].params)
             await crud.temp_set_json(db=db, temp_id=pd.temp_id, number=pd.number, params=new_params)
+            return await response_code.resp_200()
         else:
             return await response_code.resp_400(message='操作不可逆')
 
@@ -252,8 +259,11 @@ async def params_del(pd: schemas.ParamsDel, db: Session = Depends(get_db)):
         if pd.rep_params_del:
             new_params = dict_del(old_key=pd.key, dict_data=case_data[pd.number].params)
             await crud.case_set_json(db=db, case_id=pd.case_id, number=pd.number, params=new_params)
+            return await response_code.resp_200()
         else:
             return await response_code.resp_400(message='操作不可逆')
+
+    return await response_code.resp_400(message='操作无效')
 
 
 #######################################################################################################################
@@ -307,6 +317,8 @@ async def data_add(da: schemas.DataAdd, db: Session = Depends(get_db)):
             return await response_code.resp_200()
         else:
             return await response_code.resp_400(message='操作不可逆')
+
+    return await response_code.resp_400(message='操作无效')
 
 
 @own_rep.put(
@@ -362,6 +374,8 @@ async def data_edit(de: schemas.DataEdit, db: Session = Depends(get_db)):
         await crud.case_set_json(db=db, case_id=de.case_id, number=de.number, data=new_data)
         return await response_code.resp_200()
 
+    return await response_code.resp_400(message='操作无效')
+
 
 @own_rep.put(
     '/data/del',
@@ -379,6 +393,7 @@ async def data_del(dd: schemas.DataDel, db: Session = Depends(get_db)):
         if dd.rep_data_del:
             new_data = dict_del(old_key=dd.key, dict_data=template_data[dd.number].data)
             await crud.temp_set_json(db=db, temp_id=dd.temp_id, number=dd.number, data=new_data)
+            return await response_code.resp_200()
         else:
             return await response_code.resp_400(message='操作不可逆')
 
@@ -390,5 +405,8 @@ async def data_del(dd: schemas.DataDel, db: Session = Depends(get_db)):
         if dd.rep_data_del:
             new_data = dict_del(old_key=dd.key, dict_data=case_data[dd.number].data)
             await crud.case_set_json(db=db, case_id=dd.case_id, number=dd.number, data=new_data)
+            return await response_code.resp_200()
         else:
             return await response_code.resp_400(message='操作不可逆')
+
+    return await response_code.resp_400(message='操作无效')

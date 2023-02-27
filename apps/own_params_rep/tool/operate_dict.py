@@ -20,7 +20,8 @@ def dict_add(seek_key: str, insert_key: str, dict_data: dict, value: Any = None)
     :return:
     """
     if seek_key is None:
-        dict_data[insert_key] = value
+        if insert_key not in dict_data.keys():
+            dict_data[insert_key] = value
         return dict_data
 
     def handle_value(data_json):
