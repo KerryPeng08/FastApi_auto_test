@@ -338,35 +338,30 @@ async def put_api_info(api_info: schemas.TestCaseDataOut1, db: Session = Depends
     '/swap/one',
     name='编排用例数据的顺序-单次'
 )
-async def swap_one(
-        case_id: int,
-        old_number: int,
-        new_number: int,
-        db: Session = Depends(get_db)
-):
+async def swap_one(one: schemas.SwapOne, db: Session = Depends(get_db)):
     """
     单次替换用例中API的顺序-索引号
     """
-    case_data = await crud.get_case_data(db=db, case_id=case_id)
+    case_data = await crud.get_case_data(db=db, case_id=one.case_id)
     if not case_data:
         return await response_code.resp_404(message='没有获取到这个用例id')
 
     # 判断序号
     numbers = {x.number: x.id for x in case_data}
-    null_num = [num for num in [old_number, new_number] if num not in [x for x in numbers]]
+    null_num = [num for num in [one.old_number, one.new_number] if num not in [x for x in numbers]]
     if null_num:
         return await response_code.resp_400(message=f'序号{null_num} 不在该用例的序号中')
 
     # 替换number序号
-    id_ = numbers[old_number]
-    await crud.update_api_number(db=db, case_id=case_id, id_=id_, new_number=new_number)
-    id_ = numbers[new_number]
-    await crud.update_api_number(db=db, case_id=case_id, id_=id_, new_number=old_number)
+    id_ = numbers[one.old_number]
+    await crud.update_api_number(db=db, case_id=one.case_id, id_=id_, new_number=one.new_number)
+    id_ = numbers[one.new_number]
+    await crud.update_api_number(db=db, case_id=one.case_id, id_=id_, new_number=one.old_number)
 
     return await response_code.resp_200(
         data={
-            'old_number': old_number,
-            'new_number': new_number
+            'old_number': one.old_number,
+            'new_number': one.new_number
         }
     )
 
@@ -375,41 +370,37 @@ async def swap_one(
     '/swap/many',
     name='编排用例数据的顺序-全部'
 )
-async def swap_many(
-        case_id: int,
-        new_numbers: List[int],
-        db: Session = Depends(get_db)
-):
+async def swap_many(many: schemas.SwapMany, db: Session = Depends(get_db)):
     """
     依次替换用例中API的顺序-索引号
     """
-    case_data = await crud.get_case_data(db=db, case_id=case_id)
+    case_data = await crud.get_case_data(db=db, case_id=many.case_id)
     if not case_data:
         return await response_code.resp_404(message='没有获取到这个用例id')
 
-    if len(set(new_numbers)) != len(case_data):
+    if len(set(many.new_numbers)) != len(case_data):
         return await response_code.resp_400(
-            message=f'new_numbers长度：{len(set(new_numbers))}，'
+            message=f'new_numbers长度：{len(set(many.new_numbers))}，'
                     f'与数据库中的numbers长度：{len(case_data)}，不一致'
         )
 
     # 判断序号
     numbers = {x.number: x.id for x in case_data}
-    null_num = [num for num in new_numbers if num not in [x for x in numbers]]
+    null_num = [num for num in many.new_numbers if num not in [x for x in numbers]]
     if null_num:
         return await response_code.resp_400(message=f'序号{null_num} 不在该模板的序号中')
 
     # 替换number序号
     num_info = False
-    for x in range(len(new_numbers)):
-        if x != new_numbers[x]:
-            await crud.update_api_number(db=db, case_id=case_id, id_=numbers[x], new_number=new_numbers[x])
+    for x in range(len(many.new_numbers)):
+        if x != many.new_numbers[x]:
+            await crud.update_api_number(db=db, case_id=many.case_id, id_=numbers[x], new_number=many.new_numbers[x])
             num_info = True
 
     return await response_code.resp_200(
         data={
             'old_number': [x for x in numbers],
-            'new_number': new_numbers
+            'new_number': many.new_numbers
         },
         message='Success 请注意-需要同步修改用例文件中 JsonPath 表达式的序号引用'
     ) if num_info else await response_code.resp_200(
@@ -421,22 +412,18 @@ async def swap_many(
     '/set/api/config',
     name='设置用例配置'
 )
-async def set_api_config(case_id: int, number: int, config: dict, db: Session = Depends(get_db)):
+async def set_api_config(sac: schemas.SetApiConfig, db: Session = Depends(get_db)):
     """
     设置每个接口的配置信息
     """
-    if not config:
+    if not sac.config:
         return await response_code.resp_400(message='无效配置内容')
 
-    case_data = await crud.get_case_data(db=db, case_id=case_id, number=number)
+    case_data = await crud.get_case_data(db=db, case_id=sac.case_id, number=sac.number)
     if not case_data:
         return await response_code.resp_404(message='没有获取到这个用例配置')
 
-    for k in config.keys():
-        if k not in schemas.TestCaseConfig.__fields__.keys():
-            return await response_code.resp_400(message=f'无效的key: {k}')
-
-    await crud.set_case_config(db=db, case_id=case_id, number=number, config=config)
+    await crud.set_case_config(db=db, case_id=sac.case_id, number=sac.number, config=dict(sac.config))
 
     return await response_code.resp_200()
 
@@ -445,18 +432,18 @@ async def set_api_config(case_id: int, number: int, config: dict, db: Session = 
     '/set/api/description',
     name='设置描述信息'
 )
-async def set_api_description(case_id: int, number: int, description: str, db: Session = Depends(get_db)):
+async def set_api_description(sad: schemas.SetApiDescription, db: Session = Depends(get_db)):
     """
     设置每个接口的描述信息
     """
-    if not description:
+    if not sad.description:
         return await response_code.resp_400(message='无效描述内容')
 
-    case_data = await crud.get_case_data(db=db, case_id=case_id, number=number)
+    case_data = await crud.get_case_data(db=db, case_id=sad.case_id, number=sad.number)
     if not case_data:
         return await response_code.resp_404(message='没有获取到这个用例描述')
 
-    await crud.set_case_description(db=db, case_id=case_id, number=number, description=description)
+    await crud.set_case_description(db=db, case_id=sad.case_id, number=sad.number, description=sad.description)
 
     return await response_code.resp_200()
 

@@ -35,6 +35,12 @@ class ExtType(str, Enum):
     contain = 'in'
 
 
+class SetApiDescription(BaseModel):
+    case_id: int
+    number: int
+    description: str
+
+
 # 用例名称的请求/响应数据模型
 class TestCaseIn(BaseModel):
     case_name: str
@@ -147,3 +153,20 @@ class TestCaseInfoOut(BaseModel):
     run_order: int = None
     mode: str = None
     created_at: datetime = None
+
+
+class SwapOne(BaseModel):
+    case_id: int
+    old_number: int
+    new_number: int
+
+
+class SwapMany(BaseModel):
+    case_id: int
+    new_numbers: List[int]
+
+
+class SetApiConfig(BaseModel):
+    case_id: int
+    number: int
+    config: dict
