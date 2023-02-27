@@ -423,7 +423,11 @@ async def set_api_config(sac: schemas.SetApiConfig, db: Session = Depends(get_db
     if not case_data:
         return await response_code.resp_404(message='没有获取到这个用例配置')
 
-    await crud.set_case_config(db=db, case_id=sac.case_id, number=sac.number, config=dict(sac.config))
+    for k in sac.config.keys():
+        if k not in schemas.TestCaseConfig.__fields__.keys():
+            return await response_code.resp_400(message=f'无效的key: {k}')
+
+    await crud.set_case_config(db=db, case_id=sac.case_id, number=sac.number, config=sac.config)
 
     return await response_code.resp_200()
 
