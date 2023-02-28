@@ -171,7 +171,7 @@ class SwapMany(BaseModel):
 class SetApiConfig(BaseModel):
     case_id: int
     number: int
-    config: dict
+    config: TestCaseConfig
 
 
 class UpdateName(BaseModel):
