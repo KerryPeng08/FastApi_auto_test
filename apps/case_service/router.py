@@ -491,13 +491,17 @@ async def set_api_check(sac: schemas.SetApiCheck, db: Session = Depends(get_db))
             return await response_code.resp_400(message='数据逻辑校验未通过')
         if sac.check.type == 'boolean':
             if sac.check.value == 1:
-                check_info[key_] = [sac.check.s, True]
+                check_info[key_] = [sac.check.s, True] if sac.check.s != '==' else True
             else:
-                check_info[key_] = [sac.check.s, False]
+                check_info[key_] = [sac.check.s, False] if sac.check.s != '==' else False
+        elif sac.check.type == 'number':
+            check_info[key_] = [sac.check.s, int(sac.check.value)] if sac.check.s != '==' else int(sac.check.value)
+        elif sac.check.type == 'string':
+            check_info[key_] = [sac.check.s, str(sac.check.value)] if sac.check.s != '==' else str(sac.check.value)
         elif sac.check.type == 'null':
-            check_info[key_] = [sac.check.s, None]
+            check_info[key_] = [sac.check.s, None] if sac.check.s != '==' else None
         else:
-            check_info[key_] = [sac.check.s, sac.check.value]
+            check_info[key_] = [sac.check.s, sac.check.value] if sac.check.s != '==' else sac.check.value
 
     if sac.type == 'del':
         if check_info.get(key_, '_') != '_':

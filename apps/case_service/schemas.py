@@ -9,7 +9,7 @@
 
 from datetime import datetime
 from pydantic import BaseModel
-from typing import Optional, List, Union, Any
+from typing import Optional, List, Union
 from enum import Enum
 
 
