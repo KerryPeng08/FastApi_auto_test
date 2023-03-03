@@ -511,6 +511,27 @@ async def set_api_check(sac: schemas.SetApiCheck, db: Session = Depends(get_db))
     return await response_code.resp_200()
 
 
+@case_service.put(
+    '/set/api/params/data',
+    name='更新用例params/data数据'
+)
+async def set_params_data(spd: schemas.SedParamsData, db: Session = Depends(get_db)):
+    """
+    更新用例的params数据或data数据
+    """
+    case_data = await crud.get_case_data(db=db, case_id=spd.case_id, number=spd.number)
+    if not case_data:
+        return await response_code.resp_404(message='没有获取到这个用例数据')
+
+    if spd.type.lower() == 'params':
+        await crud.set_case_info(db=db, case_id=spd.case_id, number=spd.number, params=spd.data_info)
+    elif spd.type.lower() == 'data':
+        await crud.set_case_info(db=db, case_id=spd.case_id, number=spd.number, data=spd.data_info)
+    else:
+        return await response_code.resp_400()
+    return await response_code.resp_200()
+
+
 @case_service.get(
     '/response/jsonpath/list',
     name='从原始数据response中获取jsonpath表达式',

@@ -60,6 +60,13 @@ class SetApiCheck(BaseModel):
     check: CheckInfo
 
 
+class SedParamsData(BaseModel):
+    case_id: int
+    number: int
+    type: str
+    data_info: dict
+
+
 # 用例名称的请求/响应数据模型
 class TestCaseIn(BaseModel):
     case_name: str
