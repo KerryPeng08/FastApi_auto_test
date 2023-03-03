@@ -60,6 +60,18 @@ class SetApiCheck(BaseModel):
     check: CheckInfo
 
 
+class HeaderInfo(BaseModel):
+    key: str
+    value: str
+
+
+class setApiHeader(BaseModel):
+    case_id: int
+    number: int
+    type: str
+    header: HeaderInfo
+
+
 class SedParamsData(BaseModel):
     case_id: int
     number: int

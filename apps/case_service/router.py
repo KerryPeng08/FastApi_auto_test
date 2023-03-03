@@ -532,6 +532,31 @@ async def set_params_data(spd: schemas.SedParamsData, db: Session = Depends(get_
     return await response_code.resp_200()
 
 
+@case_service.put(
+    '/set/api/header',
+    name='设置请求头内容'
+)
+async def set_api_check(sac: schemas.setApiHeader, db: Session = Depends(get_db)):
+    """
+    设置每个接口的校验信息
+    """
+    case_data = await crud.get_case_data(db=db, case_id=sac.case_id, number=sac.number)
+    if not case_data:
+        return await response_code.resp_404(message='没有获取到这个用例请求头')
+
+    headers_info = case_data[0].headers
+    key_ = sac.header.key.strip()
+    if sac.type == 'edit':
+        headers_info[key_] = sac.header.value
+
+    if sac.type == 'del':
+        if headers_info.get(key_, '_') != '_':
+            del headers_info[key_]
+
+    await crud.set_case_info(db=db, case_id=sac.case_id, number=sac.number, headers=headers_info)
+    return await response_code.resp_200()
+
+
 @case_service.get(
     '/response/jsonpath/list',
     name='从原始数据response中获取jsonpath表达式',

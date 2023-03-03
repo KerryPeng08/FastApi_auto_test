@@ -120,7 +120,8 @@ async def set_case_info(
         config: dict = None,
         check: dict = None,
         params: dict = None,
-        data: dict = None
+        data: dict = None,
+        headers: dict = None,
 ):
     """
     设置用例的配置项
@@ -148,6 +149,10 @@ async def set_case_info(
         elif data is not None:
             db_temp.data = data
             flag_modified(db_temp, "data")
+
+        elif headers is not None:
+            db_temp.headers = headers
+            flag_modified(db_temp, "headers")
 
         db.commit()
         db.refresh(db_temp)
