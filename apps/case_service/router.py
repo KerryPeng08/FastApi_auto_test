@@ -21,7 +21,7 @@ from apps import response_code
 from tools.check_case_json import CheckJson
 from tools import OperationJson, ExtractParamsPath, RepData
 from setting import ALLURE_PATH
-from .tool.get_case_data_info import GetCaseDataInfo
+from .tool import GetCaseDataInfo, check
 
 from apps.template import crud as temp_crud
 from apps.case_service import crud, schemas
@@ -443,7 +443,7 @@ async def set_api_config(sac: schemas.SetApiConfig, db: Session = Depends(get_db
 
     new_config = {k: v for k, v in sac.config if v is not None and v != []}
 
-    await crud.set_case_config(db=db, case_id=sac.case_id, number=sac.number, config=new_config)
+    await crud.set_case_info(db=db, case_id=sac.case_id, number=sac.number, config=new_config)
 
     return await response_code.resp_200()
 
@@ -465,6 +465,45 @@ async def set_api_description(sad: schemas.SetApiDescription, db: Session = Depe
 
     await crud.set_case_description(db=db, case_id=sad.case_id, number=sad.number, description=sad.description)
 
+    return await response_code.resp_200()
+
+
+@case_service.put(
+    '/set/api/check',
+    name='设置校验内容'
+)
+async def set_api_check(sac: schemas.SetApiCheck, db: Session = Depends(get_db)):
+    """
+    设置每个接口的校验信息
+    """
+    case_data = await crud.get_case_data(db=db, case_id=sac.case_id, number=sac.number)
+    if not case_data:
+        return await response_code.resp_404(message='没有获取到这个用例配置')
+
+    if not sac.check.key:
+        return await response_code.resp_400(message='无效的key')
+
+    check_info = case_data[0].check
+
+    key_ = sac.check.key.strip()
+    if sac.type == 'edit':
+        if check(check=sac.check) != True:
+            return await response_code.resp_400(message='数据逻辑校验未通过')
+        if sac.check.type == 'boolean':
+            if sac.check.value == 1:
+                check_info[key_] = [sac.check.s, True]
+            else:
+                check_info[key_] = [sac.check.s, False]
+        elif sac.check.type == 'null':
+            check_info[key_] = [sac.check.s, None]
+        else:
+            check_info[key_] = [sac.check.s, sac.check.value]
+
+    if sac.type == 'del':
+        if check_info.get(key_, '_') != '_':
+            del check_info[key_]
+
+    await crud.set_case_info(db=db, case_id=sac.case_id, number=sac.number, check=check_info)
     return await response_code.resp_200()
 
 

@@ -9,7 +9,7 @@
 
 from datetime import datetime
 from pydantic import BaseModel
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Any
 from enum import Enum
 
 
@@ -39,6 +39,25 @@ class SetApiDescription(BaseModel):
     case_id: int
     number: int
     description: str
+
+
+class CheckEnum(BaseModel):
+    edit: str = 'edit'
+    delete: str = 'del'
+
+
+class CheckInfo(BaseModel):
+    key: str
+    s: str
+    type: str
+    value: Union[int, float, str, bool, None]
+
+
+class SetApiCheck(BaseModel):
+    case_id: int
+    number: int
+    type: str
+    check: CheckInfo
 
 
 # 用例名称的请求/响应数据模型

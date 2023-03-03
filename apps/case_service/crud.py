@@ -113,13 +113,14 @@ async def get_case_data(db: Session, case_id: int, number: int = None):
         ).all()
 
 
-async def set_case_config(db: Session, case_id: int, number: int, config: dict):
+async def set_case_info(db: Session, case_id: int, number: int, config: dict = None, check: dict = None):
     """
     设置用例的配置项
     :param db:
     :param case_id:
     :param number:
     :param config:
+    :param check:
     :return:
     """
     db_temp = db.query(models.TestCaseData).filter(
@@ -128,10 +129,16 @@ async def set_case_config(db: Session, case_id: int, number: int, config: dict):
     ).first()
 
     if db_temp:
-        for k, v in config.items():
-            db_temp.config[k] = v
+        if config:
+            for k, v in config.items():
+                db_temp.config[k] = v
+            flag_modified(db_temp, "config")
 
-        flag_modified(db_temp, "config")
+        elif check:
+            for k, v in check.items():
+                db_temp.check[k] = v
+            flag_modified(db_temp, "check")
+
         db.commit()
         db.refresh(db_temp)
         return db_temp
