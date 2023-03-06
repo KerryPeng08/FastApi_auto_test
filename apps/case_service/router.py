@@ -69,7 +69,7 @@ async def test_case_data(
     name='下载预处理后的模板数据-json',
 )
 async def download_case_data(
-        temp_name: str,
+        temp_id: int,
         mode: schemas.ModeEnum,
         fail_stop: bool,
         db: Session = Depends(get_db)
@@ -81,10 +81,11 @@ async def download_case_data(
     if mode != schemas.ModeEnum.service:
         return await response_code.resp_400(message=f'该模式仅支持{schemas.ModeEnum.service}模式')
 
-    template_data = await temp_crud.get_template_data(db=db, temp_name=temp_name)
+    template_data = await temp_crud.get_template_data(db=db, temp_id=temp_id)
     if template_data:
+        temp_name = await temp_crud.get_temp_name(db=db, temp_id=temp_id)
         test_data = await GenerateCase().read_template_to_api(
-            temp_name=temp_name,
+            temp_name=temp_name[0].temp_name,
             mode=mode,
             fail_stop=fail_stop,
             template_data=template_data
@@ -93,7 +94,7 @@ async def download_case_data(
         await OperationJson.write(path=path, data=test_data)
         return FileResponse(
             path=path,
-            filename=f'{temp_name}.json',
+            filename=f'{temp_name[0].temp_name}.json',
             background=BackgroundTask(lambda: os.remove(path))
         )
 
