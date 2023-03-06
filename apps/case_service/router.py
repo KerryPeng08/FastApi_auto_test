@@ -21,7 +21,7 @@ from apps import response_code
 from tools.check_case_json import CheckJson
 from tools import OperationJson, ExtractParamsPath, RepData
 from setting import ALLURE_PATH
-from .tool import GetCaseDataInfo, check
+from .tool import GetCaseDataInfo, check, CaseDataGather
 
 from apps.template import crud as temp_crud
 from apps.case_service import crud, schemas
@@ -734,3 +734,27 @@ async def copy_case(case_id: int, db: Session = Depends(get_db)):
         'data': case_data
     }
     return await insert(db=db, case_name=case_name, temp_id=case_info[0].temp_id, case_data=dict(**case_data))
+
+
+@case_service.get(
+    '/down/data/gather',
+    name='测试数据集下载-Excel'
+)
+async def down_data_gather(case_id: int, db: Session = Depends(get_db)):
+    """
+    测试数据集下载，数据集模板下载
+    """
+    case_data = await crud.get_case_data(db=db, case_id=case_id)
+    if not case_data:
+        return await response_code.resp_404(message='没有获取到这个用例id')
+
+    path = f'./files/excel/{time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))}.xlsx'
+    cdg = CaseDataGather()
+    cdg.data_gather(case_data=case_data, path=path)
+
+    case_info = await crud.get_case_info(db=db, case_id=case_id)
+    return FileResponse(
+        path=path,
+        filename=f'{case_info[0].case_name}.xlsx',
+        background=BackgroundTask(lambda: os.remove(path))
+    )
