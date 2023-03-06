@@ -59,6 +59,7 @@ class RunApi:
         # 返回结果收集
         response = []
         result = []
+        is_fail = None
         for num in range(len(temp_data)):
 
             config: dict = copy.deepcopy(dict(case_data[num].config))
@@ -198,7 +199,7 @@ class RunApi:
         })
         logger.info(f"用例: {temp_pro}-{temp_name}-{case_info.case_name} 执行完成, 进行结果校验, 序号: {case_info.run_order}")
         await self.sees.close()
-        return f"{temp_pro}-{temp_name}-{case_info.case_name}", case_info.run_order
+        return f"{temp_pro}-{temp_name}-{case_info.case_name}", case_info.run_order, is_fail
 
     async def _polling(self, case_id: int, sleep: int, check: dict, request_info: dict, files):
         """

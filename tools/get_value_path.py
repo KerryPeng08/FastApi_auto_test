@@ -32,7 +32,8 @@ class ExtractParamsPath:
         """
         return {
             'extract_contents': [{
-                'jsonpath': f"{x.number}.{x.path}"
+                'jsonpath': f"{x.number}.{x.path}",
+                'path': x.path
             } for x in my_data if extract_contents in x.path]
         }
 
@@ -65,9 +66,15 @@ class ExtractParamsPath:
                         response=data.params,
                         number=data.number,
                         ext_type=ext_type,
+                        path=data.path
                     )
                 else:
-                    value_path_list = cls._get_key_path(extract_contents, response=data.params, number=data.number)
+                    value_path_list = cls._get_key_path(
+                        extract_contents,
+                        response=data.params,
+                        number=data.number,
+                        path=data.path
+                    )
             elif type_ == schemas.RepType.data:
                 if key_value == schemas.KeyValueType.value:
                     value_path_list = cls._get_json_path(
@@ -75,10 +82,16 @@ class ExtractParamsPath:
                         key_list=cls._out_function(extract_contents, data.data, ext_type),
                         response=data.data,
                         number=data.number,
-                        ext_type=ext_type
+                        ext_type=ext_type,
+                        path=data.path
                     )
                 else:
-                    value_path_list = cls._get_key_path(extract_contents, response=data.data, number=data.number)
+                    value_path_list = cls._get_key_path(
+                        extract_contents,
+                        response=data.data,
+                        number=data.number,
+                        path=data.path
+                    )
             else:
                 if key_value == schemas.KeyValueType.value:
                     value_path_list = cls._get_json_path(
@@ -86,10 +99,16 @@ class ExtractParamsPath:
                         key_list=cls._out_function(extract_contents, data.response, ext_type),
                         response=data.response,
                         number=data.number,
-                        ext_type=ext_type
+                        ext_type=ext_type,
+                        path=data.path
                     )
                 else:
-                    value_path_list = cls._get_key_path(extract_contents, response=data.response, number=data.number)
+                    value_path_list = cls._get_key_path(
+                        extract_contents,
+                        response=data.response,
+                        number=data.number,
+                        path=data.path
+                    )
 
             path_list += value_path_list
         if type_ == schemas.RepType.response:
@@ -148,7 +167,8 @@ class ExtractParamsPath:
             key_list: list,
             response: dict,
             number: int,
-            ext_type: schemas.ExtType
+            ext_type: schemas.ExtType,
+            path: str,
     ) -> list:
         """
         通过提取出来的key，获取多个ipath，再通过value判断那个ipath是正确的
@@ -157,6 +177,7 @@ class ExtractParamsPath:
         :param response:
         :param number:
         :param ext_type:
+        :param path:
         :return:
         """
         new_path_list = []
@@ -168,25 +189,35 @@ class ExtractParamsPath:
             for k, v in zip(value_list, path_list):
                 if ext_type == schemas.ExtType.equal:
                     if str(k) == extract_contents:
-                        new_path_list.append({'jsonpath': "{{" + f"{number}.$.{'.'.join(v)}" + "}}"})
+                        new_path_list.append({
+                            'jsonpath': "{{" + f"{number}.$.{'.'.join(v)}" + "}}",
+                            'path': path
+                        })
                 else:
                     if extract_contents in str(k):
-                        new_path_list.append({'jsonpath': "{{" + f"{number}.$.{'.'.join(v)}" + "}}"})
+                        new_path_list.append({
+                            'jsonpath': "{{" + f"{number}.$.{'.'.join(v)}" + "}}",
+                            'path': path
+                        })
 
         return new_path_list
 
     @classmethod
-    def _get_key_path(cls, extract_contents: str, response: dict, number: int):
+    def _get_key_path(cls, extract_contents: str, response: dict, number: int, path: str):
         """
         通过key获取jsonpath
         :param extract_contents:
         :param response:
         :param number:
+        :param path:
         :return:
         """
         json_path = jsonpath.jsonpath(response, f"$..{extract_contents}", result_type='IPATH')
         if json_path:
-            return [{'jsonpath': '{{' + f'{number}.$.{".".join(x)}' + '}}'} for x in json_path]
+            return [{
+                'jsonpath': '{{' + f'{number}.$.{".".join(x)}' + '}}',
+                'path': path
+            } for x in json_path]
         else:
             return []
 

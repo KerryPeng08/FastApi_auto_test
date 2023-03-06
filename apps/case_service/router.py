@@ -131,7 +131,10 @@ async def test_case_upload_json(
     except json.decoder.JSONDecodeError as e:
         return await response_code.resp_400(message=f'json文件格式有错误: {str(e)}')
 
-    msg_list = await CheckJson.check_to_service(db=db, temp_id=temp_id, case_data=case_data['data'])
+    try:
+        msg_list = await CheckJson.check_to_service(db=db, temp_id=temp_id, case_data=case_data['data'])
+    except TypeError:
+        return await response_code.resp_400(message='文件格式有误')
     if msg_list:
         return await response_code.resp_400(data=msg_list)
 
@@ -635,6 +638,10 @@ async def get_case_data_json_path(
     RepData.rep_json(json_data=params_list, case_data=case_data, new_str=new_str, type_='params')
     # 对比数据================================#
     RepData.rep_json(json_data=data_list, case_data=case_data, new_str=new_str, type_='data')
+
+    if not url_list['extract_contents'] and not params_list['extract_contents'] and not data_list['extract_contents']:
+        return await response_code.resp_404()
+
     return await response_code.resp_200(
         data={
             'url_list': url_list,

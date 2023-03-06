@@ -8,9 +8,8 @@
 """
 
 from sqlalchemy.orm import Session
-from apps.template import models, schemas
+from apps.template import models
 from apps.case_service import models as case_models
-from apps.case_service import schemas as case_schemas
 from sqlalchemy.orm.attributes import flag_modified
 
 

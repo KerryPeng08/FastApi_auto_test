@@ -31,7 +31,7 @@ async def run_service_case(db: Session, case_ids: list):
             temp_info = await temp_crud.get_temp_name(db=db, temp_id=case_info[0].temp_id)
             # 处理数据，执行用例
             try:
-                case, run_order = await RunApi().fo_service(
+                case, run_order, is_fail = await RunApi().fo_service(
                     db=db,
                     case_id=case_id,
                     temp_data=temp_data,
@@ -57,8 +57,14 @@ async def run_service_case(db: Session, case_ids: list):
             await load_allure_report(allure_dir=allure_dir, case_id=case_id, run_order=run_order)
 
             # report[case_id] = f'{HOST}allure/{case_id}/{run_order}'
-            report[case_id] = f'/allure/{case_id}/{run_order}'
+            report[case_id] = {
+                'report': f'/allure/{case_id}/{run_order}',
+                'is_fail': is_fail
+            }
         else:
-            report[case_id] = f'用例{case_id}不存在'
+            report[case_id] = {
+                'report': f'用例{case_id}不存在',
+                'is_fail': True
+            }
 
     return report

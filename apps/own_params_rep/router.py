@@ -32,6 +32,7 @@ async def url_for_data(method: str, path: str, db: Session = Depends(get_db)):
     """
     通过url+method，查询出模板的信息，以及关联的用例信息
     """
+    path = path.replace('*', '%')
     temp_info = await crud.get_all_url_method(db=db, method=method.upper(), path=path.strip())
     return [{
         'temp_id': x[0],
