@@ -167,35 +167,35 @@ class CaseDataGather:
         :param data_json:
         :return:
         """
-        target = {}
+        target = []
 
         def inter_of(data):
             for k, v in data.items():
                 if not isinstance(v, (list, dict)):
                     if '{{' not in str(v) and "$" not in str(v) and '}}' not in str(v):
-                        target[k] = v
+                        target.append((k, v))
                     continue
                 if isinstance(v, dict):
-                    target[k] = inter_of(v)
+                    inter_of(v)
                     continue
                 if isinstance(v, list):
-                    # new_list = []
                     for x in v:
-                        inter_of(x)
-                    # target[k] = new_list
+                        if isinstance(x, dict):
+                            inter_of(x)
                     continue
             return target
 
         return inter_of(data_json)
 
     @staticmethod
-    def _header_data_list(data_json: dict):
+    def _header_data_list(data_list: list):
         """
         把字典数据处理成list
-        :param data_json:
+        :param data_list:
         :return:
         """
-        return [[k, v] for k, v in data_json.items()]
+        print(data_list)
+        return [[k, v] for k, v in data_list]
 
     @staticmethod
     def _sheet_coll(
@@ -216,6 +216,6 @@ class CaseDataGather:
         :param fill: 背景填充
         :return:
         """
-        sheet.cell(row, col).value = value
+        sheet.cell(row, col).value = str(value) if isinstance(value, (str, list)) else value
         sheet.cell(row, col).alignment = align
         sheet.cell(row, col).fill = fill
