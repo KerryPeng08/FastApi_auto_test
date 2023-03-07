@@ -7,13 +7,20 @@
 @Time: 2023/3/6-14:46
 """
 
+from typing import Any
 import openpyxl
+from openpyxl.styles import PatternFill
 from openpyxl.styles import Alignment
 
 
 class CaseDataGather:
 
-    def data_gather(self, case_data, path: str):
+    def __init__(self):
+
+        self.color1 = ['DAEEF3', 'B7DEE8', '92CDDC', '31869B']
+        self.color2 = ['FDE9D9', 'FCD5B4', 'FABF8F', 'E26B0A']
+
+    async def data_gather(self, case_data, path: str):
         """
         处理测试数据集的内容
         :param case_data:
@@ -24,11 +31,11 @@ class CaseDataGather:
         case_gather = []
         for data in case_data:
             # params的参数数据
-            params = self._header_data(data.params)
+            params = self._header_data_list(self._header_data(data.params))
             # data的参数数据
-            data_ = self._header_data(data.data)
+            data_ = self._header_data_list(self._header_data(data.data))
             # check的数据
-            check = self._header_data(data.check)
+            check = self._header_data_list(self._header_data(data.check))
             if params or data_:
                 case_gather.append({
                     'url': f"{data.number}#{data.path}",
@@ -38,18 +45,20 @@ class CaseDataGather:
 
                 })
         # 输出表格
-        self._excel(path=path, case_gather=case_gather)
+        await self._excel(path=path, case_gather=case_gather)
 
-    @staticmethod
-    def _excel(path: str, case_gather: list):
+    # @staticmethod
+    async def _excel(self, path: str, case_gather: list):
         """
         输出excel
         :param case_gather:
+        :param path
         :return:
         """
         workbook = openpyxl.Workbook()
         sheet = workbook.active
-        align = Alignment(horizontal='center', vertical='center')
+        sheet.freeze_panes = 'B4'
+        # align = Alignment(horizontal='center', vertical='center')
         start_column = 2
         end_column = 0
         for data in case_gather:
@@ -66,11 +75,14 @@ class CaseDataGather:
                 start_column=start_column,
                 end_column=end_column + 1
             )
-            sheet.cell(1, start_column).value = data['url']
-            sheet.cell(1, start_column).alignment = align
-            sheet.cell(1, 1).value = 'URL'
-            sheet.cell(1, 1).alignment = align
-            # 合并params、data、check的行
+            self._sheet_coll(
+                sheet=sheet,
+                row=1,
+                col=start_column,
+                value=data['url'],
+                fill=PatternFill('solid', fgColor=self.color2[0] if start_column % 2 else self.color1[0])
+            )
+            self._sheet_coll(sheet=sheet, row=1, col=1, value='URL')
             if data['params']:
                 sheet.merge_cells(
                     start_row=2,
@@ -78,15 +90,22 @@ class CaseDataGather:
                     start_column=start_column,
                     end_column=end_column + 1 - (data_len + check_len)
                 )
-                sheet.cell(2, start_column).value = 'params'
-                sheet.cell(2, start_column).alignment = align
-                sheet.cell(2, 1).value = '分类'
-                sheet.cell(2, 1).alignment = align
+                self._sheet_coll(
+                    sheet=sheet,
+                    row=2,
+                    col=start_column,
+                    value='params',
+                    fill=PatternFill('solid', fgColor=self.color2[1] if start_column % 2 else self.color1[1])
+                )
+                self._sheet_coll(sheet=sheet, row=2, col=1, value='分类')
                 for x in range(len(data['params'])):
-                    sheet.cell(3, start_column + x).value = list(data['params'].keys())[x]
-                    sheet.cell(3, start_column + x).alignment = align
-                    sheet.cell(4, start_column + x).value = list(data['params'].values())[x]
-                    sheet.cell(4, start_column + x).alignment = align
+                    for y in range(len(data['params'][x])):
+                        self._sheet_coll(
+                            sheet=sheet,
+                            row=3 + y,
+                            col=start_column + x,
+                            value=data['params'][x][y]
+                        )
             if data['data']:
                 sheet.merge_cells(
                     start_row=2,
@@ -94,13 +113,21 @@ class CaseDataGather:
                     start_column=start_column + params_len,
                     end_column=end_column + 1 - check_len
                 )
-                sheet.cell(2, start_column + params_len).value = 'data'
-                sheet.cell(2, start_column + params_len).alignment = align
+                self._sheet_coll(
+                    sheet=sheet,
+                    row=2,
+                    col=start_column + params_len,
+                    value='data',
+                    fill=PatternFill('solid', fgColor=self.color2[2] if start_column % 2 else self.color1[2])
+                )
                 for x in range(len(data['data'])):
-                    sheet.cell(3, start_column + params_len + x).value = list(data['data'].keys())[x]
-                    sheet.cell(3, start_column + params_len + x).alignment = align
-                    sheet.cell(4, start_column + params_len + x).value = list(data['data'].values())[x]
-                    sheet.cell(4, start_column + params_len + x).alignment = align
+                    for y in range(len(data['data'][x])):
+                        self._sheet_coll(
+                            sheet=sheet,
+                            row=3 + y,
+                            col=start_column + params_len + x,
+                            value=data['data'][x][y]
+                        )
 
             if data['check']:
                 sheet.merge_cells(
@@ -109,18 +136,26 @@ class CaseDataGather:
                     start_column=start_column + params_len + data_len,
                     end_column=end_column + 1
                 )
-                sheet.cell(2, start_column + params_len + data_len).value = 'check'
-                sheet.cell(2, start_column + params_len + data_len).alignment = align
-                sheet.cell(3, 1).value = '参数'
-                sheet.cell(3, 1).alignment = align
-                sheet.cell(4, 1).value = '原始数据'
-                sheet.cell(4, 1).alignment = align
+                self._sheet_coll(
+                    sheet=sheet,
+                    row=2,
+                    col=start_column + params_len + data_len,
+                    value='check',
+                    fill=PatternFill('solid', fgColor=self.color2[3] if start_column % 2 else self.color1[3])
+                )
+                self._sheet_coll(sheet=sheet, row=3, col=1, value='参数')
+                self._sheet_coll(sheet=sheet, row=4, col=1, value='原始数据')
+                self._sheet_coll(sheet=sheet, row=5, col=1, value='数据集-1')
+                self._sheet_coll(sheet=sheet, row=6, col=1, value='数据集-2')
+                self._sheet_coll(sheet=sheet, row=7, col=1, value='数据集-3')
                 for x in range(len(data['check'])):
-                    sheet.cell(3, start_column + params_len + data_len + x).value = list(data['check'].keys())[x]
-                    sheet.cell(3, start_column + params_len + data_len + x).alignment = align
-                    sheet.cell(4, start_column + params_len + data_len + x).value = list(data['check'].values())[x]
-                    sheet.cell(4, start_column + params_len + data_len + x).alignment = align
-
+                    for y in range(len(data['check'][x])):
+                        self._sheet_coll(
+                            sheet=sheet,
+                            row=3 + y,
+                            col=start_column + params_len + data_len + x,
+                            value=data['check'][x][y]
+                        )
             start_column += url_len
 
         workbook.save(path)
@@ -137,7 +172,7 @@ class CaseDataGather:
         def inter_of(data):
             for k, v in data.items():
                 if not isinstance(v, (list, dict)):
-                    if '{' not in str(v) and '}' not in str(v):
+                    if '{{' not in str(v) and "$" not in str(v) and '}}' not in str(v):
                         target[k] = v
                     continue
                 if isinstance(v, dict):
@@ -152,3 +187,35 @@ class CaseDataGather:
             return target
 
         return inter_of(data_json)
+
+    @staticmethod
+    def _header_data_list(data_json: dict):
+        """
+        把字典数据处理成list
+        :param data_json:
+        :return:
+        """
+        return [[k, v] for k, v in data_json.items()]
+
+    @staticmethod
+    def _sheet_coll(
+            sheet,
+            row: int,
+            col: int,
+            value: Any,
+            align=Alignment(horizontal='center', vertical='center'),
+            fill=PatternFill()
+    ):
+        """
+        生成单元格样试
+        :param sheet: 表格
+        :param row: 行
+        :param col: 列
+        :param value: 值
+        :param align: 居中
+        :param fill: 背景填充
+        :return:
+        """
+        sheet.cell(row, col).value = value
+        sheet.cell(row, col).alignment = align
+        sheet.cell(row, col).fill = fill

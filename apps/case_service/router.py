@@ -750,7 +750,7 @@ async def down_data_gather(case_id: int, db: Session = Depends(get_db)):
 
     path = f'./files/excel/{time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))}.xlsx'
     cdg = CaseDataGather()
-    cdg.data_gather(case_data=case_data, path=path)
+    await cdg.data_gather(case_data=case_data, path=path)
 
     case_info = await crud.get_case_info(db=db, case_id=case_id)
     return FileResponse(
