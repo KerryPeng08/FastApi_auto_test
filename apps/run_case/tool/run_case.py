@@ -59,12 +59,14 @@ async def run_service_case(db: Session, case_ids: list):
             # report[case_id] = f'{HOST}allure/{case_id}/{run_order}'
             report[case_id] = {
                 'report': f'/allure/{case_id}/{run_order}',
-                'is_fail': is_fail
+                'is_fail': is_fail,
+                'run_order': run_order
             }
         else:
             report[case_id] = {
                 'report': f'用例{case_id}不存在',
-                'is_fail': True
+                'is_fail': True,
+                'run_order': 0
             }
 
     return report

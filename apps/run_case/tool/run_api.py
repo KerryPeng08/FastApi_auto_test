@@ -248,7 +248,7 @@ class RunApi:
                 res_json = await res.json(content_type='application/json' if not files else None)
                 res_json['status_code'] = res.status
             except (client_exceptions.ContentTypeError, json.decoder.JSONDecodeError) as e:
-                logger.error(f"res.json()错误信息: {str(e)}")
+                logger.debug(f"res.json()错误信息: {str(e)}")
                 break
 
             result = []
