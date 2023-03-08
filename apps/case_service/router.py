@@ -19,7 +19,7 @@ from starlette.background import BackgroundTask
 from depends import get_db
 from apps import response_code
 from tools.check_case_json import CheckJson
-from tools import OperationJson, ExtractParamsPath, RepData
+from tools import OperationJson, ExtractParamsPath, RepData, ReadExcel
 from setting import ALLURE_PATH
 from .tool import GetCaseDataInfo, check, CaseDataGather
 
@@ -758,3 +758,27 @@ async def down_data_gather(case_id: int, db: Session = Depends(get_db)):
         filename=f'{case_info[0].case_name}.xlsx',
         background=BackgroundTask(lambda: os.remove(path))
     )
+
+
+@case_service.post(
+    '/upload/data/gather',
+    name='测试数据集上传-Excel'
+)
+async def upload_data_gather(case_id: int, file: UploadFile, db: Session = Depends(get_db)):
+    """
+    测试数据集上传
+    """
+    if file.content_type != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+        return await response_code.resp_400(message='文件类型错误，只支持xlsx格式文件')
+
+    case_data = await crud.get_case_data(db=db, case_id=case_id)
+    if not case_data:
+        return await response_code.resp_404(message='没有获取到这个用例id')
+
+    path = f'./files/excel/{time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))}.xlsx'
+    # 写入本地
+    with open(path, 'wb') as w:
+        w.write(file.file.read())
+
+    # 读取数据
+    await ReadExcel(path=path).read()

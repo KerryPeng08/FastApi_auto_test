@@ -9,6 +9,7 @@
 
 import json
 import openpyxl
+from openpyxl import load_workbook
 from openpyxl.styles import Alignment
 from typing import List
 
@@ -63,3 +64,54 @@ class CreateExcel:
             sheet_num += 1
 
         self.workbook.save(self.path)
+
+
+class ReadExcel:
+
+    def __init__(self, path: str):
+        self.path = path
+        self.wb = load_workbook(path, read_only=True)
+
+    async def read(self):
+        sheet = self.wb.active
+        # 把excel数据先读出来
+        data_list = []
+        url = None
+        da = None
+        for column in range(2, sheet.max_column):
+            row_list = []
+            for row in range(1, sheet.max_row):
+                value = sheet.cell(row=row, column=column).value
+                if row == 1:
+                    if value:
+                        url = value
+                        row_list.append(url)
+                    else:
+                        row_list.append(url)
+                elif row == 2:
+                    if value:
+                        da = value
+                        row_list.append(da)
+                    else:
+                        row_list.append(da)
+                else:
+                    row_list.append(value)
+            data_list.append(row_list)
+        self.wb.close()
+
+        # 处理数据
+        data_dict = {}
+        for column in data_list:
+            for x in range(len(column)):
+                if x == 0:
+                    if not data_dict.get(column[x]):
+                        data_dict[column[x]] = {}
+                elif x == 1:
+                    if not data_dict[column[0]].get(column[1]):
+                        data_dict[column[0]][column[1]] = {}
+                else:
+                    if not data_dict[column[0]][column[1]].get(column[2]):
+                        data_dict[column[0]][column[1]][column[2]] = column[4:]
+                    break
+
+        print(data_dict)
