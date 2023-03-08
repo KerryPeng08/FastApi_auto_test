@@ -63,7 +63,7 @@ class RunApi:
         for num in range(len(temp_data)):
 
             config: dict = copy.deepcopy(dict(case_data[num].config))
-            logger.info(f"{'=' * 30}case_id:{case_id},开始请求,number:{num}{'=' * 30}")
+            logger.debug(f"{'=' * 30}case_id:{case_id},开始请求,number:{num}{'=' * 30}")
             try:
                 # 识别url表达式
                 url = await self._replace_url(
@@ -116,7 +116,7 @@ class RunApi:
                 f"{'json' if temp_data[num].json_body == 'json' else 'data'}": data,
             }
 
-            logger.info(f"case_id:{case_id},请求信息: {json.dumps(request_info, indent=2, ensure_ascii=False)}")
+            logger.debug(f"case_id:{case_id},请求信息: {json.dumps(request_info, indent=2, ensure_ascii=False)}")
 
             # 轮询执行接口
             response_info = await self._polling(
@@ -145,7 +145,7 @@ class RunApi:
             #         index=_extract[1]
             #     )
 
-            logger.info(f"case_id:{case_id},状态码: {res.status}")
+            # logger.info(f"case_id:{case_id},状态码: {res.status}")
 
             # 收集结果
             request_info['file'] = True if temp_data[num].file else False
@@ -175,8 +175,8 @@ class RunApi:
             config['sleep'] = 0.3
             await asyncio.sleep(config['sleep'])
             result.append(request_info)
-            logger.info(f"case_id:{case_id},响应信息: {json.dumps(res_json, indent=2, ensure_ascii=False)}")
-            logger.info(f"{'=' * 30}case_id:{case_id},结束请求,number:{num}{'=' * 30}")
+            logger.debug(f"case_id:{case_id},响应信息: {json.dumps(res_json, indent=2, ensure_ascii=False)}")
+            logger.debug(f"{'=' * 30}case_id:{case_id},结束请求,number:{num}{'=' * 30}")
 
             # 失败停止的判断
             if GLOBAL_FAIL_STOP and is_fail:
@@ -213,8 +213,6 @@ class RunApi:
         """
 
         # check = copy.deepcopy(check)
-        status_code = check['status_code']
-        del check['status_code']
 
         is_fail = False  # 标记是否失败
         num = 0
@@ -242,17 +240,13 @@ class RunApi:
                     } for file in files
                 ]
 
-            if res.status not in [200, 302]:
-                is_fail = True
-                logger.error(f"状态码: {res.status}")
-                break
-
             if (sleep < 5 and is_fail) or not check:
                 break
 
-            logger.info(f"循环case_id:{case_id},{num + 1}次: {request_info['url']}")
+            logger.debug(f"循环case_id:{case_id},{num + 1}次: {request_info['url']}")
             try:
                 res_json = await res.json(content_type='application/json' if not files else None)
+                res_json['status_code'] = res.status
             except (client_exceptions.ContentTypeError, json.decoder.JSONDecodeError) as e:
                 logger.error(f"res.json()错误信息: {str(e)}")
                 break
@@ -309,9 +303,9 @@ class RunApi:
                         if value not in v[1]:
                             result.append({k: value})
 
-            logger.info(f"第{num + 1}次匹配")
-            logger.info(f"实际-{result}")
-            logger.info(f"预期-{check}")
+            logger.debug(f"第{num + 1}次匹配")
+            logger.debug(f"实际-{result}")
+            logger.debug(f"预期-{check}")
             if len(result) == len(check):
                 is_fail = False
                 break
@@ -322,7 +316,6 @@ class RunApi:
             sleep -= 5
             num += 1
 
-        check['status_code'] = status_code
         return res, is_fail
 
     @staticmethod
@@ -534,7 +527,7 @@ async def _header_str_param(x: str, response: list):
         if value:
             return list(value)[0]
         else:
-            return False
+            return ''
 
     value = jsonpath.jsonpath(response[int(num)], json_path)
     if value:
@@ -552,7 +545,7 @@ async def _header_str_param(x: str, response: list):
             else:
                 return value[0]
     else:
-        return value
+        return ''
 
 
 async def _header_adjoin(seek_name: str, seek_value: str, compare: str, extract_key: str, response_data):
