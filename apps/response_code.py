@@ -40,14 +40,16 @@ class MyJSONResponse(JSONResponse):
         ).encode("utf-8")
 
 
-async def resp_200(*, data: Union[list, dict, str, int, float] = '', message: str = 'Success') -> Response:
+async def resp_200(*, data: Union[list, dict, str, int, float] = '', message: str = 'Success',
+                   background=None) -> Response:
     return MyJSONResponse(
         status_code=status.HTTP_200_OK,
         content={
             'code': 0,
             'message': message,
             'data': data,
-        }
+        },
+        background=background
     )
 
 

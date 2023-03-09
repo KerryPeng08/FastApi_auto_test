@@ -7,6 +7,7 @@
 @Time: 2022/8/11-16:40
 """
 
+import copy
 import json
 import openpyxl
 from openpyxl import load_workbook
@@ -68,9 +69,9 @@ class CreateExcel:
 
 class ReadExcel:
 
-    def __init__(self, path: str):
-        self.path = path
-        self.wb = load_workbook(path, read_only=True)
+    def __init__(self, path: str, case_id: int):
+        self.wb = load_workbook(path)
+        self.case_id = case_id
 
     async def read(self):
         sheet = self.wb.active
@@ -78,9 +79,9 @@ class ReadExcel:
         data_list = []
         url = None
         da = None
-        for column in range(2, sheet.max_column):
+        for column in range(1, sheet.max_column + 1):
             row_list = []
-            for row in range(1, sheet.max_row):
+            for row in range(1, sheet.max_row + 1):
                 value = sheet.cell(row=row, column=column).value
                 if row == 1:
                     if value:
@@ -99,19 +100,45 @@ class ReadExcel:
             data_list.append(row_list)
         self.wb.close()
 
-        # 处理数据
-        data_dict = {}
+        # 处理数据，一行数据集一套
+        gather_name = []
+        new_data_list = [{} for _ in range(len(data_list[0][4:]))]
+        num = 0
         for column in data_list:
-            for x in range(len(column)):
-                if x == 0:
-                    if not data_dict.get(column[x]):
-                        data_dict[column[x]] = {}
-                elif x == 1:
-                    if not data_dict[column[0]].get(column[1]):
-                        data_dict[column[0]][column[1]] = {}
-                else:
-                    if not data_dict[column[0]][column[1]].get(column[2]):
-                        data_dict[column[0]][column[1]][column[2]] = column[4:]
-                    break
+            if num != 0:
+                for x in range(len(column)):
+                    if x == 0:
+                        for i in range(len(new_data_list)):
+                            if not new_data_list[i].get(column[x]):
+                                new_data_list[i][column[x]] = {}
 
-        print(data_dict)
+                    elif x == 1:
+                        for i in range(len(new_data_list)):
+                            if not new_data_list[i][column[0]].get(column[1]):
+                                new_data_list[i][column[0]][column[1]] = {}
+                    elif x == 2:
+                        for i in range(len(new_data_list)):
+                            if not new_data_list[i][column[0]][column[1]].get(column[2]):
+                                new_data_list[i][column[0]][column[1]][column[2]] = column[4 + i]
+            else:
+                gather_name = column[4:]
+
+            num += 1
+
+        new_data = []
+        num = 1
+        for name, gather_data in zip(gather_name, new_data_list):
+
+            for k, v in gather_data.items():
+                new_dict = {}
+                number, url = k.split("#")
+                new_dict['case_id'] = self.case_id
+                new_dict['suite'] = num
+                new_dict['name'] = name
+                new_dict['number'] = int(number)
+                new_dict['path'] = url
+                new_dict = {**new_dict, **v}
+                new_data.append(new_dict)
+            num += 1
+
+        return new_data

@@ -13,13 +13,16 @@ from setting import ALLURE_PATH, TIPS, HOST
 from apps.template.router import template
 from apps.case_service.router import case_service
 from apps.case_ddt.router import case_ddt
-from apps.case_perf.router import case_perf
+# from apps.case_perf.router import case_perf
 from apps.api_pool.router import pool
 from apps.run_case.router import run_case
 from apps.own_params_rep.router import own_rep
 from tools.load_allure import load_allure_reports
 from fastapi.staticfiles import StaticFiles
 from apps import response_code
+from tools.database import Base, engine
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     # docs_url='/',

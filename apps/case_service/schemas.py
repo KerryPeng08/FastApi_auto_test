@@ -215,3 +215,18 @@ class SetApiConfig(BaseModel):
 class UpdateName(BaseModel):
     new_name: str
     case_id: int = None
+
+
+class TestGrater(BaseModel):
+    case_id: int
+    suite: int
+    name: str
+    number: int
+    path: str
+    params: Optional[dict] = {}
+    data: Optional[dict] = {}
+    check: Optional[dict] = {}
+    headers: Optional[dict] = {}
+
+    class Config:
+        orm_mode = True

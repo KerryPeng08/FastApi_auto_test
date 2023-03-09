@@ -364,3 +364,28 @@ async def put_case_name(db: Session, case_id: int, new_name: str):
         db.commit()
         db.refresh(db_temp)
         return db_temp
+
+
+async def create_test_grater(db: Session, data: schemas.TestGrater):
+    """
+    创建模板数据集
+    :param db:
+    :param data:
+    :return:
+    """
+    db_data = models.TestGather(**data.dict())
+    db.add(db_data)
+    db.commit()
+    db.refresh(db_data)
+    return db_data
+
+
+async def del_test_grater(db: Session, case_id: int):
+    """
+    删除测试数据集
+    :param db:
+    :param case_id:
+    :return:
+    """
+    db.query(models.TestGather).filter(models.TestGather.case_id == case_id).delete()
+    db.commit()

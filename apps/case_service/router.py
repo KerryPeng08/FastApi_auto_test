@@ -764,14 +764,18 @@ async def down_data_gather(case_id: int, db: Session = Depends(get_db)):
     '/upload/data/gather',
     name='测试数据集上传-Excel'
 )
-async def upload_data_gather(case_id: int, file: UploadFile, db: Session = Depends(get_db)):
+async def upload_data_gather(
+        case_id: int,
+        file: UploadFile,
+        db: Session = Depends(get_db)
+):
     """
     测试数据集上传
     """
     if file.content_type != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
         return await response_code.resp_400(message='文件类型错误，只支持xlsx格式文件')
 
-    case_data = await crud.get_case_data(db=db, case_id=case_id)
+    case_data = await crud.get_case_info(db=db, case_id=case_id)
     if not case_data:
         return await response_code.resp_404(message='没有获取到这个用例id')
 
@@ -780,5 +784,12 @@ async def upload_data_gather(case_id: int, file: UploadFile, db: Session = Depen
     with open(path, 'wb') as w:
         w.write(file.file.read())
 
-    # 读取数据
-    await ReadExcel(path=path).read()
+    # 读取并处理数据
+    gather_data = await ReadExcel(path=path, case_id=case_id).read()
+    # 入库
+    await crud.del_test_grater(db=db, case_id=case_id)
+    for gather in gather_data:
+        await crud.create_test_grater(db=db, data=schemas.TestGrater(**gather))
+    return await response_code.resp_200(
+        background=BackgroundTask(lambda: os.remove(path))
+    )

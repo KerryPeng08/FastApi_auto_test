@@ -25,5 +25,3 @@ SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False, expi
 
 # 数据模型的基类
 Base = declarative_base()
-
-Base.metadata.create_all(bind=engine)
