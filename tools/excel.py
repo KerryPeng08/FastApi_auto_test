@@ -7,7 +7,6 @@
 @Time: 2022/8/11-16:40
 """
 
-import copy
 import json
 import openpyxl
 from openpyxl import load_workbook
@@ -102,7 +101,7 @@ class ReadExcel:
 
         # 处理数据，一行数据集一套
         gather_name = []
-        new_data_list = [{} for _ in range(len(data_list[0][4:]))]
+        new_data_list = [{} for _ in range(len(data_list[0][3:]))]
         num = 0
         for column in data_list:
             if num != 0:
@@ -119,9 +118,9 @@ class ReadExcel:
                     elif x == 2:
                         for i in range(len(new_data_list)):
                             if not new_data_list[i][column[0]][column[1]].get(column[2]):
-                                new_data_list[i][column[0]][column[1]][column[2]] = column[4 + i]
+                                new_data_list[i][column[0]][column[1]][column[2]] = column[3 + i]
             else:
-                gather_name = column[4:]
+                gather_name = column[3:]
 
             num += 1
 

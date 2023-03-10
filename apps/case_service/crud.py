@@ -366,7 +366,7 @@ async def put_case_name(db: Session, case_id: int, new_name: str):
         return db_temp
 
 
-async def create_test_grater(db: Session, data: schemas.TestGrater):
+async def create_test_gather(db: Session, data: schemas.TestGrater):
     """
     创建模板数据集
     :param db:
@@ -380,7 +380,7 @@ async def create_test_grater(db: Session, data: schemas.TestGrater):
     return db_data
 
 
-async def del_test_grater(db: Session, case_id: int):
+async def del_test_gather(db: Session, case_id: int):
     """
     删除测试数据集
     :param db:
@@ -389,3 +389,20 @@ async def del_test_grater(db: Session, case_id: int):
     """
     db.query(models.TestGather).filter(models.TestGather.case_id == case_id).delete()
     db.commit()
+
+
+async def get_gather(db: Session, case_id: int, number: int = None, suite: int = None):
+    """
+    模糊查询url
+    :param db:
+    :param case_id:
+    :param number:
+    :param suite:
+    :return:
+    """
+
+    return db.query(models.TestGather).filter(models.TestGather.case_id == case_id).order_by(
+        models.TestGather.suite
+    ).order_by(
+        models.TestGather.number
+    ).all()
