@@ -10,4 +10,3 @@
 from .insert_case_data import insert, cover_insert
 from .get_case_data_info import GetCaseDataInfo
 from .check_Info import check
-from .case_data_gather import CaseDataGather
