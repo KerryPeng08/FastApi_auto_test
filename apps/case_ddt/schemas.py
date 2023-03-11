@@ -7,6 +7,7 @@
 @Time: 2022/8/22-9:51
 """
 
+from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional
 
@@ -24,3 +25,9 @@ class TestGrater(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class TestGraterOut(TestGrater):
+    id: int
+    created_at: datetime
+    updated_at: datetime
