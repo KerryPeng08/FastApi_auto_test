@@ -14,7 +14,9 @@ from typing import List
 from depends import get_db
 from apps import response_code
 from apps.case_service import crud as case_crud
-from .tool.run_case import run_service_case
+from apps.case_ddt import crud as gather_crud
+from apps.run_case import schemas
+from .tool import run_service_case, run_ddt_case, header
 
 run_case = APIRouter()
 
@@ -60,3 +62,42 @@ async def run_case_name(temp_ids: List[int], db: Session = Depends(get_db)):
     for x in result:
         new_result.update(x)
     return await response_code.resp_200(data={'allure_report': new_result, "temp_info": temp_info})
+
+
+@run_case.post(
+    '/gather',
+    name='选择数据集执行用例',
+    response_class=response_code.MyJSONResponse,
+)
+async def run_case_gather(rcs: schemas.RunCaseGather, db: Session = Depends(get_db)):
+    """
+    按数据集执行用例
+    """
+    gather_data = await gather_crud.get_gather(db=db, case_id=rcs.case_id, suite=rcs.suite)
+    if not gather_data:
+        return await response_code.resp_404()
+
+    # 获取用例数据,按数据集分套替换数据
+    case_data = await case_crud.get_case_data(db=db, case_id=rcs.case_id)
+    new_case_data = await header(case_data=case_data, gather_data=gather_data)
+
+    # 运行用例
+    if rcs.async_:
+        tasks = [
+            asyncio.create_task(
+                run_ddt_case(
+                    db=db,
+                    case_id=rcs.case_id,
+                    case_info=[data]
+                )
+            ) for data in new_case_data
+        ]
+        result = await asyncio.gather(*tasks)
+
+        new_result = {}
+        for x in result:
+            new_result.update(x)
+        return await response_code.resp_200(data={'allure_report': new_result})
+    else:
+        report = await run_ddt_case(db=db, case_id=rcs.case_id, case_info=new_case_data)
+        return await response_code.resp_200(data={'allure_report': report})

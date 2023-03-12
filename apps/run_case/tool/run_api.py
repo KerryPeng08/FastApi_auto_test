@@ -37,7 +37,6 @@ class RunApi:
         self.code = None  # 存验证码数据
         self.extract = None  # 存提取的内容
         self.fk = FakerData()
-        # self.session = requests.session()
 
     async def fo_service(
             self,
@@ -176,7 +175,7 @@ class RunApi:
             await asyncio.sleep(config['sleep'])
             result.append(request_info)
             logger.debug(f"case_id:{case_id},响应信息: {json.dumps(res_json, indent=2, ensure_ascii=False)}")
-            logger.debug(f"{'=' * 30}case_id:{case_id},结束请求,number:{num}{'=' * 30}")
+            logger.info(f"{'=' * 30}case_id:{case_id},结束请求,number:{num}{'=' * 30}")
 
             # 失败停止的判断
             if GLOBAL_FAIL_STOP and is_fail:

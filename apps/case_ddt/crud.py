@@ -7,6 +7,7 @@
 @Time: 2022/8/22-9:50
 """
 
+from typing import List
 from sqlalchemy.orm import Session
 from apps.case_ddt import models, schemas
 
@@ -36,7 +37,7 @@ async def del_test_gather(db: Session, case_id: int):
     db.commit()
 
 
-async def get_gather(db: Session, case_id: int, number: int = None, suite: int = None):
+async def get_gather(db: Session, case_id: int, number: int = None, suite: List[int] = None):
     """
     模糊查询url
     :param db:
@@ -45,6 +46,15 @@ async def get_gather(db: Session, case_id: int, number: int = None, suite: int =
     :param suite:
     :return:
     """
+    if suite:
+        return db.query(models.TestGather).filter(
+            models.TestGather.case_id == case_id,
+            models.TestGather.suite.in_(suite)
+        ).order_by(
+            models.TestGather.suite
+        ).order_by(
+            models.TestGather.number
+        ).all()
 
     return db.query(models.TestGather).filter(models.TestGather.case_id == case_id).order_by(
         models.TestGather.suite
