@@ -99,11 +99,11 @@ async def upload_data_gather(
     response_model=List[schemas.TestGraterOut],
     response_class=response_code.MyJSONResponse,
 )
-async def get_data_gather(case_id: int, suite: List[int], db: Session = Depends(get_db)):
+async def get_data_gather(case_id: int, db: Session = Depends(get_db)):
     """
     获取数据集数据
     """
-    gather_info = await crud.get_gather(db=db, case_id=case_id, suite=suite)
+    gather_info = await crud.get_gather(db=db, case_id=case_id)
     if not gather_info:
         return await response_code.resp_404(message='这个用例没有上传数据集')
 

@@ -239,16 +239,14 @@ class RunApi:
                     } for file in files
                 ]
 
-            if (sleep < 5 and is_fail) or not check:
-                break
-
             logger.debug(f"循环case_id:{case_id},{num + 1}次: {request_info['url']}")
             try:
                 res_json = await res.json(content_type='application/json' if not files else None)
                 res_json['status_code'] = res.status
             except (client_exceptions.ContentTypeError, json.decoder.JSONDecodeError) as e:
                 logger.debug(f"res.json()错误信息: {str(e)}")
-                break
+                res_json = {}
+                res_json['status_code'] = res.status
 
             result = []
             for k, v in check.items():
@@ -257,6 +255,8 @@ class RunApi:
                     sql_data = await self._sql_data(v[1])
                     if v[0] == sql_data[0]:
                         result.append({k: sql_data[0]})
+                    else:
+                        is_fail = True
                     check[k][1] = sql_data[0]
                     continue
 
@@ -265,51 +265,67 @@ class RunApi:
 
                 if value:
                     value = value[0]
-                else:
-                    break
 
                 if isinstance(v, (str, int, float, bool, dict)):
                     if v == value:
                         result.append({k: value})
-                    continue
+                    else:
+                        is_fail = True
 
-                if isinstance(v, list):
+                elif isinstance(v, list):
                     if v[0] == '<':
                         if value < v[1]:
                             result.append({k: value})
+                        else:
+                            is_fail = True
                     elif v[0] == '<=':
                         if value <= v[1]:
                             result.append({k: value})
+                        else:
+                            is_fail = True
                     elif v[0] == '==':
                         if value == v[1]:
                             result.append({k: value})
+                        else:
+                            is_fail = True
                     elif v[0] == '!=':
                         if value != v[1]:
                             result.append({k: value})
+                        else:
+                            is_fail = True
                     elif v[0] == '>=':
                         if value >= v[1]:
                             result.append({k: value})
+                        else:
+                            is_fail = True
                     elif v[0] == '>':
                         if value > v[1]:
                             result.append({k: value})
+                        else:
+                            is_fail = True
                     elif v[0] == 'in':
                         if value in v[1]:
                             result.append({k: value})
+                        else:
+                            is_fail = True
                     elif v[0] == 'not in':
                         if value not in v[1]:
                             result.append({k: value})
+                        else:
+                            is_fail = True
                     elif v[0] == 'notin':
                         if value not in v[1]:
                             result.append({k: value})
+                        else:
+                            is_fail = True
 
             logger.debug(f"第{num + 1}次匹配")
             logger.debug(f"实际-{result}")
             logger.debug(f"预期-{check}")
-            if len(result) == len(check):
-                is_fail = False
+
+            print(1111, is_fail)
+            if is_fail or sleep <= 5:
                 break
-            else:
-                is_fail = True
 
             await asyncio.sleep(5)
             sleep -= 5
