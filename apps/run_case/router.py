@@ -15,7 +15,7 @@ from depends import get_db
 from apps import response_code
 from apps.case_service import crud as case_crud
 from apps.case_ddt import crud as gather_crud
-from apps.run_case import schemas
+from apps.run_case import schemas, CASE_STATUS
 from .tool import run_service_case, run_ddt_case, header
 
 run_case = APIRouter()
@@ -101,3 +101,13 @@ async def run_case_gather(rcs: schemas.RunCaseGather, db: Session = Depends(get_
     else:
         report = await run_ddt_case(db=db, case_id=rcs.case_id, case_info=new_case_data)
         return await response_code.resp_200(data={'allure_report': report})
+
+
+@run_case.get(
+    '/case/status',
+    name='获取用例运行的状态'
+)
+async def case_status(key_id: str = None):
+    if CASE_STATUS.get(key_id):
+        CASE_STATUS[key_id]['stop'] = True
+    return CASE_STATUS

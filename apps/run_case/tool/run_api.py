@@ -14,6 +14,7 @@ import json
 import base64
 import asyncio
 import jsonpath
+import random
 # import ddddocr
 import aiohttp
 from aiohttp import FormData
@@ -27,6 +28,7 @@ from setting import GLOBAL_FAIL_STOP, DB_CONFIG
 from apps.template import schemas as temp
 from apps.case_service import schemas as service
 from apps.run_case import crud
+from apps.run_case import CASE_STATUS
 
 
 class RunApi:
@@ -53,6 +55,17 @@ class RunApi:
         2.拿表达式从response里面提取出来值
         2.拿到值，直接替换
         """
+
+        random_key = f"{int(time.time() * 1000)}{random.uniform(0, 1)}"
+        case_status = {
+            'case_id': case_id,
+            'total': len(temp_data),
+            'stop': False,
+            'success': 0,
+            'fail': 0,
+        }
+        CASE_STATUS[random_key] = case_status
+
         temp_data = copy.deepcopy(temp_data)
         case_data = copy.deepcopy(case_data)
         # 返回结果收集
@@ -60,7 +73,6 @@ class RunApi:
         result = []
         is_fail = None
         for num in range(len(temp_data)):
-
             config: dict = copy.deepcopy(dict(case_data[num].config))
             logger.debug(f"{'=' * 30}case_id:{case_id},开始请求,number:{num}{'=' * 30}")
             try:
@@ -127,6 +139,11 @@ class RunApi:
             )
             res, is_fail = response_info
 
+            if not is_fail:
+                CASE_STATUS[random_key]['success'] += 1
+            else:
+                CASE_STATUS[random_key]['fail'] += 1
+
             if config['is_login']:
                 self.cookies[temp_data[num].host] = await get_cookie(rep_type='aiohttp', response=res)
 
@@ -189,6 +206,13 @@ class RunApi:
                 await self.sees.close()
                 break
 
+            if CASE_STATUS[random_key]['stop']:
+                logger.info(f"case_id:{case_id},number:{num} 手动停止执行")
+                await self.sees.close()
+                break
+
+        CASE_STATUS[random_key]['stop'] = True
+        del CASE_STATUS[random_key]
         case_info = await crud.update_test_case_order(db=db, case_id=case_id)
 
         await crud.queue_add(db=db, data={
@@ -245,8 +269,9 @@ class RunApi:
                 res_json['status_code'] = res.status
             except (client_exceptions.ContentTypeError, json.decoder.JSONDecodeError) as e:
                 logger.debug(f"res.json()错误信息: {str(e)}")
-                res_json = {}
-                res_json['status_code'] = res.status
+                res_json = {
+                    'status_code': res.status
+                }
 
             result = []
             for k, v in check.items():
@@ -323,7 +348,6 @@ class RunApi:
             logger.debug(f"实际-{result}")
             logger.debug(f"预期-{check}")
 
-            print(1111, is_fail)
             if is_fail or sleep <= 5:
                 break
 
