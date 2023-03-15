@@ -136,6 +136,7 @@ class RunApi:
                 check=case_data[num].check,
                 request_info=request_info,
                 files=temp_data[num].file_data,
+                random_key=random_key
             )
             res, is_fail = response_info
 
@@ -212,9 +213,7 @@ class RunApi:
                 await self.sees.close()
                 break
 
-
         if CASE_STATUS.get(random_key):
-            CASE_STATUS[random_key]['stop'] = True
             asyncio.create_task(self._del_case_status(random_key))
 
         case_info = await crud.update_test_case_order(db=db, case_id=case_id)
@@ -238,7 +237,7 @@ class RunApi:
         await asyncio.sleep(20)
         del CASE_STATUS[random_key]
 
-    async def _polling(self, case_id: int, sleep: int, check: dict, request_info: dict, files):
+    async def _polling(self, case_id: int, sleep: int, check: dict, request_info: dict, files, random_key: str):
         """
         轮询执行接口
         :param case_id:
@@ -246,6 +245,7 @@ class RunApi:
         :param check:
         :param request_info:
         :param files:
+        :param random_key:
         :return:
         """
 
@@ -376,6 +376,10 @@ class RunApi:
             logger.info(f"第{num + 1}次匹配")
             logger.debug(f"实际-{result}")
             logger.debug(f"预期-{check}")
+
+            if CASE_STATUS[random_key]['stop']:
+                asyncio.create_task(self._del_case_status(random_key))
+                break
 
             if sleep <= 5:
                 break
