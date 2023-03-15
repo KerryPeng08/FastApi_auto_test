@@ -499,7 +499,7 @@ async def set_api_check(sac: schemas.SetApiCheck, db: Session = Depends(get_db))
             else:
                 check_info[key_] = [sac.check.s, False] if sac.check.s != '==' else False
         elif sac.check.type == 'number':
-            check_info[key_] = [sac.check.s, int(sac.check.value)] if sac.check.s != '==' else int(sac.check.value)
+            check_info[key_] = [sac.check.s, sac.check.value] if sac.check.s != '==' else sac.check.value
         elif sac.check.type == 'string':
             check_info[key_] = [sac.check.s, str(sac.check.value)] if sac.check.s != '==' else str(sac.check.value)
         elif sac.check.type == 'null':

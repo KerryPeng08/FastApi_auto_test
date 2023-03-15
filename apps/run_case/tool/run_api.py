@@ -373,11 +373,11 @@ class RunApi:
                         else:
                             is_fail = True
 
-            logger.debug(f"第{num + 1}次匹配")
+            logger.info(f"第{num + 1}次匹配")
             logger.debug(f"实际-{result}")
             logger.debug(f"预期-{check}")
 
-            if is_fail or sleep <= 5:
+            if sleep <= 5:
                 break
 
             await asyncio.sleep(5)

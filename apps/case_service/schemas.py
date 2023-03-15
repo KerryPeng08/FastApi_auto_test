@@ -50,7 +50,7 @@ class CheckInfo(BaseModel):
     key: str
     s: str
     type: str
-    value: Union[int, float, str, bool, None]
+    value: Union[float, int, str, bool, None]
 
 
 class SetApiCheck(BaseModel):
@@ -215,4 +215,3 @@ class SetApiConfig(BaseModel):
 class UpdateName(BaseModel):
     new_name: str
     case_id: int = None
-
