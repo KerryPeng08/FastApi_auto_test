@@ -212,9 +212,9 @@ class RunApi:
                 await self.sees.close()
                 break
 
-        CASE_STATUS[random_key]['stop'] = True
 
         if CASE_STATUS.get(random_key):
+            CASE_STATUS[random_key]['stop'] = True
             asyncio.create_task(self._del_case_status(random_key))
 
         case_info = await crud.update_test_case_order(db=db, case_id=case_id)

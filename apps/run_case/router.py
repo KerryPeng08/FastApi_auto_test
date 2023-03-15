@@ -109,6 +109,10 @@ async def run_case_gather(rcs: schemas.RunCaseGather, db: Session = Depends(get_
     response_class=response_code.MyJSONResponse,
 )
 async def case_status(key_id: str = None):
-    if CASE_STATUS.get(key_id):
-        CASE_STATUS[key_id]['stop'] = True
+    if key_id:
+        if CASE_STATUS.get(key_id):
+            CASE_STATUS[key_id]['stop'] = True
+            return await response_code.resp_200(message='停止成功')
+        else:
+            return await response_code.resp_200(message='没有运行这个用例')
     return CASE_STATUS
