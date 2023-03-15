@@ -213,8 +213,7 @@ class RunApi:
                 await self.sees.close()
                 break
 
-        if CASE_STATUS.get(random_key):
-            asyncio.create_task(self._del_case_status(random_key))
+        asyncio.create_task(self._del_case_status(random_key))
 
         case_info = await crud.update_test_case_order(db=db, case_id=case_id)
 
@@ -235,7 +234,8 @@ class RunApi:
         :return:
         """
         await asyncio.sleep(20)
-        del CASE_STATUS[random_key]
+        if CASE_STATUS.get(random_key):
+            del CASE_STATUS[random_key]
 
     async def _polling(self, case_id: int, sleep: int, check: dict, request_info: dict, files, random_key: str):
         """
