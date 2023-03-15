@@ -108,11 +108,17 @@ class TestService:
             elif v[0] == '>':
                 assert value > v[1]
             elif v[0] == 'in':
-                assert value in v[1]
+                assert value in str(v[1])
+            elif v[0] == '!in':
+                assert v[1] in str(value)
             elif v[0] == 'not in':
-                assert value not in v[1]
+                assert value not in str(v[1])
             elif v[0] == 'notin':
-                assert value not in v[1]
+                assert value not in str(v[1])
+            elif v[0] == '!not in':
+                assert v[1] not in str(value)
+            elif v[0] == '!notin':
+                assert v[1] not in str(value)
             else:
                 assert 1 == 0, '未匹配到比较符'
 

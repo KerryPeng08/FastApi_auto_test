@@ -105,7 +105,8 @@ async def run_case_gather(rcs: schemas.RunCaseGather, db: Session = Depends(get_
 
 @run_case.get(
     '/case/status',
-    name='获取用例运行的状态'
+    name='获取用例运行的状态',
+    response_class=response_code.MyJSONResponse,
 )
 async def case_status(key_id: str = None):
     if CASE_STATUS.get(key_id):

@@ -241,7 +241,7 @@ class RepData:
             number, json_path = url['jsonpath'].split('.', 1)
             url['old_data'] = extract_contents
             url['new_data'] = new_str
-            url['jsonpath'] = 're.sub(extract_contents, jsonpath, old_data)'
+            url['jsonpath'] = 'replace(old, new)'
             url['number'] = int(number)
         return url_list
 

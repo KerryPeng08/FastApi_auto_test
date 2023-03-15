@@ -208,11 +208,15 @@ class RunApi:
 
             if CASE_STATUS[random_key]['stop']:
                 logger.info(f"case_id:{case_id},number:{num} 手动停止执行")
+                del CASE_STATUS[random_key]
                 await self.sees.close()
                 break
 
         CASE_STATUS[random_key]['stop'] = True
-        del CASE_STATUS[random_key]
+
+        if CASE_STATUS.get(random_key):
+            asyncio.create_task(self._del_case_status(random_key))
+
         case_info = await crud.update_test_case_order(db=db, case_id=case_id)
 
         await crud.queue_add(db=db, data={
@@ -223,6 +227,16 @@ class RunApi:
         logger.info(f"用例: {temp_pro}-{temp_name}-{case_info.case_name} 执行完成, 进行结果校验, 序号: {case_info.run_order}")
         await self.sees.close()
         return f"{temp_pro}-{temp_name}-{case_info.case_name}", case_info.run_order, is_fail
+
+    @staticmethod
+    async def _del_case_status(random_key):
+        """
+        延迟删除用例运行状态
+        :param random_key:
+        :return:
+        """
+        await asyncio.sleep(20)
+        del CASE_STATUS[random_key]
 
     async def _polling(self, case_id: int, sleep: int, check: dict, request_info: dict, files):
         """
@@ -329,17 +343,32 @@ class RunApi:
                         else:
                             is_fail = True
                     elif v[0] == 'in':
-                        if value in v[1]:
+                        if value in str(v[1]):
+                            result.append({k: value})
+                        else:
+                            is_fail = True
+                    elif v[0] == '!in':
+                        if v[1] in str(value):
                             result.append({k: value})
                         else:
                             is_fail = True
                     elif v[0] == 'not in':
-                        if value not in v[1]:
+                        if value not in str(v[1]):
                             result.append({k: value})
                         else:
                             is_fail = True
                     elif v[0] == 'notin':
-                        if value not in v[1]:
+                        if value not in str(v[1]):
+                            result.append({k: value})
+                        else:
+                            is_fail = True
+                    elif v[0] == '!not in':
+                        if v[1] not in str(value):
+                            result.append({k: value})
+                        else:
+                            is_fail = True
+                    elif v[0] == '!notin':
+                        if v[1] not in str(value):
                             result.append({k: value})
                         else:
                             is_fail = True
