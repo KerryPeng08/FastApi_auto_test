@@ -378,6 +378,85 @@ async def get_template_data(temp_name: str = None, temp_id: int = None, db: Sess
     return await response_code.resp_400()
 
 
+@template.post(
+    '/create/new/temp',
+    name='创建新的模板'
+)
+async def create_new_temp(
+        temp_name: str,
+        project_name: schemas.TempEnum,
+        number_list: List[str],
+        db: Session = Depends(get_db)
+):
+    """
+    创建新的模板数据
+    """
+    temp_name_ = await crud.get_temp_name(db=db, temp_name=temp_name)
+    if temp_name_:
+        return await response_code.resp_400(message='模板名称重复')
+    # 查找数据
+    new_temp_info = []
+    for i, x in enumerate(number_list):
+        temp_id, number, method = x.split('-')
+        try:
+            temp_info = await crud.get_new_temp_info(
+                db=db,
+                temp_id=int(temp_id),
+                number=int(number),
+                method=str(method)
+            )
+        except ValueError:
+            return await response_code.resp_400(message=f'数据拆解失败：{x}')
+
+        if temp_info:
+            new_temp_info.append({
+                'number': i,
+                'host': temp_info.host,
+                'path': temp_info.path,
+                'code': temp_info.code,
+                'method': temp_info.method,
+                'params': temp_info.params,
+                'json_body': temp_info.json_body,
+                'data': temp_info.data,
+                'file': temp_info.file,
+                'file_data': temp_info.file_data,
+                'headers': temp_info.headers,
+                'response': temp_info.response,
+            })
+        else:
+            return await response_code.resp_404(message=f'未查到的模板信息：{x}')
+
+    # 创建主表数据
+    db_template = await crud.create_template(db=db, temp_name=temp_name, project_name=project_name)
+    # 批量写入数据
+    for temp in new_temp_info:
+        await crud.create_template_data(db=db, data=schemas.TemplateDataIn(**temp), temp_id=db_template.id)
+    await crud.update_template(db=db, temp_id=db_template.id, api_count=len(new_temp_info))
+    return await response_code.resp_200()
+
+
+@template.get(
+    '/temp/all',
+    name='模板全部数据'
+)
+async def temp_all(db: Session = Depends(get_db)):
+    """
+    查询模板全部数据
+    """
+    distinct_list = []
+    temp_data = []
+    for x in await crud.get_temp_all(db=db):
+        if x[3] not in distinct_list:
+            distinct_list.append(x[3])
+            temp_data.append({
+                'temp_id': x[0],
+                'number': x[1],
+                'method': x[2],
+                'path': x[3],
+            })
+    return temp_data
+
+
 @template.get(
     '/download/excel',
     name='下载模板数据-excel',

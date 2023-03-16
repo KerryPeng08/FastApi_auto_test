@@ -235,3 +235,37 @@ async def get_all_temp_name(db: Session, temp_ids):
         models.Template.id.in_(temp_ids)
     ).all()
     return db_temp
+
+
+async def get_new_temp_info(db: Session, temp_id: int, number: int, method: str):
+    """
+
+    :param db:
+    :param temp_id:
+    :param number:
+    :param method:
+    :return:
+    """
+    return db.query(models.TemplateData).filter(
+        models.TemplateData.temp_id == temp_id,
+        models.TemplateData.number == number,
+        models.TemplateData.method == method
+    ).order_by(
+        models.TemplateData.number
+    ).first()
+
+
+async def get_temp_all(db: Session):
+    """
+    查询所有模板数据
+    :param db:
+    :return:
+    """
+    return db.query(
+        models.TemplateData.temp_id,
+        models.TemplateData.number,
+        models.TemplateData.method,
+        models.TemplateData.path
+    ).order_by(
+        models.TemplateData.id
+    ).all()
