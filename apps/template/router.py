@@ -271,7 +271,7 @@ async def del_har(
 
 
 @template.delete(
-    '/del/all',
+    '/del/all/{temp_id}',
     name='删除全部模板数据'
 )
 async def delete_name(temp_id: int, db: Session = Depends(get_db)):
@@ -397,8 +397,8 @@ async def create_new_temp(
     # 查找数据
     new_temp_info = []
     for i, x in enumerate(number_list):
-        temp_id, number, method = x.split('-')
         try:
+            temp_id, number, method = x.split('-')
             temp_info = await crud.get_new_temp_info(
                 db=db,
                 temp_id=int(temp_id),

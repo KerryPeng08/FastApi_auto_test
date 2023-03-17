@@ -25,6 +25,7 @@ from .tool import GetCaseDataInfo, check
 
 from apps.template import crud as temp_crud
 from apps.case_service import crud, schemas
+from apps.case_ddt import crud as ddt_crud
 from apps.case_service.tool import insert, cover_insert
 from apps.template.tool import GenerateCase
 
@@ -290,6 +291,7 @@ async def del_case(case_id: int, db: Session = Depends(get_db)):
     if not await crud.get_case_info(db=db, case_id=case_id):
         return await response_code.resp_404()
     await crud.del_case_data(db=db, case_id=case_id)
+    await ddt_crud.del_test_gather(db=db, case_id=case_id)
     shutil.rmtree(f"{ALLURE_PATH}/{case_id}", ignore_errors=True)
     return await response_code.resp_200(message=f'用例{case_id}删除成功')
 

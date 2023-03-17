@@ -63,6 +63,11 @@ class RunApi:
             'stop': False,
             'success': 0,
             'fail': 0,
+            'sleep': 0,
+            'actual': {},
+            'expect': {},
+            'request_info': {},
+            'response_info': {},
         }
         CASE_STATUS[random_key] = case_status
 
@@ -250,7 +255,7 @@ class RunApi:
         """
 
         # check = copy.deepcopy(check)
-
+        CASE_STATUS[random_key]['request_info'] = request_info
         is_fail = False  # 标记是否失败
         num = 0
         while True:
@@ -286,7 +291,7 @@ class RunApi:
                 res_json = {
                     'status_code': res.status
                 }
-
+            CASE_STATUS[random_key]['response_info'] = res_json
             result = []
             for k, v in check.items():
                 # 从数据库获取需要的值
@@ -381,7 +386,14 @@ class RunApi:
                 asyncio.create_task(self._del_case_status(random_key))
                 break
 
-            if sleep <= 5:
+            CASE_STATUS[random_key]['sleep'] = sleep
+            CASE_STATUS[random_key]['expect'] = check
+            CASE_STATUS[random_key]['actual'] = result
+
+            if len(check) == len(result):
+                break
+
+            if sleep < 5:
                 break
 
             await asyncio.sleep(5)
