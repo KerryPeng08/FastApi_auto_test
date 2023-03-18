@@ -71,18 +71,18 @@ from aiohttp import FormData
 #     # },
 # }
 
-
-async def test():
-    async with aiohttp.ClientSession() as sess:
-        async with sess.request(
-                **data
-        ) as res:
-            print(res.status)
-            # print(res.headers)
-            print(await res.json(content_type=None))
-            # res.text()
-            # print(res.get_encoding())
-            print(res.cookies.items())
+#
+# async def test():
+#     async with aiohttp.ClientSession() as sess:
+#         async with sess.request(
+#                 **data
+#         ) as res:
+#             print(res.status)
+#             # print(res.headers)
+#             print(await res.json(content_type=None))
+#             # res.text()
+#             # print(res.get_encoding())
+#             print(res.cookies.items())
 
 
 # loop = asyncio.get_event_loop()
@@ -123,21 +123,26 @@ async def test():
 # print(res.status_code)
 # print(res.text)
 # print(re.findall('<td width="130" align="center">(.*?)</td>	', res.text))
-import time
-import hashlib
-import secrets
+# import time
+# import hashlib
+# import secrets
+#
+# secret_generator = secrets.SystemRandom()
+# secret_generator.randint(1, 100)
+#
+# a = []
+# for x in range(100):
+#     t = time.time()
+#     # print(t)
+#     tr = str(t + secret_generator.randint(1, 100))
+#     m = hashlib.md5(tr.encode('utf-8')).hexdigest()
+#     if m not in a:
+#         a.append(m)
+#     else:
+#         print(m)
+#     # print(m)
 
-secret_generator = secrets.SystemRandom()
-secret_generator.randint(1, 100)
+import ast
 
-a = []
-for x in range(100):
-    t = time.time()
-    # print(t)
-    tr = str(t + secret_generator.randint(1, 100))
-    m = hashlib.md5(tr.encode('utf-8')).hexdigest()
-    if m not in a:
-        a.append(m)
-    else:
-        print(m)
-    # print(m)
+# print(ast.literal_eval('1 + 2'))
+print(eval('(1%2)*3.333333'))

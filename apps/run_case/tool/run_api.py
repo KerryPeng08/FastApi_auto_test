@@ -112,6 +112,12 @@ class RunApi:
                     faker=self.fk
                 )
 
+                check = await self._replace_params_data(
+                    data=case_data[num].check,
+                    response=response,
+                    faker=self.fk
+                )
+
             except IndexError:
                 await self.sees.close()
                 raise IndexError(f'case_id:{case_id},参数提取错误, 请检查用例编号: {num} 的提取表达式')
@@ -134,11 +140,14 @@ class RunApi:
 
             logger.debug(f"case_id:{case_id},请求信息: {json.dumps(request_info, indent=2, ensure_ascii=False)}")
 
+            # 计算check的内容
+            await self._check_count(check=check)
+
             # 轮询执行接口
             response_info = await self._polling(
                 case_id=case_id,
                 sleep=config['sleep'],
-                check=case_data[num].check,
+                check=check,
                 request_info=request_info,
                 files=temp_data[num].file_data,
                 random_key=random_key
@@ -171,7 +180,7 @@ class RunApi:
 
             # 收集结果
             request_info['file'] = True if temp_data[num].file else False
-            request_info['expect'] = case_data[num].check
+            request_info['expect'] = check
             request_info['description'] = case_data[num].description
             request_info['config'] = case_data[num].config
             try:
@@ -183,10 +192,10 @@ class RunApi:
             response.append(res_json)
 
             # 判断响应结果，调整校验内容收集
-            if res.status != case_data[num].check['status_code']:
+            if res.status != check['status_code']:
                 request_info['actual'] = {'status_code': [res.status]}
             else:
-                new_check = copy.deepcopy(case_data[num].check)
+                new_check = copy.deepcopy(check)
                 del new_check['status_code']
                 request_info['actual'] = {
                     **{'status_code': [res.status]},
@@ -230,6 +239,30 @@ class RunApi:
         logger.info(f"用例: {temp_pro}-{temp_name}-{case_info.case_name} 执行完成, 进行结果校验, 序号: {case_info.run_order}")
         await self.sees.close()
         return f"{temp_pro}-{temp_name}-{case_info.case_name}", case_info.run_order, is_fail
+
+    @staticmethod
+    async def _check_count(check: dict):
+        """
+        对校验数据进行加减乘除
+        :param check:
+        :return:
+        """
+        count = ['+', '-', '*', '/', '//', '%']
+        for k, v in check.items():
+            for x in count:
+                if isinstance(v, list):
+                    if isinstance(v[1], str) and x in v[1]:
+                        try:
+                            v[1] = eval(v[1])
+                            check[k] = v
+                        except NameError:
+                            pass
+                if isinstance(v, str):
+                    if x in v:
+                        try:
+                            check[k] = eval(v)
+                        except NameError:
+                            pass
 
     @staticmethod
     async def _del_case_status(random_key):
