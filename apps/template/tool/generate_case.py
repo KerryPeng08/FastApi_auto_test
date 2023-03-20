@@ -51,7 +51,8 @@ class GenerateCase:
                 'file': True if template_data[num].file else False,
                 'check': {
                     **{'status_code': template_data[num].code},
-                    **{k: v for k, v in AUTO_CHECK.items() if template_data[num].response.get(k) == v}
+                    **{k: v for k, v in AUTO_CHECK.items() if
+                       isinstance(template_data[num].response, dict) and template_data[num].response.get(k) == v}
                 },
                 'description': '',
                 'config': {
