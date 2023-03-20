@@ -30,6 +30,8 @@ from apps.case_service import schemas as service
 from apps.run_case import crud
 from apps.run_case import CASE_STATUS
 
+COUNT = ['+', '-', '*', '/', '//', '%']
+
 
 class RunApi:
     def __init__(self):
@@ -247,9 +249,8 @@ class RunApi:
         :param check:
         :return:
         """
-        count = ['+', '-', '*', '/', '//', '%']
         for k, v in check.items():
-            for x in count:
+            for x in COUNT:
                 if isinstance(v, list):
                     if isinstance(v[1], str) and x in v[1]:
                         try:
@@ -315,15 +316,19 @@ class RunApi:
                     } for file in files
                 ]
 
+            status_code = res.status
+            if check.get('status_code'):
+                if check['status_code'] != status_code:
+                    is_fail = True
+                del check['status_code']
+
             logger.debug(f"循环case_id:{case_id},{num + 1}次: {request_info['url']}")
             try:
                 res_json = await res.json(content_type='application/json' if not files else None)
-                res_json['status_code'] = res.status
             except (client_exceptions.ContentTypeError, json.decoder.JSONDecodeError) as e:
                 logger.debug(f"res.json()错误信息: {str(e)}")
-                res_json = {
-                    'status_code': res.status
-                }
+                res_json = {}
+
             CASE_STATUS[random_key]['response_info'] = res_json
             result = []
             for k, v in check.items():
@@ -424,9 +429,11 @@ class RunApi:
             CASE_STATUS[random_key]['actual'] = result
 
             if len(check) == len(result):
+                check['status_code'] = status_code
                 break
 
             if sleep < 5:
+                check['status_code'] = status_code
                 break
 
             await asyncio.sleep(5)
@@ -582,8 +589,11 @@ async def header_srt(
                 x = re.sub("{{(.*?)}}", str(new_value), x, count=1)
                 continue
 
-            if isinstance(new_value, str):
-                x = re.sub("{{(.*?)}}", new_value, x, count=1)
+            if isinstance(new_value, (str, float, int)):
+                if isinstance(new_value, (float, int)) and [_ for _ in COUNT if _ in x]:
+                    x = re.sub("{{(.*?)}}", str(new_value), x, count=1)
+                else:
+                    x = re.sub("{{(.*?)}}", new_value, x, count=1)
             else:
                 x = new_value
 
