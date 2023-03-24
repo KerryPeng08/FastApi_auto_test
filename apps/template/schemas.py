@@ -77,6 +77,22 @@ class TemplateDataIn(BaseModel):
         orm_mode = True
 
 
+class TemplateDataInTwo(BaseModel):
+    temp_id: int
+    number: Union[int, str]
+    host: HttpUrl
+    path: str
+    code: int
+    method: str
+    params: Optional[dict] = {}
+    json_body: str
+    data: Optional[dict] = {}
+    file: bool
+    file_data: Optional[list] = []
+    headers: Optional[dict] = {}
+    response: Union[dict, list, str] = None
+
+
 class TemplateDataOut(TemplateDataIn):
     id: int
     temp_id: int

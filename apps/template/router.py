@@ -362,7 +362,7 @@ async def update_name(un: schemas.UpdateName, db: Session = Depends(get_db)):
     response_model=List[schemas.TemplateDataOut],
     response_class=response_code.MyJSONResponse,
     response_model_exclude_unset=True,
-    response_model_exclude=['headers', 'file_data'],
+    response_model_exclude=['file_data'],
     name='查询模板接口原始数据'
 )
 async def get_template_data(temp_name: str = None, temp_id: int = None, db: Session = Depends(get_db)):
@@ -370,10 +370,10 @@ async def get_template_data(temp_name: str = None, temp_id: int = None, db: Sess
     按模板名称查询接口原始数据，不返回['headers', 'file_data']
     """
     if temp_name:
-        return await crud.get_template_data(db=db, temp_name=temp_name) or await response_code.resp_404()
+        return await crud.get_template_data(db=db, temp_name=temp_name)
 
     if temp_id:
-        return await crud.get_template_data(db=db, temp_id=temp_id) or await response_code.resp_404()
+        return await crud.get_template_data(db=db, temp_id=temp_id)
 
     return await response_code.resp_400()
 
@@ -455,6 +455,39 @@ async def temp_all(db: Session = Depends(get_db)):
                 'path': x[3],
             })
     return temp_data
+
+
+@template.put(
+    '/add/api',
+    name='添加模板api',
+)
+async def add_api(api_info: schemas.TemplateDataInTwo, db: Session = Depends(get_db)):
+    '''
+    新增模板接口，若关联得有用例，则同步新增用例接口
+    '''
+    print(api_info)
+
+
+@template.put(
+    '/edit/api',
+    name='修改模板api',
+)
+async def edit_api(api_info: schemas.TemplateDataInTwo, db: Session = Depends(get_db)):
+    '''
+    修改模板接口，若关联得有用例，则同步修改用例接口
+    '''
+    print(api_info)
+
+
+@template.delete(
+    '/del/api',
+    name='删除模板api'
+)
+async def del_api(temp_id: int, number: int, db: Session = Depends(get_db)):
+    '''
+    删除模板接口，若关联得有用例，则同步删除用例接口
+    '''
+    print(temp_id, number)
 
 
 @template.get(
