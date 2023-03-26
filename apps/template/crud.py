@@ -58,6 +58,20 @@ async def create_template_data(db: Session, data: schemas.TemplateDataIn, temp_i
     return db_data
 
 
+async def create_template_data_add(db: Session, data: schemas.TemplateDataInTwo):
+    """
+    创建模板数据集
+    :param db:
+    :param data:
+    :return:
+    """
+    db_data = models.TemplateData(**data.dict())
+    db.add(db_data)
+    db.commit()
+    db.refresh(db_data)
+    return db_data
+
+
 async def update_template_data(db: Session, temp_id: int, id_: int, new_number: int, old_number: int = None):
     """
     更新模板信息
@@ -268,4 +282,38 @@ async def get_temp_all(db: Session):
         models.TemplateData.path
     ).order_by(
         models.TemplateData.id
+    ).all()
+
+
+async def update_api_info(db: Session, api_info: schemas.TemplateDataInTwo):
+    """
+    修改用例api信息
+    :param db:
+    :param api_info:
+    :return:
+    """
+    if not await get_template_data(db=db, temp_id=api_info.temp_id, numbers=[api_info.number]):
+        return False
+
+    db.query(models.TemplateData).filter(
+        models.TemplateData.temp_id == api_info.temp_id,
+        models.TemplateData.number == api_info.number
+    ).update(api_info.dict())
+    db.commit()
+    return True
+
+
+async def get_temp_numbers(db: Session, temp_id: int, number: int):
+    """
+    查询某个number后的模板数据
+    :param db:
+    :param temp_id:
+    :param number:
+    :return:
+    """
+    return db.query(models.TemplateData).filter(
+        models.TemplateData.temp_id == temp_id,
+        models.TemplateData.number >= number
+    ).order_by(
+        models.TemplateData.number
     ).all()

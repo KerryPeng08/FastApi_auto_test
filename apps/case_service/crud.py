@@ -60,6 +60,20 @@ async def create_test_case_data(db: Session, data: schemas.TestCaseDataIn, case_
     return db_data
 
 
+async def create_test_case_data_add(db: Session, data: schemas.TestCaseDataInTwo):
+    """
+    创建测试数据集
+    :param db:
+    :param data:
+    :return:
+    """
+    db_data = models.TestCaseData(**data.dict())
+    db.add(db_data)
+    db.commit()
+    db.refresh(db_data)
+    return db_data
+
+
 async def del_test_case_data(db: Session, case_id: int):
     """
     删除测试数据，不删除用例
@@ -244,7 +258,7 @@ async def get_case(db: Session, temp_id: int):
     :param temp_id:
     :return:
     """
-    return db.query(models.TestCase).filter(models.TestCase.temp_id == temp_id).first()
+    return db.query(models.TestCase).filter(models.TestCase.temp_id == temp_id).all()
 
 
 async def get_case_ids(db: Session, temp_id: int):
@@ -366,3 +380,17 @@ async def put_case_name(db: Session, case_id: int, new_name: str):
         return db_temp
 
 
+async def get_case_numbers(db: Session, case_id: int, number: int):
+    """
+    查询某个number后的用例数据
+    :param db:
+    :param case_id:
+    :param number:
+    :return:
+    """
+    return db.query(models.TestCaseData).filter(
+        models.TestCaseData.case_id == case_id,
+        models.TestCaseData.number >= number
+    ).order_by(
+        models.TestCaseData.number
+    ).all()

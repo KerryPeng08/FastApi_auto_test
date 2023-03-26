@@ -60,7 +60,7 @@ class TempTestCase(TemplateOut):
 
 # 测试模板数据的请求/响应数据模型
 class TemplateDataIn(BaseModel):
-    number: Union[str, int]
+    number: Union[int, str]
     host: HttpUrl
     path: str
     code: int
@@ -77,20 +77,8 @@ class TemplateDataIn(BaseModel):
         orm_mode = True
 
 
-class TemplateDataInTwo(BaseModel):
+class TemplateDataInTwo(TemplateDataIn):
     temp_id: int
-    number: Union[int, str]
-    host: HttpUrl
-    path: str
-    code: int
-    method: str
-    params: Optional[dict] = {}
-    json_body: str
-    data: Optional[dict] = {}
-    file: bool
-    file_data: Optional[list] = []
-    headers: Optional[dict] = {}
-    response: Union[dict, list, str] = None
 
 
 class TemplateDataOut(TemplateDataIn):

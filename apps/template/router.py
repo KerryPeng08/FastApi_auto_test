@@ -20,9 +20,9 @@ from depends import get_db
 from apps.template import crud, schemas
 from apps.case_service import schemas as case_schemas
 from apps.case_service import crud as case_crud
-from apps.template.tool import ParseData, check_num, GenerateCase
+from apps.template.tool import ParseData, check_num, GenerateCase, InsertTempData, DelTempData
+from apps.case_service.tool import refresh, temp_to_case
 from tools import CreateExcel, OperationJson
-from .tool import InsertTempData, DelTempData
 
 template = APIRouter()
 
@@ -462,10 +462,42 @@ async def temp_all(db: Session = Depends(get_db)):
     name='添加模板api',
 )
 async def add_api(api_info: schemas.TemplateDataInTwo, db: Session = Depends(get_db)):
-    '''
+    """
     新增模板接口，若关联得有用例，则同步新增用例接口
-    '''
-    print(api_info)
+    """
+    temp_info = await crud.get_template_data(db=db, temp_id=api_info.temp_id)
+    # 校验下数据
+    max_number = max([x.number for x in temp_info]) if temp_info else 0
+    if api_info.number > max_number + 1:
+        return await response_code.resp_400(message=f'number值超过当前最大序号: {max_number} + 1')
+
+    # 插入数据
+    await crud.create_template_data_add(db=db, data=api_info)
+    await crud.update_template(db=db, temp_id=api_info.temp_id, api_count=len(temp_info) + 1)
+
+    if api_info.number == max_number + 1:
+        pass
+    else:
+        # 重新对number进行编号
+        number_info = await crud.get_temp_numbers(db=db, temp_id=api_info.temp_id, number=api_info.number)
+        for i, x in enumerate(number_info):
+            if i == 1:
+                continue
+            await crud.update_template_data(db=db, temp_id=api_info.temp_id, id_=x.id, new_number=x.number + 1)
+
+    # 对用例进行操作
+    for case in await case_crud.get_case(db=db, temp_id=api_info.temp_id):
+        # 插入数据
+        case_info = await temp_to_case(api_info=api_info, case_id=case.id)
+        await case_crud.create_test_case_data_add(db=db, data=case_schemas.TestCaseDataInTwo(**case_info))
+        await case_crud.update_test_case(db=db, case_id=case.id, case_count=len(temp_info) + 1)
+
+        if api_info.number == max_number + 1:
+            pass
+        else:
+            await refresh(db=db, case_id=case.id, start_number=api_info.number)
+
+    return await response_code.resp_200()
 
 
 @template.put(
@@ -473,10 +505,13 @@ async def add_api(api_info: schemas.TemplateDataInTwo, db: Session = Depends(get
     name='修改模板api',
 )
 async def edit_api(api_info: schemas.TemplateDataInTwo, db: Session = Depends(get_db)):
-    '''
+    """
     修改模板接口，若关联得有用例，则同步修改用例接口
-    '''
-    print(api_info)
+    """
+    if await crud.update_api_info(db=db, api_info=api_info):
+        return await response_code.resp_200()
+    else:
+        return await response_code.resp_404(message='修改失败，未获取到内容')
 
 
 @template.delete(
@@ -484,10 +519,30 @@ async def edit_api(api_info: schemas.TemplateDataInTwo, db: Session = Depends(ge
     name='删除模板api'
 )
 async def del_api(temp_id: int, number: int, db: Session = Depends(get_db)):
-    '''
+    """
     删除模板接口，若关联得有用例，则同步删除用例接口
-    '''
-    print(temp_id, number)
+    """
+    temp_info = await crud.get_template_data(db=db, temp_id=temp_id, numbers=[number])
+    if not temp_info:
+        return await response_code.resp_404(message='没有获取到这个模板api数据')
+
+    # 删除数据
+    await crud.del_template_data(db=db, temp_id=temp_id, number=number)
+    api_count = await crud.get_temp_name(db=db, temp_id=temp_id)
+    await crud.update_template(
+        db=db,
+        temp_id=temp_id,
+        api_count=api_count[0].api_count - 1 if api_count[0].api_count - 1 >= 0 else 0
+    )
+
+    # 重新对number进行编号
+    number_info = await crud.get_temp_numbers(db=db, temp_id=temp_id, number=number + 1)
+    for i, x in enumerate(number_info):
+        await crud.update_template_data(db=db, temp_id=temp_id, id_=x.id, new_number=x.number - 1)
+
+    # 对用例进行操作
+
+    return await response_code.resp_200()
 
 
 @template.get(

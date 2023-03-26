@@ -124,6 +124,10 @@ class TestCaseDataIn(BaseModel):
         orm_mode = True
 
 
+class TestCaseDataInTwo(TestCaseDataIn):
+    case_id: int
+
+
 class TestCaseData(BaseModel):
     number: Union[int, str]
     path: str
@@ -166,17 +170,7 @@ class TestCaseDataOut1(BaseModel):
         orm_mode = True
 
 
-class TestCaseDataOut2(BaseModel):
-    number: int
-    case_id: int
-    path: str
-    headers: Optional[dict] = {}
-    params: Optional[dict] = {}
-    data: Optional[dict] = {}
-    file: bool
-    check: Optional[dict] = {}
-    description: str
-    config: TestCaseConfig
+class TestCaseDataOut2(TestCaseDataOut1):
     created_at: datetime
     updated_at: datetime
 
