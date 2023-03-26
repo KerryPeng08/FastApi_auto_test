@@ -495,7 +495,7 @@ async def add_api(api_info: schemas.TemplateDataInTwo, db: Session = Depends(get
         if api_info.number == max_number + 1:
             pass
         else:
-            await refresh(db=db, case_id=case.id, start_number=api_info.number)
+            await refresh(db=db, case_id=case.id, start_number=api_info.number, type_='add')
 
     return await response_code.resp_200()
 
@@ -541,6 +541,16 @@ async def del_api(temp_id: int, number: int, db: Session = Depends(get_db)):
         await crud.update_template_data(db=db, temp_id=temp_id, id_=x.id, new_number=x.number - 1)
 
     # 对用例进行操作
+    for case in await case_crud.get_case(db=db, temp_id=temp_id):
+        # 删除数据
+        await case_crud.del_test_case_data(db=db, case_id=case.id, number=number)
+        await case_crud.update_test_case(
+            db=db,
+            case_id=case.id,
+            case_count=case.case_count - 1 if case.case_count - 1 >= 0 else 0
+        )
+
+        await refresh(db=db, case_id=case.id, start_number=number, type_='del')
 
     return await response_code.resp_200()
 

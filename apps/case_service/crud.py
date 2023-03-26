@@ -74,13 +74,22 @@ async def create_test_case_data_add(db: Session, data: schemas.TestCaseDataInTwo
     return db_data
 
 
-async def del_test_case_data(db: Session, case_id: int):
+async def del_test_case_data(db: Session, case_id: int, number: int = None):
     """
     删除测试数据，不删除用例
     :param db:
     :param case_id:
+    :param number:
     :return:
     """
+    if number:
+        db.query(models.TestCaseData).filter(
+            models.TestCaseData.case_id == case_id,
+            models.TestCaseData.number == number
+        ).delete()
+        db.commit()
+        return
+
     db.query(models.TestCaseData).filter(models.TestCaseData.case_id == case_id).delete()
     db.commit()
 

@@ -15,39 +15,66 @@ from apps.case_service import crud, schemas
 from apps.template import schemas as temp_schemas
 
 
-async def refresh(db: Session, case_id: int, start_number: int):
+async def refresh(db: Session, case_id: int, start_number: int, type_: str):
     """
     刷新用例的number序号好jsonPath中的number
     :param db:
     :param case_id:
     :param start_number:
+    :param type_:
     :return:
     """
     # 重新对number进行编号
     number_info = await crud.get_case_numbers(db=db, case_id=case_id, number=start_number)
-    for i, x in enumerate(number_info):
-        if i == 1:
-            continue
-        await crud.update_api_number(db=db, case_id=case_id, id_=x.id, new_number=x.number + 1)
 
-    for i, x in enumerate(number_info):
-        path = await _rep_url(x.path, start_number)
-        params = await _rep_dict(x.params, start_number)
-        data = await _rep_dict(x.data, start_number)
-        check = await _rep_dict(x.check, start_number)
-        headers = await _rep_dict(x.headers, start_number)
-        await crud.update_api_info(db=db, api_info=schemas.TestCaseDataOut1(**{
-            'number': x.number,
-            'case_id': x.case_id,
-            'path': path,
-            'headers': headers,
-            'params': params,
-            'data': data,
-            'file': x.file,
-            'check': check,
-            'description': x.description,
-            'config': x.config
-        }))
+    if type_ == 'add':
+        for i, x in enumerate(number_info):
+            if i == 1:
+                continue
+            await crud.update_api_number(db=db, case_id=case_id, id_=x.id, new_number=x.number + 1)
+
+        for i, x in enumerate(number_info):
+            path = await _rep_url(x.path, start_number, 'add')
+            params = await _rep_dict(x.params, start_number, 'add')
+            data = await _rep_dict(x.data, start_number, 'add')
+            check = await _rep_dict(x.check, start_number, 'add')
+            headers = await _rep_dict(x.headers, start_number, 'add')
+            await crud.update_api_info(db=db, api_info=schemas.TestCaseDataOut1(**{
+                'number': x.number,
+                'case_id': x.case_id,
+                'path': path,
+                'headers': headers,
+                'params': params,
+                'data': data,
+                'file': x.file,
+                'check': check,
+                'description': x.description,
+                'config': x.config
+            }))
+        return
+
+    if type_ == 'del':
+        for i, x in enumerate(number_info):
+            await crud.update_api_number(db=db, case_id=case_id, id_=x.id, new_number=x.number - 1)
+
+        for i, x in enumerate(number_info):
+            path = await _rep_url(x.path, start_number, 'del')
+            params = await _rep_dict(x.params, start_number, 'del')
+            data = await _rep_dict(x.data, start_number, 'del')
+            check = await _rep_dict(x.check, start_number, 'del')
+            headers = await _rep_dict(x.headers, start_number, 'del')
+            await crud.update_api_info(db=db, api_info=schemas.TestCaseDataOut1(**{
+                'number': x.number,
+                'case_id': x.case_id,
+                'path': path,
+                'headers': headers,
+                'params': params,
+                'data': data,
+                'file': x.file,
+                'check': check,
+                'description': x.description,
+                'config': x.config
+            }))
 
 
 async def temp_to_case(case_id: int, api_info: temp_schemas.TemplateDataInTwo):
@@ -83,10 +110,12 @@ async def temp_to_case(case_id: int, api_info: temp_schemas.TemplateDataInTwo):
     }
 
 
-async def _rep_dict(case_data: dict, start_number: int):
+async def _rep_dict(case_data: dict, start_number: int, type_: str):
     """
     递归替换
     :param case_data:
+    :param start_number:
+    :param type_:
     :return:
     """
 
@@ -107,7 +136,10 @@ async def _rep_dict(case_data: dict, start_number: int):
                         for replace in replace_values:
                             number, json_path = replace.split('.', 1)
                             if int(number) >= start_number:
-                                v = re.sub("{{(.*?)}}", "{{" + f"{int(number) + 1}.{json_path}" + "}}", v, count=1)
+                                if type_ == 'add':
+                                    v = re.sub("{{(.*?)}}", "{{" + f"{int(number) + 1}.{json_path}" + "}}", v, count=1)
+                                if type_ == 'del':
+                                    v = re.sub("{{(.*?)}}", "{{" + f"{int(number) - 1}.{json_path}" + "}}", v, count=1)
                             else:
                                 v = re.sub("{{(.*?)}}", "{{" + f"{int(number)}.{json_path}" + "}}", v, count=1)
                         target[k] = v
@@ -121,10 +153,12 @@ async def _rep_dict(case_data: dict, start_number: int):
     return inter(case_data)
 
 
-async def _rep_url(url: str, start_number: int):
+async def _rep_url(url: str, start_number: int, type_: str):
     """
     替换url数据
     :param url:
+    :param start_number:
+    :param type_:
     :return:
     """
     if "{{" in url and "$" in url and "}}" in url:
@@ -132,7 +166,10 @@ async def _rep_url(url: str, start_number: int):
         for replace in replace_values:
             number, json_path = replace.split('.', 1)
             if int(number) >= start_number:
-                url = re.sub("{{(.*?)}}", "{{" + f"{int(number) + 1}.{json_path}" + "}}", url, count=1)
+                if type_ == 'add':
+                    url = re.sub("{{(.*?)}}", "{{" + f"{int(number) + 1}.{json_path}" + "}}", url, count=1)
+                if type_ == 'del':
+                    url = re.sub("{{(.*?)}}", "{{" + f"{int(number) - 1}.{json_path}" + "}}", url, count=1)
             else:
                 url = re.sub("{{(.*?)}}", "{{" + f"{int(number)}.{json_path}" + "}}", url, count=1)
 
