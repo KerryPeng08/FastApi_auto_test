@@ -316,9 +316,9 @@ class RunApi:
                     } for file in files
                 ]
 
-            status_code = res.status
+            status_code = check['status_code']
             if check.get('status_code'):
-                if check['status_code'] != status_code:
+                if check['status_code'] != res.status:
                     is_fail = True
                 del check['status_code']
 
