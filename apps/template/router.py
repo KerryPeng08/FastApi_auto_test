@@ -9,9 +9,12 @@
 
 import os
 import time
+import json
 from typing import List
+from pydantic import HttpUrl
 from fastapi import APIRouter, UploadFile, Depends, Form, File, Query
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from starlette.responses import FileResponse
 from starlette.background import BackgroundTask
 from apps import response_code
@@ -20,7 +23,7 @@ from depends import get_db
 from apps.template import crud, schemas
 from apps.case_service import schemas as case_schemas
 from apps.case_service import crud as case_crud
-from apps.template.tool import ParseData, check_num, GenerateCase, InsertTempData, DelTempData
+from apps.template.tool import ParseData, check_num, GenerateCase, InsertTempData, DelTempData, ReadSwagger
 from apps.case_service.tool import refresh, temp_to_case
 from tools import CreateExcel, OperationJson
 
@@ -81,6 +84,54 @@ async def analysis_file_har(file: UploadFile):
         return await response_code.resp_400(message=f'文件类型错误，只支持har格式文件')
 
     return await ParseData.pares_data(har_data=file.file.read())
+
+
+@template.post(
+    '/upload/swagger/json',
+    name='上传SwaggerJson文件',
+    response_model=schemas.TemplateOut,
+)
+async def upload_swagger_json(
+        project_name: schemas.TempEnum,
+        host: HttpUrl,
+        file: UploadFile,
+        db: Session = Depends(get_db)
+):
+    """
+    上传Swagger的json文件，解析后存入模板，文件名称作为模板名称
+    """
+    if file.content_type != 'application/json':
+        return await response_code.resp_400(message='文件类型错误，只支持json格式文件')
+
+    # 校验数据
+    try:
+        temp_data = json.loads(file.file.read().decode('utf-8'))
+    except json.decoder.JSONDecodeError as e:
+        return await response_code.resp_400(message=f'json文件格式有错误: {str(e)}')
+
+    # 解析数据，拿到解析结果
+    try:
+        rs = ReadSwagger(host)
+        temp_info = rs.header(temp_data)
+    except KeyError as e:
+        return await response_code.resp_400(message=f'Swagger文件内容有错误: {str(e)}')
+    else:
+        pass
+        # 创建主表数据
+        try:
+            db_template = await crud.create_template(
+                db=db,
+                temp_name=file.filename.split('.')[0],
+                project_name=project_name
+            )
+        except IntegrityError:
+            return await response_code.resp_400(message=f'创建数据失败: temp_name 重复')
+        else:
+            # 批量写入数据
+            for temp in temp_info:
+                print(temp)
+                await crud.create_template_data(db=db, data=schemas.TemplateDataIn(**temp), temp_id=db_template.id)
+            return await crud.update_template(db=db, temp_id=db_template.id, api_count=len(temp_info))
 
 
 @template.put(

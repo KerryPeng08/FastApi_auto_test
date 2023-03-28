@@ -135,8 +135,8 @@ async def test_case_upload_json(
 
     try:
         msg_list = await CheckJson.check_to_service(db=db, temp_id=temp_id, case_data=case_data['data'])
-    except TypeError:
-        return await response_code.resp_400(message='文件格式有误')
+    except (TypeError, KeyError):
+        return await response_code.resp_400(message='文件格式或内容有误')
     if msg_list:
         return await response_code.resp_400(data=msg_list)
 
