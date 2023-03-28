@@ -49,4 +49,6 @@ def rep_url(url: str, old_str: str, new_str: str, ) -> str:
     :param url:
     :return:
     """
+    if '{' + old_str + '}' in url:
+        old_str = '{' + old_str + '}'
     return url.replace(old_str, new_str)
