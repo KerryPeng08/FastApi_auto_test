@@ -118,6 +118,7 @@ class CaseDataGather:
         sheet.freeze_panes = 'B4'
         # align = Alignment(horizontal='center', vertical='center')
         start_column = 2
+        column_num = 0
         end_column = 0
         for data in case_gather:
             params_len = len(data['params'])
@@ -138,7 +139,7 @@ class CaseDataGather:
                 row=1,
                 col=start_column,
                 value=data['url'],
-                fill=PatternFill('solid', fgColor=self.color2[0] if start_column % 2 else self.color1[0])
+                fill=PatternFill('solid', fgColor=self.color2[0] if column_num % 2 else self.color1[0])
             )
             self._sheet_coll(sheet=sheet, row=1, col=1, value='URL')
             if data['params']:
@@ -153,7 +154,7 @@ class CaseDataGather:
                     row=2,
                     col=start_column,
                     value='params',
-                    fill=PatternFill('solid', fgColor=self.color2[1] if start_column % 2 else self.color1[1])
+                    fill=PatternFill('solid', fgColor=self.color2[1] if column_num % 2 else self.color1[1])
                 )
                 self._sheet_coll(sheet=sheet, row=2, col=1, value='分类')
                 for x in range(len(data['params'])):
@@ -176,7 +177,7 @@ class CaseDataGather:
                     row=2,
                     col=start_column + params_len,
                     value='data',
-                    fill=PatternFill('solid', fgColor=self.color2[2] if start_column % 2 else self.color1[2])
+                    fill=PatternFill('solid', fgColor=self.color2[2] if column_num % 2 else self.color1[2])
                 )
                 for x in range(len(data['data'])):
                     for y in range(len(data['data'][x])):
@@ -199,7 +200,7 @@ class CaseDataGather:
                     row=2,
                     col=start_column + params_len + data_len,
                     value='check',
-                    fill=PatternFill('solid', fgColor=self.color2[3] if start_column % 2 else self.color1[3])
+                    fill=PatternFill('solid', fgColor=self.color2[3] if column_num % 2 else self.color1[3])
                 )
                 self._sheet_coll(sheet=sheet, row=3, col=1, value='参数')
                 if gather:
@@ -219,6 +220,7 @@ class CaseDataGather:
                             value=data['check'][x][y]
                         )
             start_column += url_len
+            column_num += 1
 
         workbook.save(path)
 
