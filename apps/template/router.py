@@ -609,20 +609,22 @@ async def del_api(temp_id: int, number: int, db: Session = Depends(get_db)):
 @template.get(
     '/download/excel',
     name='下载模板数据-excel',
-    deprecated=True,
-    include_in_schema=False
+    # deprecated=True,
+    # include_in_schema=False
 )
-async def download_temp_excel(temp_name: str, db: Session = Depends(get_db)):
+async def download_temp_excel(temp_id: int, db: Session = Depends(get_db)):
     """
     将Charles录制的测试场景原始数据下载到excel
     """
-    template_data = await crud.get_template_data(db=db, temp_name=temp_name)
+    template_data = await crud.get_template_data(db=db, temp_id=temp_id)
+    temp_name = await crud.get_temp_name(db=db, temp_id=temp_id)
+    temp_name = temp_name[0].temp_name
     if template_data:
         sheet_name = [temp_name]
-        sheet_title = ['域名', '接口地址', '响应状态码', '请求参数', 'JSON或BODY数据', '响应数据']
+        sheet_title = ['host', 'path', 'code', 'params', 'data']
         sheet_data = [
             [
-                [x.host, x.path, x.code, x.params, x.data, x.response] for x in template_data
+                [x.host, x.path, x.code, x.params, x.data] for x in template_data
             ]
         ]
         path = f'./files/excel/{time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))}.xlsx'
