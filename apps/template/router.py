@@ -19,6 +19,8 @@ from starlette.responses import FileResponse
 from starlette.background import BackgroundTask
 from apps import response_code
 from depends import get_db
+from apps.my_pagination import Page
+from fastapi_pagination import add_pagination, paginate
 
 from apps.template import crud, schemas
 from apps.case_service import schemas as case_schemas
@@ -348,7 +350,7 @@ async def delete_name(temp_id: int, db: Session = Depends(get_db)):
 
 @template.get(
     '/name/list',
-    response_model=List[schemas.TempTestCase],
+    response_model=Page[schemas.TempTestCase],
     response_class=response_code.MyJSONResponse,
     response_model_exclude_unset=True,
     name='查询模板数据'
@@ -388,7 +390,7 @@ async def get_templates(
         temp_info.update(case_info)
         out_info.append(temp_info)
 
-    return out_info or await response_code.resp_404()
+    return paginate(out_info) or await response_code.resp_404()
 
 
 @template.put(
@@ -637,3 +639,6 @@ async def download_temp_excel(temp_id: int, db: Session = Depends(get_db)):
             background=BackgroundTask(lambda: os.remove(path))
         )
     return await response_code.resp_404()
+
+
+add_pagination(template)

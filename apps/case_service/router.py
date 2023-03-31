@@ -22,6 +22,8 @@ from tools.check_case_json import CheckJson
 from tools import OperationJson, ExtractParamsPath, RepData
 from setting import ALLURE_PATH
 from .tool import GetCaseDataInfo, check
+from apps.my_pagination import Page
+from fastapi_pagination import add_pagination, paginate
 
 from apps.template import crud as temp_crud
 from apps.case_service import crud, schemas
@@ -249,7 +251,7 @@ async def download_case_data_info(case_id: int, db: Session = Depends(get_db)):
 
 @case_service.get(
     '/data/case/list',
-    response_model=List[schemas.TestCaseInfoOut],
+    response_model=Page[schemas.TestCaseInfoOut],
     response_class=response_code.MyJSONResponse,
     response_model_exclude_unset=True,
     name='查看测试用例列表'
@@ -280,7 +282,7 @@ async def case_data_list(outline: bool = True, db: Session = Depends(get_db)):
                 "case_id": case.id
             }
         )
-    return case_info or await response_code.resp_404()
+    return paginate(case_info) or await response_code.resp_404()
 
 
 @case_service.delete(
@@ -736,3 +738,6 @@ async def copy_case(case_id: int, db: Session = Depends(get_db)):
         'data': case_data
     }
     return await insert(db=db, case_name=case_name, temp_id=case_info[0].temp_id, case_data=dict(**case_data))
+
+
+add_pagination(case_service)
