@@ -44,9 +44,9 @@ class CaseDataGather:
         [names.append(i) for i in [x.name for x in gather_data] if i not in names]
         gather_list = [NewData() for _ in max_path]
 
-        params = self._header([[x.params for x in gather_data if path[1] == x.path] for path in max_path])
-        datas = self._header([[x.data for x in gather_data if path[1] == x.path] for path in max_path])
-        checks = self._header([[x.check for x in gather_data if path[1] == x.path] for path in max_path])
+        params = self._header([[x.params for x in gather_data if path == (x.number, x.path)] for path in max_path])
+        datas = self._header([[x.data for x in gather_data if path == (x.number, x.path)] for path in max_path])
+        checks = self._header([[x.check for x in gather_data if path == (x.number, x.path)] for path in max_path])
 
         gd = gather_data[0:len(gather_list)]
         for i, new_data in enumerate(gather_list):
