@@ -11,16 +11,16 @@
 LOGGER_LEVEL: str = 'INFO'
 
 # allure总目录
-ALLURE_PATH: str = 'D:\\Works\\liweijia\\auto_report'
+ALLURE_PATH: str = 'D:\\Works\\auto_report'
 
 # host
 HOST: str = 'http://172.16.100.121:8000/'
 
 # YApi配置信息
 YAPI_INFO: dict = {
-    'host': 'http://yapi.liweijia.com',
-    'email': 'yangjie@liweijia.com',
-    'password': 'liweijia666'
+    'host': '',
+    'email': '',
+    'password': ''
 }
 
 # 自动添加校验字段（统一响应字段）
@@ -33,9 +33,9 @@ GLOBAL_FAIL_STOP: bool = True
 
 # 数据库配置
 DB_CONFIG = {
-    'host': '172.16.100.7',
-    'user': 'read',
-    'password': '87654321',
+    'host': '',
+    'user': '',
+    'password': '',
     # 'database': '',
     'port': 8066,
     'charset': 'utf8'
