@@ -26,6 +26,7 @@ def mkdir():
     pathlib.Path(f'./files/excel').mkdir(parents=True, exist_ok=True)
     pathlib.Path(f'./files/json').mkdir(parents=True, exist_ok=True)
     pathlib.Path(f'./files/code').mkdir(parents=True, exist_ok=True)
+    pathlib.Path(f'./sqlite').mkdir(parents=True, exist_ok=True)
 
 
 mkdir()

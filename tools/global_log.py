@@ -13,6 +13,7 @@ import logging.handlers
 import os
 import copy
 
+from setting import LOG_PATH
 from setting import LOGGER_LEVEL
 from enum import Enum, unique
 
@@ -56,7 +57,7 @@ class _DirMode(Enum):
 _LOGGING_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
-    "log_dir": "D:/logs/",
+    "log_dir": LOG_PATH,
     "formatters": {
         "simple": {
             # 'format': '%(asctime)s [%(levelname)s] [%(thread)d#%(threadName)s] [%(module)s#%(funcName)s] - %(message)s',

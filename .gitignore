@@ -7,7 +7,7 @@ __pycache__/
 *.so
 
 # Distribution / packaging
-setting.py
+test.py
 alembic.ini
 auto_test.sqlite3
 /static
@@ -21,7 +21,6 @@ sqlite/
 allure_report/
 .Python
 configs.py
-test.py
 /test
 test/
 build/
