@@ -17,15 +17,16 @@ from apps.case_ddt.router import case_ddt
 from apps.api_pool.router import pool
 from apps.run_case.router import run_case
 from apps.own_params_rep.router import own_rep
+from apps.whole_conf.router import conf
 from tools.load_allure import load_allure_reports
 from fastapi.staticfiles import StaticFiles
 from apps import response_code
+
 # from tools.database import Base, engine
 
 # Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    # docs_url='/',
     include_in_=True,
     title='随便测测'
 )
@@ -52,6 +53,7 @@ app.include_router(case_ddt, prefix='/caseDdt', tags=['[用例]数据驱动'])
 # app.include_router(case_perf, prefix='/casePerf', tags=['[用例]性能测试'])
 app.include_router(run_case, prefix='/runCase', tags=['执行测试'])
 app.include_router(own_rep, prefix='/ownRep', tags=['参数替换'])
+app.include_router(conf, prefix='/conf', tags=['全局配置'])
 app.include_router(pool, prefix='/YApi', tags=['YApi接口池'])
 
 
