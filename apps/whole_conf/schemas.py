@@ -17,11 +17,25 @@ class HostConf(BaseModel):
     value: HttpUrl
 
 
+class ProjectName(BaseModel):
+    key: str
+    value: str
+
+
+class DbConfig(BaseModel):
+    host: Union[str] = None
+    user: Union[str] = None
+    password: Union[str] = None
+    database: Union[str] = None
+    port: Union[int] = None
+    charset: Union[str] = 'utf8'
+
+
 class WholeConfIn(BaseModel):
     host: Union[List[HostConf]] = []
-    project: Union[List[str]] = []
+    project: Union[List[ProjectName]] = []
     unify_res: Union[dict] = {}
-    db_conf: Union[dict] = {}
+    db_conf: Union[DbConfig] = {}
 
     class Config:
         orm_mode = True
