@@ -22,6 +22,12 @@ class ProjectName(BaseModel):
     value: str
 
 
+class UnifyRes(BaseModel):
+    key: str
+    value: Union[float, int, str]
+    type: str
+
+
 class DbConfig(BaseModel):
     host: Union[str] = None
     user: Union[str] = None
@@ -34,7 +40,7 @@ class DbConfig(BaseModel):
 class WholeConfIn(BaseModel):
     host: Union[List[HostConf]] = []
     project: Union[List[ProjectName]] = []
-    unify_res: Union[dict] = {}
+    unify_res: Union[List[UnifyRes]] = {}
     db_conf: Union[DbConfig] = {}
 
     class Config:

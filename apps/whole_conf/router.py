@@ -22,7 +22,29 @@ conf = APIRouter()
     response_model=schemas.WholeConfOut
 )
 async def get_setting(db: Session = Depends(get_db)):
-    return await crud.get_info(db=db)
+    conf_info = await crud.get_info(db=db)
+    if conf_info:
+        return conf_info
+    else:
+        return {
+            'host': [
+                {'key': '本地', 'value': 'http://127.0.0.1'}
+            ],
+            'project': [
+                {'key': '', 'value': ''}
+            ],
+            'unify_res': [
+                {'key': 'code', 'value': 0, 'type': 'string'}
+            ],
+            'db_conf': {
+                'host': '',
+                'user': '',
+                'password': '',
+                'database': '',
+                'port': 3306,
+                'charset': 'utf8',
+            }
+        }
 
 
 @conf.put(
