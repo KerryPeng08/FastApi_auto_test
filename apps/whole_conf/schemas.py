@@ -24,7 +24,7 @@ class ProjectName(BaseModel):
 
 class UnifyRes(BaseModel):
     key: str
-    value: Union[float, int, str]
+    value: Union[int, str, None]
     type: str
 
 

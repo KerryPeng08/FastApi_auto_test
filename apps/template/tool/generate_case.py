@@ -10,13 +10,16 @@
 import jsonpath
 from typing import List, Any
 from apps.template import schemas
-from setting import TIPS, AUTO_CHECK
+from apps.whole_conf import crud as conf_crud
+from setting import TIPS
+from sqlalchemy.orm import Session
 
 
 class GenerateCase:
 
     async def read_template_to_api(
             self,
+            db: Session,
             temp_name: str,
             mode: str,
             fail_stop: bool,
@@ -31,6 +34,21 @@ class GenerateCase:
         :return:
         """
         response = [x.response for x in template_data]
+
+        conf = await conf_crud.get_info(db=db)
+        auto_check = {}
+        for x in conf.unify_res:
+            try:
+                if x['type'] == 'string':
+                    auto_check[x['key']] = str(x['value'])
+                if x['type'] == 'number':
+                    auto_check[x['key']] = int(x['value'])
+                if x['type'] == 'boolean':
+                    auto_check[x['key']] = x['value']
+                if x['type'] == 'null':
+                    auto_check[x['key']] = None
+            except ValueError:
+                auto_check[x['key']] = x['value']
 
         case_data_list = []
         temp_id = None
@@ -51,7 +69,7 @@ class GenerateCase:
                 'file': True if template_data[num].file else False,
                 'check': {
                     **{'status_code': template_data[num].code},
-                    **{k: v for k, v in AUTO_CHECK.items() if
+                    **{k: v for k, v in auto_check.items() if
                        isinstance(template_data[num].response, dict) and template_data[num].response.get(k) == v}
                 },
                 'description': '',

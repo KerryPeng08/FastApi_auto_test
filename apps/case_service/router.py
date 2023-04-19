@@ -56,6 +56,7 @@ async def test_case_data(
     template_data = await temp_crud.get_template_data(db=db, temp_name=temp_name)
     if template_data:
         return await GenerateCase().read_template_to_api(
+            db=db,
             temp_name=temp_name,
             mode=mode,
             fail_stop=fail_stop,
@@ -88,6 +89,7 @@ async def download_case_data(
     if template_data:
         temp_name = await temp_crud.get_temp_name(db=db, temp_id=temp_id)
         test_data = await GenerateCase().read_template_to_api(
+            db=db,
             temp_name=temp_name[0].temp_name,
             mode=mode,
             fail_stop=fail_stop,
@@ -174,6 +176,7 @@ async def temp_to_case(
 
     template_data = await temp_crud.get_template_data(db=db, temp_name=db_temp[0].temp_name)
     test_data = await GenerateCase().read_template_to_api(
+        db=db,
         temp_name=db_temp[0].temp_name,
         mode='service',
         fail_stop=fail_stop,

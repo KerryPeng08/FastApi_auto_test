@@ -9,10 +9,10 @@
 
 import re
 from typing import List
-from setting import AUTO_CHECK
 from sqlalchemy.orm import Session
 from apps.case_service import crud, schemas
 from apps.template import schemas as temp_schemas
+from apps.whole_conf import crud as conf_crud
 
 
 async def refresh(db: Session, case_id: int, start_number: int, type_: str):
@@ -77,13 +77,27 @@ async def refresh(db: Session, case_id: int, start_number: int, type_: str):
             }))
 
 
-async def temp_to_case(case_id: int, api_info: temp_schemas.TemplateDataInTwo):
+async def temp_to_case(db: Session, case_id: int, api_info: temp_schemas.TemplateDataInTwo):
     """
     将模板数据转为用例数据
     :param case_id:
     :param api_info:
     :return:
     """
+    conf = await conf_crud.get_info(db=db)
+    auto_check = {}
+    for x in conf.unify_res:
+        try:
+            if x['type'] == 'string':
+                auto_check[x['key']] = str(x['value'])
+            if x['type'] == 'number':
+                auto_check[x['key']] = int(x['value'])
+            if x['type'] == 'boolean':
+                auto_check[x['key']] = x['value']
+            if x['type'] == 'null':
+                auto_check[x['key']] = None
+        except ValueError:
+            auto_check[x['key']] = x['value']
 
     return {
         'case_id': case_id,
@@ -95,7 +109,7 @@ async def temp_to_case(case_id: int, api_info: temp_schemas.TemplateDataInTwo):
         'file': api_info.file,
         'check': {
             **{'status_code': api_info.code},
-            **{k: v for k, v in AUTO_CHECK.items() if
+            **{k: v for k, v in auto_check.items() if
                isinstance(api_info.response, dict) and api_info.response.get(k) == v}
         },
         'description': '',

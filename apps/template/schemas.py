@@ -10,7 +10,6 @@
 from datetime import datetime
 from pydantic import BaseModel, HttpUrl
 from typing import Optional, List, Union
-from enum import Enum
 
 
 # 模板名称的请求/响应数据模型

@@ -198,6 +198,7 @@ async def insert_har(
             )
 
     test_data = await GenerateCase().read_template_to_api(
+        db=db,
         temp_name=str(temp_id),
         mode=case_schemas.ModeEnum.service,
         fail_stop=True,
@@ -554,7 +555,7 @@ async def add_api(api_info: schemas.TemplateDataInTwo, db: Session = Depends(get
     # 对用例进行操作
     for case in await case_crud.get_case(db=db, temp_id=api_info.temp_id):
         # 插入数据
-        case_info = await temp_to_case(api_info=api_info, case_id=case.id)
+        case_info = await temp_to_case(db=db, api_info=api_info, case_id=case.id)
         await case_crud.create_test_case_data_add(db=db, data=case_schemas.TestCaseDataInTwo(**case_info))
         await case_crud.update_test_case(db=db, case_id=case.id, case_count=len(temp_info) + 1)
 
