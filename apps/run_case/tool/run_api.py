@@ -24,11 +24,12 @@ from sqlalchemy.orm import Session
 from tools import logger, get_cookie, AsyncMySql
 from tools.faker_data import FakerData
 # from .extract import extract as my_extract
-from setting import GLOBAL_FAIL_STOP, DB_CONFIG
+from setting import GLOBAL_FAIL_STOP
 from apps.template import schemas as temp
 from apps.case_service import schemas as service
 from apps.run_case import crud
 from apps.run_case import CASE_STATUS
+from apps.whole_conf import crud as conf_crud
 
 COUNT = ['+', '-', '*', '/', '//', '%']
 
@@ -41,6 +42,18 @@ class RunApi:
         self.code = None  # 存验证码数据
         self.extract = None  # 存提取的内容
         self.fk = FakerData()
+        self.case_status = {
+            'case_id': 0,
+            'total': 0,
+            'stop': False,
+            'success': 0,
+            'fail': 0,
+            'sleep': 0,
+            'actual': {},
+            'expect': {},
+            'request_info': {},
+            'response_info': {},
+        }
 
     async def fo_service(
             self,
@@ -59,19 +72,10 @@ class RunApi:
         """
 
         random_key = f"{int(time.time() * 1000)}{random.uniform(0, 1)}"
-        case_status = {
-            'case_id': case_id,
-            'total': len(temp_data),
-            'stop': False,
-            'success': 0,
-            'fail': 0,
-            'sleep': 0,
-            'actual': {},
-            'expect': {},
-            'request_info': {},
-            'response_info': {},
-        }
-        CASE_STATUS[random_key] = case_status
+
+        self.case_status['case_id'] = case_id
+        self.case_status['total'] = len(temp_data)
+        CASE_STATUS[random_key] = self.case_status
 
         temp_data = copy.deepcopy(temp_data)
         case_data = copy.deepcopy(case_data)
@@ -79,6 +83,7 @@ class RunApi:
         response = []
         result = []
         is_fail = None
+        db_config = await conf_crud.get_info(db=db)
         for num in range(len(temp_data)):
             config: dict = copy.deepcopy(dict(case_data[num].config))
             logger.debug(f"{'=' * 30}case_id:{case_id},开始请求,number:{num}{'=' * 30}")
@@ -152,7 +157,8 @@ class RunApi:
                 check=check,
                 request_info=request_info,
                 files=temp_data[num].file_data,
-                random_key=random_key
+                random_key=random_key,
+                db_config=db_config.db_conf
             )
             res, is_fail = response_info
 
@@ -276,7 +282,16 @@ class RunApi:
         if CASE_STATUS.get(random_key):
             del CASE_STATUS[random_key]
 
-    async def _polling(self, case_id: int, sleep: int, check: dict, request_info: dict, files, random_key: str):
+    async def _polling(
+            self,
+            case_id: int,
+            sleep: int,
+            check: dict,
+            request_info: dict,
+            files,
+            random_key: str,
+            db_config: dict
+    ):
         """
         轮询执行接口
         :param case_id:
@@ -285,6 +300,7 @@ class RunApi:
         :param request_info:
         :param files:
         :param random_key:
+        :param db_config:
         :return:
         """
 
@@ -334,7 +350,7 @@ class RunApi:
             for k, v in check.items():
                 # 从数据库获取需要的值
                 if isinstance(v, list) and 'sql_' == k[:4]:
-                    sql_data = await self._sql_data(v[1])
+                    sql_data = await self._sql_data(v[1], db_config)
                     if v[0] == sql_data[0]:
                         result.append({k: sql_data[0]})
                     else:
@@ -443,13 +459,14 @@ class RunApi:
         return res, is_fail
 
     @staticmethod
-    async def _sql_data(sql: str):
+    async def _sql_data(sql: str, db_config: dict):
         """
         从数据库查询数据
         :param sql:
+        :param db_config:
         :return:
         """
-        async with AsyncMySql(DB_CONFIG) as s:
+        async with AsyncMySql(db_config) as s:
             sql_data = await s.select(sql=sql)
             return [x[0] for x in sql_data] if sql_data else False
 

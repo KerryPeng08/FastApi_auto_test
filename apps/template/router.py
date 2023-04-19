@@ -27,6 +27,7 @@ from apps.case_service import schemas as case_schemas
 from apps.case_service import crud as case_crud
 from apps.template.tool import ParseData, check_num, GenerateCase, InsertTempData, DelTempData, ReadSwagger
 from apps.case_service.tool import refresh, temp_to_case
+from apps.whole_conf import crud as conf_crud
 from tools import CreateExcel, OperationJson
 
 template = APIRouter()
@@ -41,7 +42,7 @@ template = APIRouter()
 )
 async def upload_file_har(
         temp_name: str,
-        project_name: schemas.TempEnum,
+        project_name: str,
         file: UploadFile,
         db: Session = Depends(get_db)
 ):
@@ -55,6 +56,10 @@ async def upload_file_har(
 
     if await crud.get_temp_name(db=db, temp_name=temp_name):
         return await response_code.resp_400(message=f'模板名称已存在')
+
+    conf = await conf_crud.get_info(db=db)
+    if project_name not in [x['value'] for x in conf.project]:
+        return await response_code.resp_400(message='项目编码不匹配或未创建项目')
 
     # 解析数据，拿到解析结果
     temp_info = await ParseData.pares_data(
@@ -94,7 +99,7 @@ async def analysis_file_har(file: UploadFile):
     response_model=schemas.TemplateOut,
 )
 async def upload_swagger_json(
-        project_name: schemas.TempEnum,
+        project_name: str,
         host: HttpUrl,
         file: UploadFile,
         db: Session = Depends(get_db)
@@ -111,6 +116,10 @@ async def upload_swagger_json(
     except json.decoder.JSONDecodeError as e:
         return await response_code.resp_400(message=f'json文件格式有错误: {str(e)}')
 
+    conf = await conf_crud.get_info(db=db)
+    if project_name not in [x['value'] for x in conf.project]:
+        return await response_code.resp_400(message='项目编码不匹配或未创建项目')
+
     # 解析数据，拿到解析结果
     try:
         rs = ReadSwagger(host)
@@ -118,7 +127,6 @@ async def upload_swagger_json(
     except KeyError as e:
         return await response_code.resp_400(message=f'Swagger文件内容有错误: {str(e)}')
     else:
-        pass
         # 创建主表数据
         try:
             db_template = await crud.create_template(
@@ -437,7 +445,7 @@ async def get_template_data(temp_name: str = None, temp_id: int = None, db: Sess
 )
 async def create_new_temp(
         temp_name: str,
-        project_name: schemas.TempEnum,
+        project_name: str,
         number_list: List[str],
         db: Session = Depends(get_db)
 ):
@@ -447,6 +455,11 @@ async def create_new_temp(
     temp_name_ = await crud.get_temp_name(db=db, temp_name=temp_name)
     if temp_name_:
         return await response_code.resp_400(message='模板名称重复')
+
+    conf = await conf_crud.get_info(db=db)
+    if project_name not in [x['value'] for x in conf.project]:
+        return await response_code.resp_400(message='项目编码不匹配或未创建项目')
+
     # 查找数据
     new_temp_info = []
     for i, x in enumerate(number_list):

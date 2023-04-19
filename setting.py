@@ -13,6 +13,9 @@ LOGGER_LEVEL: str = 'INFO'
 # allure总目录
 ALLURE_PATH: str = 'D:\\Works\\auto_report'
 
+# log日志目录
+LOG_PATH: str = "D:/logs/"
+
 # host
 HOST: str = 'http://172.16.100.121:8000/'
 
@@ -30,16 +33,6 @@ AUTO_CHECK = {
 
 # 失败即刻停止执行
 GLOBAL_FAIL_STOP: bool = True
-
-# 数据库配置
-DB_CONFIG = {
-    'host': '',
-    'user': '',
-    'password': '',
-    # 'database': '',
-    'port': 8066,
-    'charset': 'utf8'
-}
 
 # 自动匹配参数的模式
 # all： 按key和value比较，不区分大小写 [推荐]

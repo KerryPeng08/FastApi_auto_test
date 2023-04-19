@@ -14,8 +14,6 @@ import typing
 from sqlalchemy.orm import sessionmaker
 from tools.database import engine
 from apps.run_case import crud
-from tools import AsyncMySql
-from setting import DB_CONFIG
 
 
 async def get_case_info():
@@ -121,14 +119,3 @@ class TestService:
                 assert v[1] not in str(value)
             else:
                 assert 1 == 0, '未匹配到比较符'
-
-    @staticmethod
-    async def _sql_data(sql: str):
-        """
-        从数据库查询数据
-        :param sql:
-        :return:
-        """
-        async with AsyncMySql(DB_CONFIG) as s:
-            sql_data = await s.select(sql=sql)
-        return [x[0] for x in sql_data] if sql_data else False

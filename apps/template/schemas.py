@@ -13,18 +13,10 @@ from typing import Optional, List, Union
 from enum import Enum
 
 
-class TempEnum(str, Enum):
-    sales = 'sales'
-    oms = 'oms'
-    site = 'site'
-    tms = 'tms'
-    wxapp = 'wxapp'
-
-
 # 模板名称的请求/响应数据模型
 class TemplateIn(BaseModel):
     temp_name: str
-    project_name: TempEnum = None
+    project_name: str = None
 
     class Config:
         orm_mode = True
