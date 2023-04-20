@@ -440,6 +440,21 @@ async def get_template_data(temp_name: str = None, temp_id: int = None, db: Sess
     return await response_code.resp_400()
 
 
+@template.get(
+    '/data/host/list',
+    name='查询模板host数据'
+)
+async def get_temp_host_list(temp_id: int, db: Session = Depends(get_db)):
+    """
+    查询模板的host列表
+    """
+    hosts = await crud.get_temp_host(db=db, temp_id=temp_id)
+    if hosts:
+        return hosts
+    else:
+        return await response_code.resp_404()
+
+
 @template.post(
     '/create/new/temp',
     name='创建新的模板'

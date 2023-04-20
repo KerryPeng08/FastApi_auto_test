@@ -176,6 +176,18 @@ async def get_template_data(db: Session, temp_name: str = None, temp_id: int = N
         ).all()
 
 
+async def get_temp_host(db: Session, temp_id: int):
+    """
+    查询模板数据
+    :param db:
+    :param temp_id:
+    :return:
+    """
+    return db.query(models.TemplateData.host).filter(models.TemplateData.temp_id == temp_id).order_by(
+        models.TemplateData.number
+    ).all()
+
+
 async def put_temp_name(db: Session, new_name: str, temp_id: int = None, old_name: str = None):
     """
     更新模板名称
