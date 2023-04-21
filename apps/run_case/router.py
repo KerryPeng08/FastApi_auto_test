@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from depends import get_db
 from apps import response_code
+from apps.template import crud
 from apps.case_service import crud as case_crud
 from apps.case_ddt import crud as gather_crud
 from apps.run_case import schemas, CASE_STATUS
@@ -116,3 +117,20 @@ async def case_status(key_id: str = None):
         else:
             return await response_code.resp_200(message='没有运行这个用例')
     return CASE_STATUS
+
+
+@run_case.get(
+    '/temp/host',
+    name='通过case_id查询temp的host数据'
+)
+async def get_temp_host_list(case_id: int, db: Session = Depends(get_db)):
+    """
+    查询模板的host列表
+    """
+    case_info = await case_crud.get_case_info(db=db, case_id=case_id)
+
+    hosts = await crud.get_temp_host(db=db, temp_id=case_info[0].temp_id)
+    if hosts:
+        return hosts
+    else:
+        return await response_code.resp_404()
