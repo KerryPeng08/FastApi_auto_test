@@ -7,6 +7,7 @@
 @Time: 2022/9/28-17:15
 """
 
+import copy
 from aiohttp.client_exceptions import ServerTimeoutError, ServerConnectionError, ServerDisconnectedError, \
     ClientConnectorError
 from sqlalchemy.orm import Session
@@ -37,7 +38,7 @@ async def run_service_case(db: Session, case_ids: list, temp_hosts: List[schemas
             case_data = await case_crud.get_case_data(db=db, case_id=case_info[0].id)
             # 拿到模板数据
             temp_data = await temp_crud.get_template_data(db=db, temp_id=case_info[0].temp_id)
-            await whole_host(temp_data=temp_data, temp_hosts=temp_hosts)
+            temp_data = await whole_host(temp_data=copy.deepcopy(temp_data), temp_hosts=temp_hosts)
             # 拿到项目名称、模板名称
             temp_info = await temp_crud.get_temp_name(db=db, temp_id=case_info[0].temp_id)
             # 处理数据，执行用例

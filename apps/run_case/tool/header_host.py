@@ -40,3 +40,5 @@ async def whole_host(temp_data: List[temp_schemas.TemplateDataOut], temp_hosts: 
                         temp.headers[k] = temp.headers[k].replace(host.temp_host, host.whole_host)
 
                 break
+
+    return temp_data

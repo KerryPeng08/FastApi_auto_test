@@ -53,4 +53,7 @@ async def get_setting(db: Session = Depends(get_db)):
     response_model=schemas.WholeConfOut
 )
 async def setting_conf(conf_info: schemas.WholeConfIn, db: Session = Depends(get_db)):
+    for host in conf_info.host:
+        if host.value[-1] == '/':
+            host.value = host.value[:-1]
     return await crud.set_info(db=db, conf_info=conf_info)

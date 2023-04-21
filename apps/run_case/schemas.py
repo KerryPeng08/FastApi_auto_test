@@ -7,13 +7,13 @@
 @Time: 2022/8/23-13:56
 """
 
-from typing import List, Optional
+from typing import List, Optional, Union
 from pydantic import BaseModel, HttpUrl
 
 
 class TempHosts(BaseModel):
     temp_host: HttpUrl
-    whole_host: HttpUrl
+    whole_host: Union[None, HttpUrl]
     change: bool
 
 
