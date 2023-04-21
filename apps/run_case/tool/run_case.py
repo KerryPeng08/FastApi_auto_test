@@ -27,7 +27,7 @@ async def run_service_case(db: Session, case_ids: list, temp_hosts: List[schemas
     执行业务流程用例
     :param db:
     :param case_ids:
-    :temp_hosts:
+    :param temp_hosts：
     :return:
     """
     report = {}
@@ -84,12 +84,13 @@ async def run_service_case(db: Session, case_ids: list, temp_hosts: List[schemas
     return report
 
 
-async def run_ddt_case(db: Session, case_id: int, case_info: list):
+async def run_ddt_case(db: Session, case_id: int, case_info: list, temp_hosts: List[schemas.TempHosts] = None):
     """
     执行数据驱动用例
     :param db:
     :param case_id:
     :param case_info:
+    :param temp_hosts:
     :return:
     """
     report = {}
@@ -97,6 +98,7 @@ async def run_ddt_case(db: Session, case_id: int, case_info: list):
         case_info = await case_crud.get_case_info(db=db, case_id=case_id)
         # 拿到模板数据
         temp_data = await temp_crud.get_template_data(db=db, temp_id=case_info[0].temp_id)
+        temp_data = await whole_host(temp_data=copy.deepcopy(temp_data), temp_hosts=temp_hosts)
         # 拿到项目名称、模板名称
         temp_info = await temp_crud.get_temp_name(db=db, temp_id=case_info[0].temp_id)
         # 处理数据，执行用例

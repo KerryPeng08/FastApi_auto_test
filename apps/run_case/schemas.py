@@ -26,3 +26,4 @@ class RunCaseGather(BaseModel):
     case_id: int
     suite: List[int]
     async_: Optional[bool] = False
+    temp_hosts: List[TempHosts]

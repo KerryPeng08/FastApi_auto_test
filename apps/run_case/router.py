@@ -89,7 +89,8 @@ async def run_case_gather(rcs: schemas.RunCaseGather, db: Session = Depends(get_
                 run_ddt_case(
                     db=db,
                     case_id=rcs.case_id,
-                    case_info=[data]
+                    case_info=[data],
+                    temp_hosts=rcs.temp_hosts
                 )
             ) for data in new_case_data
         ]
@@ -100,7 +101,12 @@ async def run_case_gather(rcs: schemas.RunCaseGather, db: Session = Depends(get_
             new_result.update(x)
         return await response_code.resp_200(data={'allure_report': new_result})
     else:
-        report = await run_ddt_case(db=db, case_id=rcs.case_id, case_info=new_case_data)
+        report = await run_ddt_case(
+            db=db,
+            case_id=rcs.case_id,
+            case_info=new_case_data,
+            temp_hosts=rcs.temp_hosts
+        )
         return await response_code.resp_200(data={'allure_report': report})
 
 
