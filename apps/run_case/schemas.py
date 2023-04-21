@@ -8,7 +8,18 @@
 """
 
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
+
+
+class TempHosts(BaseModel):
+    temp_host: HttpUrl
+    whole_host: HttpUrl
+    change: bool
+
+
+class RunCase(BaseModel):
+    case_ids: List[int]
+    temp_hosts: List[TempHosts]
 
 
 class RunCaseGather(BaseModel):

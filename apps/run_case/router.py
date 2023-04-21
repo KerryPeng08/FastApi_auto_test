@@ -28,11 +28,11 @@ run_case = APIRouter()
     name='按用例Id执行',
     description='按用例ID的顺序执行'
 )
-async def run_case_name(case_ids: List[int], db: Session = Depends(get_db)):
-    if not case_ids:
+async def run_case_name(ids: schemas.RunCase, db: Session = Depends(get_db)):
+    if not ids.case_ids:
         return await response_code.resp_400()
 
-    report = await run_service_case(db=db, case_ids=case_ids)
+    report = await run_service_case(db=db, case_ids=ids.case_ids, temp_hosts=ids.temp_hosts)
     return await response_code.resp_200(data={'allure_report': report})
 
 

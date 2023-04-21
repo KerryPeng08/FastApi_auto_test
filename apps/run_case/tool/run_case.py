@@ -10,19 +10,23 @@
 from aiohttp.client_exceptions import ServerTimeoutError, ServerConnectionError, ServerDisconnectedError, \
     ClientConnectorError
 from sqlalchemy.orm import Session
+from typing import List
 from apps.case_service import crud as case_crud
 from apps.template import crud as temp_crud
 from apps.run_case.tool import RunApi, run
+from apps.run_case import schemas
 from tools.load_allure import load_allure_report
 from apps import response_code
 from setting import ALLURE_PATH, HOST
+from apps.run_case.tool.header_host import whole_host
 
 
-async def run_service_case(db: Session, case_ids: list):
+async def run_service_case(db: Session, case_ids: list, temp_hosts: List[schemas.TempHosts] = None):
     """
     执行业务流程用例
     :param db:
     :param case_ids:
+    :temp_hosts:
     :return:
     """
     report = {}
@@ -33,6 +37,7 @@ async def run_service_case(db: Session, case_ids: list):
             case_data = await case_crud.get_case_data(db=db, case_id=case_info[0].id)
             # 拿到模板数据
             temp_data = await temp_crud.get_template_data(db=db, temp_id=case_info[0].temp_id)
+            await whole_host(temp_data=temp_data, temp_hosts=temp_hosts)
             # 拿到项目名称、模板名称
             temp_info = await temp_crud.get_temp_name(db=db, temp_id=case_info[0].temp_id)
             # 处理数据，执行用例
