@@ -16,6 +16,7 @@ from fastapi_pagination import add_pagination, paginate
 
 from apps import response_code
 from apps.case_ui import schemas, crud
+from apps.case_ui.tool import case_data
 
 case_ui = APIRouter()
 
@@ -78,6 +79,25 @@ async def get_playwright_list(db: Session = Depends(get_db)):
     """
     temp_info = await crud.get_playwright(db=db)
     return paginate(temp_info) or await response_code.resp_404()
+
+
+@case_ui.get(
+    '/get/playwright/case/{temp_id}',
+    name='获取文本中对应的数据',
+)
+async def get_playwright_case(temp_id: int, db: Session = Depends(get_db)):
+    """
+    获取测试数据
+    """
+    temp_info = await crud.get_playwright(db=db, temp_id=temp_id)
+    if temp_info:
+        data = await case_data.get_row_data(temp_info=temp_info[0])
+        if data:
+            return await response_code.resp_200(data=data)
+        else:
+            return await response_code.resp_400(message='没有提取到内容')
+    else:
+        return await response_code.resp_404()
 
 
 @case_ui.delete(
