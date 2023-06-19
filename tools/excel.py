@@ -141,3 +141,28 @@ class ReadExcel:
             num += 1
 
         return new_data
+
+
+class CreateExcelToUi:
+
+    def __init__(self, path):
+        self.path = path
+        self.workbook = openpyxl.Workbook()
+
+    def insert(self, data: list):
+        worksheet = self.workbook.create_sheet(index=0)
+        # 写入表头
+        worksheet.cell(row=1, column=1).value = 'row'
+        worksheet.cell(row=1, column=2).value = '原始数据'
+        worksheet.cell(row=1, column=3).value = '数据集1'
+        worksheet.cell(row=1, column=4).value = '数据集2'
+        # 写入数据
+        for i, column in enumerate(data):
+            for j, row in enumerate(column):
+                if i == 0:
+                    worksheet.cell(row=j + 2, column=i + 1).value = row['row']
+                    worksheet.cell(row=j + 2, column=i + 2).value = row['data']
+                else:
+                    worksheet.cell(row=j + 2, column=i + 2).value = row['data']
+
+        self.workbook.save(self.path)

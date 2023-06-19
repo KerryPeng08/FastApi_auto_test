@@ -7,14 +7,19 @@
 @Time: 2023/6/9-16:31
 """
 
+import os
+import time
 from fastapi import APIRouter, Depends
 from depends import get_db
 from typing import List
 from sqlalchemy.orm import Session
 from apps.my_pagination import Page
+from starlette.responses import FileResponse
+from starlette.background import BackgroundTask
 from fastapi_pagination import add_pagination, paginate
 
 from apps import response_code
+from tools.excel import CreateExcelToUi
 from apps.case_ui import schemas, crud
 from apps.case_ui.tool import case_data
 
@@ -95,7 +100,33 @@ async def get_playwright_case(temp_id: int, db: Session = Depends(get_db)):
         if data:
             return await response_code.resp_200(data=data)
         else:
-            return await response_code.resp_400(message='没有提取到内容')
+            return await response_code.resp_404(message='没有提取到内容')
+    else:
+        return await response_code.resp_404()
+
+
+@case_ui.get(
+    '/down/playwright/data/{temp_id}',
+    name='下载文本中的数据'
+)
+async def down_playwright_data(temp_id: int, db: Session = Depends(get_db)):
+    """
+    下载ui测试数据
+    """
+    temp_info = await crud.get_playwright(db=db, temp_id=temp_id)
+    if temp_info:
+        data = await case_data.get_row_data(temp_info=temp_info[0])
+        if data:
+            path = f'./files/excel/{time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))}.xlsx'
+            create = CreateExcelToUi(path=path)
+            create.insert([data])
+            return FileResponse(
+                path=path,
+                filename=f'{temp_info[0].temp_name}.xlsx',
+                background=BackgroundTask(lambda: os.remove(path))
+            )
+        else:
+            return await response_code.resp_404(message='没有提取到内容')
     else:
         return await response_code.resp_404()
 
