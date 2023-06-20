@@ -149,13 +149,17 @@ class CreateExcelToUi:
         self.path = path
         self.workbook = openpyxl.Workbook()
 
-    def insert(self, data: list):
+    def insert(self, names: List[str], data: list):
+        """
+        下载数据到excel
+        :param names: [name, name]
+        :param data:
+        :return:
+        """
         worksheet = self.workbook.create_sheet(index=0)
         # 写入表头
-        worksheet.cell(row=1, column=1).value = 'row'
-        worksheet.cell(row=1, column=2).value = '原始数据'
-        worksheet.cell(row=1, column=3).value = '数据集1'
-        worksheet.cell(row=1, column=4).value = '数据集2'
+        for i, name in enumerate(names):
+            worksheet.cell(row=1, column=i + 1).value = name
         # 写入数据
         for i, column in enumerate(data):
             for j, row in enumerate(column):
@@ -166,3 +170,51 @@ class CreateExcelToUi:
                     worksheet.cell(row=j + 2, column=i + 2).value = row['data']
 
         self.workbook.save(self.path)
+
+
+class ReadUiExcel:
+    """
+    读取ui表格数据
+    """
+
+    def __init__(self, path: str, temp_id: int):
+        self.wb = load_workbook(path)
+        self.temp_id = temp_id
+
+    async def read(self):
+        sheet = self.wb.active
+        # 把excel数据先读出来
+        data_list = []
+        for column in range(1, sheet.max_column + 1):
+            row_list = []
+            for row in range(1, sheet.max_row + 1):
+                row_list.append(sheet.cell(row=row, column=column).value)
+            data_list.append(row_list)
+
+        self.wb.close()
+
+        # 去掉全列都是空的数据
+        data_list = [x for x in data_list if list(set(x[1:])) != [None]]
+
+        # 分套处理
+        table = data_list[0]
+        values = data_list[1:]
+
+        all_data = []
+        for value in values:
+            case_data = []
+            case_name = ''
+            for i, data in enumerate(value):
+                if i == 0:
+                    case_name = data
+                    continue
+
+                case_data.append({'row': table[i], 'data': data})
+
+            all_data.append({
+                'temp_id': self.temp_id,
+                'case_name': case_name,
+                'rows_data': case_data
+            })
+
+        return all_data

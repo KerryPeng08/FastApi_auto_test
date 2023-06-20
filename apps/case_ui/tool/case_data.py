@@ -8,16 +8,15 @@
 """
 
 import re
-from apps.case_ui import schemas
 
 
-async def get_row_data(temp_info: schemas.PlaywrightOut):
+async def get_row_data(playwright_text: str):
     """
     处理text文本数据
-    :param temp_info:
+    :param playwright_text:
     :return:
     """
-    data_list = temp_info.text.split('\n')
+    data_list = playwright_text.split('\n')
 
     result = []
     for i, data in enumerate(data_list):

@@ -73,3 +73,61 @@ async def del_template_data(db: Session, temp_id: int):
         models.PlaywrightTemp.id == temp_id,
     ).delete()
     db.commit()
+
+
+async def create_play_case_data(db: Session, data: schemas.PlaywrightDataIn):
+    """
+    获取测试数据
+    :param db:
+    :param data:
+    :return:
+    """
+    db_temp = models.PlaywrightCaseDate(**data.dict())
+    db.add(db_temp)
+    db.commit()
+    db.refresh(db_temp)
+    return db_temp
+
+
+async def get_play_case_data(db: Session, case_id: int = None, temp_id: int = None):
+    """
+    获取测试用例的数据
+    :param db:
+    :param case_id:
+    :param temp_id:
+    :return:
+    """
+    if case_id:
+        return db.query(models.PlaywrightCaseDate).filter(
+            models.PlaywrightCaseDate.id == case_id
+        ).all()
+
+    if temp_id:
+        return db.query(models.PlaywrightCaseDate).filter(
+            models.PlaywrightCaseDate.temp_id == temp_id
+        ).all()
+
+    return ()
+
+
+async def del_play_case_data(db: Session, case_id: int = None, temp_id: int = None):
+    """
+    删除测试呼叫
+    :param db:
+    :param case_id:
+    :param temp_id:
+    :return:
+    """
+    if case_id:
+        db.query(models.PlaywrightCaseDate).filter(
+            models.PlaywrightCaseDate.id == case_id,
+        ).delete()
+        db.commit()
+        return
+
+    if temp_id:
+        db.query(models.PlaywrightCaseDate).filter(
+            models.PlaywrightCaseDate.temp_id == temp_id,
+        ).delete()
+        db.commit()
+        return

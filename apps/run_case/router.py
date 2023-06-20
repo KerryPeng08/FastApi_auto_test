@@ -16,8 +16,9 @@ from apps import response_code
 from apps.template import crud
 from apps.case_service import crud as case_crud
 from apps.case_ddt import crud as gather_crud
+from apps.case_ui import crud as ui_crud
 from apps.run_case import schemas, CASE_STATUS
-from .tool import run_service_case, run_ddt_case, header
+from .tool import run_service_case, run_ddt_case, run_ui_case, header
 
 run_case = APIRouter()
 
@@ -108,6 +109,22 @@ async def run_case_gather(rcs: schemas.RunCaseGather, db: Session = Depends(get_
             temp_hosts=rcs.temp_hosts
         )
         return await response_code.resp_200(data={'allure_report': report})
+
+
+@run_case.post(
+    '/ui/temp',
+    name='执行ui脚本用例'
+)
+async def ui_temp(temp_id: int, db: Session = Depends(get_db)):
+    """
+    执行ui脚本用例
+    """
+    ui_temp_info = await ui_crud.get_playwright(db=db, temp_id=temp_id)
+    if ui_temp_info:
+        playwright = ui_temp_info[0].text.replace('{{', '').replace('}}', '')
+        await run_ui_case(db=db, playwright_text=playwright)
+    else:
+        return await response_code.resp_404()
 
 
 @run_case.get(

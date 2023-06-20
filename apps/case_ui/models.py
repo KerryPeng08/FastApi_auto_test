@@ -35,7 +35,7 @@ class PlaywrightCaseDate(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     temp_id = Column(Integer, ForeignKey('playwright_temp.id'))
     case_name = Column(String, nullable=True, index=True, comment='用例名称')
-    data = Column(JSON, comment='测试数据')
+    rows_data = Column(JSON, comment='测试数据')
 
     created_at = Column(DateTime, server_default=func.now(), comment='创建时间')
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), comment='更新时间')

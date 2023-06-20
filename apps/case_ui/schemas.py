@@ -28,3 +28,18 @@ class PlaywrightOut(PlaywrightIn):
     run_order: int
     created_at: datetime = None
     updated_at: datetime = None
+
+
+class PlaywrightDataIn(BaseModel):
+    temp_id: int
+    case_name: str
+    rows_data: Union[list, dict]
+
+    class Config:
+        orm_mode = True
+
+
+class PlaywrightDataOut(PlaywrightDataIn):
+    id: int
+    created_at: datetime = None
+    updated_at: datetime = None

@@ -9,7 +9,7 @@
 
 import os
 import time
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile
 from depends import get_db
 from typing import List
 from sqlalchemy.orm import Session
@@ -22,6 +22,7 @@ from apps import response_code
 from tools.excel import CreateExcelToUi
 from apps.case_ui import schemas, crud
 from apps.case_ui.tool import case_data
+from tools import ReadUiExcel
 
 case_ui = APIRouter()
 
@@ -96,7 +97,7 @@ async def get_playwright_case(temp_id: int, db: Session = Depends(get_db)):
     """
     temp_info = await crud.get_playwright(db=db, temp_id=temp_id)
     if temp_info:
-        data = await case_data.get_row_data(temp_info=temp_info[0])
+        data = await case_data.get_row_data(playwright_text=temp_info[0].text)
         if data:
             return await response_code.resp_200(data=data)
         else:
@@ -115,20 +116,71 @@ async def down_playwright_data(temp_id: int, db: Session = Depends(get_db)):
     """
     temp_info = await crud.get_playwright(db=db, temp_id=temp_id)
     if temp_info:
-        data = await case_data.get_row_data(temp_info=temp_info[0])
-        if data:
-            path = f'./files/excel/{time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))}.xlsx'
+        case_info = await crud.get_play_case_data(db=db, temp_id=temp_id)
+        path = f'./files/excel/{time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))}.xlsx'
+        if case_info:
             create = CreateExcelToUi(path=path)
-            create.insert([data])
+            create.insert(
+                names=['rows'] + [x.case_name for x in case_info],
+                data=[x.rows_data for x in case_info]
+            )
             return FileResponse(
                 path=path,
                 filename=f'{temp_info[0].temp_name}.xlsx',
                 background=BackgroundTask(lambda: os.remove(path))
             )
         else:
-            return await response_code.resp_404(message='没有提取到内容')
+            data = await case_data.get_row_data(playwright_text=temp_info[0].text)
+            if data:
+                create = CreateExcelToUi(path=path)
+                create.insert(
+                    names=['rows', '原始数据', '数据集1', '数据集2'],
+                    data=[data]
+                )
+                return FileResponse(
+                    path=path,
+                    filename=f'{temp_info[0].temp_name}.xlsx',
+                    background=BackgroundTask(lambda: os.remove(path))
+                )
+            else:
+                return await response_code.resp_404(message='没有提取到内容')
     else:
         return await response_code.resp_404()
+
+
+@case_ui.post(
+    '/upload/playwright/data/',
+    name='UI测试数据集上传-Excel'
+)
+async def upload_data_gather(
+        temp_id: int,
+        file: UploadFile,
+        db: Session = Depends(get_db)
+):
+    """
+    测试数据集上传
+    """
+    if file.content_type != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+        return await response_code.resp_400(message='文件类型错误，只支持xlsx格式文件')
+
+    temp_data = await crud.get_playwright(db=db, temp_id=temp_id)
+    if not temp_data:
+        return await response_code.resp_404(message='没有获取到这个模板id')
+
+    path = f'./files/excel/{time.strftime("%Y%m%d%H%M%S", time.localtime(time.time()))}.xlsx'
+    # 写入本地
+    with open(path, 'wb') as w:
+        w.write(file.file.read())
+
+    # 读取并处理数据
+    gather_data = await ReadUiExcel(path=path, temp_id=temp_id).read()
+    # 入库
+    await crud.del_play_case_data(db=db, temp_id=temp_id)
+    for gather in gather_data:
+        await crud.create_play_case_data(db=db, data=schemas.PlaywrightDataIn(**gather))
+    return await response_code.resp_200(
+        background=BackgroundTask(lambda: os.remove(path))
+    )
 
 
 @case_ui.delete(
