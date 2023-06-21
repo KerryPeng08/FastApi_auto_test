@@ -218,10 +218,9 @@ class RunApi:
             logger.info(f"{'=' * 30}case_id:{case_id},结束请求,number:{num}{'=' * 30}")
 
             # 失败停止的判断
-            if GLOBAL_FAIL_STOP and is_fail:
-                await self.sees.close()
+            if GLOBAL_FAIL_STOP and is_fail and config.get('fail_stop'):
                 logger.info(f"case_id:{case_id},编号: {num} 校验错误-退出执行")
-                logger.info(f"{'=' * 30}case_id:{case_id},结束请求,number:{num}{'=' * 30}")
+                await self.sees.close()
                 break
 
             if config.get('stop'):
@@ -309,6 +308,7 @@ class RunApi:
         is_fail = False  # 标记是否失败
         num = 0
         while True:
+            logger.debug(f"循环case_id:{case_id},{num + 1}次: {request_info['url']}")
             if files:
                 files_data = FormData()
                 for file in files:
@@ -333,12 +333,10 @@ class RunApi:
                 ]
 
             status_code = check['status_code']
-            if check.get('status_code'):
-                if check['status_code'] != res.status:
-                    is_fail = True
-                del check['status_code']
+            if check['status_code'] != res.status:
+                is_fail = True
+            del check['status_code']
 
-            logger.debug(f"循环case_id:{case_id},{num + 1}次: {request_info['url']}")
             try:
                 res_json = await res.json(content_type='application/json' if not files else None)
             except (client_exceptions.ContentTypeError, json.decoder.JSONDecodeError) as e:
@@ -444,12 +442,11 @@ class RunApi:
             CASE_STATUS[random_key]['expect'] = check
             CASE_STATUS[random_key]['actual'] = result
 
+            check['status_code'] = status_code
             if len(check) == len(result):
-                check['status_code'] = status_code
                 break
 
             if sleep < 5:
-                check['status_code'] = status_code
                 break
 
             await asyncio.sleep(5)
