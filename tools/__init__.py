@@ -15,6 +15,7 @@ from .aiohttp_get_cookie import get_cookie
 from .my_sql import AsyncMySql
 from .get_value_path import ExtractParamsPath, RepData
 from .rep_case_data_value import rep_value, rep_url
+from setting import ALLURE_PATH
 
 
 def mkdir():
@@ -23,6 +24,7 @@ def mkdir():
     :return:
     """
     # pathlib.Path(f"{ALLURE_PATH}/allure_plus/1/1").mkdir(parents=True, exist_ok=True)
+    pathlib.Path(ALLURE_PATH).mkdir(parents=True, exist_ok=True)
     pathlib.Path(f'./files/excel').mkdir(parents=True, exist_ok=True)
     pathlib.Path(f'./files/json').mkdir(parents=True, exist_ok=True)
     pathlib.Path(f'./files/code').mkdir(parents=True, exist_ok=True)
