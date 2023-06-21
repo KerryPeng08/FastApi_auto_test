@@ -44,8 +44,10 @@ class ParseData:
 
             logger.debug(f"{'=' * 30}开始解析{api_count}{'=' * 30}")
             # logger.debug(f"原始数据: {json.dumps(data, indent=2, ensure_ascii=False)}")
-
-            host = [x['value'] for x in data['request']['headers'] if x['name'] == 'Host'][0]
+            try:
+                host = [x['value'] for x in data['request']['headers'] if x['name'] == 'Host'][0]
+            except IndexError:
+                continue
             http, path = data['request']['url'].split(host, 1)
 
             # 处理请求中的params数据
