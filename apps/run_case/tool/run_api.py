@@ -607,7 +607,7 @@ async def header_srt(
                 if isinstance(new_value, (float, int)) and [_ for _ in COUNT if _ in x]:
                     x = re.sub("{{(.*?)}}", str(new_value), x, count=1)
                 else:
-                    x = re.sub("{{(.*?)}}", new_value, x, count=1)
+                    x = re.sub("{{(.*?)}}", str(new_value), x, count=1)
             else:
                 x = new_value
 

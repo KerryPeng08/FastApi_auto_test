@@ -13,7 +13,7 @@ import time
 import pathlib
 
 
-async def run(test_path: str, allure_dir: str, report_url, case_name: str, case_id: int):
+async def run(test_path: str, allure_dir: str, report_url, case_name: str, case_id: int, run_order: int):
     """
     执行测试用例
     :param test_path: test_*.py测试文件路径
@@ -21,6 +21,7 @@ async def run(test_path: str, allure_dir: str, report_url, case_name: str, case_
     :param report_url: 报告路由
     :param case_name: 用例名称
     :param case_id: 用例id
+    :param run_order: 运行次数
     :return:
     """
     allure_plus_dir = os.path.join(allure_dir, str(case_id), 'allure_plus')
@@ -29,7 +30,7 @@ async def run(test_path: str, allure_dir: str, report_url, case_name: str, case_
     command = f'pytest {test_path} -s  --alluredir={allure_path}'
     os.system(command)
     # 先调用get_dirname()，获取到这次需要构建的次数
-    build_order, old_data = get_dirname(allure_plus_dir)
+    build_order, old_data = get_dirname(allure_plus_dir, run_order)
     # 再执行命令行
     command = f"allure generate {allure_path} -o {os.path.join(allure_plus_dir, str(build_order))} --clean"
     os.system(command)
@@ -37,7 +38,7 @@ async def run(test_path: str, allure_dir: str, report_url, case_name: str, case_
     await update_trend_data(allure_plus_dir, build_order, old_data, report_url, case_name, case_id)
 
 
-def get_dirname(allure_plus_dir):
+def get_dirname(allure_plus_dir, run_order):
     hostory_file = os.path.join(allure_plus_dir, "history.json")
     if os.path.exists(hostory_file):
         with open(hostory_file) as f:
@@ -45,12 +46,12 @@ def get_dirname(allure_plus_dir):
         # 根据构建次数进行排序，从大到小
         li.sort(key=lambda x: x['buildOrder'], reverse=True)
         # 返回下一次的构建次数，所以要在排序后的历史数据中的buildOrder+1
-        return li[0]["buildOrder"] + 1, li
+        return li[0]["buildOrder"] + run_order - 1, li
     else:
         # 首次进行生成报告，肯定会进到这一步，先创建history.json,然后返回构建次数1（代表首次）
         with open(hostory_file, "w") as f:
             f.write(json.dumps({}))
-        return 1, None
+        return run_order, None
 
 
 async def update_trend_data(allure_plus_dir: str, dirname: int, old_data: list, report_url: str, case_name: str,
@@ -77,7 +78,7 @@ async def update_trend_data(allure_plus_dir: str, dirname: int, old_data: list, 
     # 把最新的数据，插入到备份数据列表首位
     old_data.insert(0, new_data[0])
     # 把所有生成的报告中的history-trend.json都更新成新备份的数据old_data，这样的话，点击历史趋势图就可以实现新老报告切换
-    for i in range(1, dirname + 1):
+    for i in range(dirname, dirname + 1):
         with open(os.path.join(allure_plus_dir, f"{str(i)}/widgets/history-trend.json"), "w+") as f:
             f.write(json.dumps(old_data))
     # 把数据备份到history.json
