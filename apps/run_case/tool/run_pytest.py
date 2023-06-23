@@ -35,7 +35,7 @@ async def run(test_path: str, allure_dir: str, report_url, case_name: str, case_
     command = f"allure generate {allure_path} -o {os.path.join(allure_plus_dir, str(build_order))} --clean"
     os.system(command)
     # 执行完毕后再调用update_trend_data()
-    await update_trend_data(allure_plus_dir, build_order, old_data, report_url, case_name, case_id)
+    await update_trend_data(allure_plus_dir, build_order, old_data, report_url, case_name, case_id, run_order)
 
 
 def get_dirname(allure_plus_dir, run_order):
@@ -46,7 +46,7 @@ def get_dirname(allure_plus_dir, run_order):
         # 根据构建次数进行排序，从大到小
         li.sort(key=lambda x: x['buildOrder'], reverse=True)
         # 返回下一次的构建次数，所以要在排序后的历史数据中的buildOrder+1
-        return li[0]["buildOrder"] + run_order - 1, li
+        return li[0]["buildOrder"] + 1, li
     else:
         # 首次进行生成报告，肯定会进到这一步，先创建history.json,然后返回构建次数1（代表首次）
         with open(hostory_file, "w") as f:
@@ -55,7 +55,7 @@ def get_dirname(allure_plus_dir, run_order):
 
 
 async def update_trend_data(allure_plus_dir: str, dirname: int, old_data: list, report_url: str, case_name: str,
-                            case_id: int):
+                            case_id: int, run_order: int):
     """
     dirname：构建次数
     old_data：备份的数据
@@ -71,7 +71,7 @@ async def update_trend_data(allure_plus_dir: str, dirname: int, old_data: list, 
         new_data[0]["buildOrder"] = old_data[0]["buildOrder"] + 1
     else:
         old_data = []
-        new_data[0]["buildOrder"] = 1
+        new_data[0]["buildOrder"] = run_order
     # 给最新生成的数据添加reportUrl key，reportUrl要根据自己的实际情况更改
     new_data[0]["reportUrl"] = f"{report_url}allure/{case_id}/{dirname}/index.html"
     new_data[0]["reportName"] = f"{case_name}"

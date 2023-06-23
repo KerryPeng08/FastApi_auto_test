@@ -443,7 +443,8 @@ class RunApi:
             CASE_STATUS[random_key]['actual'] = result
 
             check['status_code'] = status_code
-            if len(check) == len(result):
+            if len(check) == len(result) + 1:
+                is_fail = False
                 break
 
             if sleep < 5:

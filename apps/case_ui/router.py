@@ -11,7 +11,6 @@ import os
 import time
 from fastapi import APIRouter, Depends, UploadFile
 from depends import get_db
-from typing import List
 from sqlalchemy.orm import Session
 from apps.my_pagination import Page
 from starlette.responses import FileResponse
