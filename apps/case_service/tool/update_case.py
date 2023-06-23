@@ -12,7 +12,7 @@ from typing import List
 from sqlalchemy.orm import Session
 from apps.case_service import crud, schemas
 from apps.template import schemas as temp_schemas
-from apps.whole_conf import crud as conf_crud
+from .auto_check import my_auto_check
 
 
 async def refresh(db: Session, case_id: int, start_number: int, type_: str):
@@ -84,20 +84,7 @@ async def temp_to_case(db: Session, case_id: int, api_info: temp_schemas.Templat
     :param api_info:
     :return:
     """
-    conf = await conf_crud.get_info(db=db)
-    auto_check = {}
-    for x in conf.unify_res:
-        try:
-            if x['type'] == 'string':
-                auto_check[x['key']] = str(x['value'])
-            if x['type'] == 'number':
-                auto_check[x['key']] = int(x['value'])
-            if x['type'] == 'boolean':
-                auto_check[x['key']] = x['value']
-            if x['type'] == 'null':
-                auto_check[x['key']] = None
-        except ValueError:
-            auto_check[x['key']] = x['value']
+    auto_check = await my_auto_check(db=db)
 
     return {
         'case_id': case_id,

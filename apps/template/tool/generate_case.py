@@ -10,7 +10,7 @@
 import jsonpath
 from typing import List, Any
 from apps.template import schemas
-from apps.whole_conf import crud as conf_crud
+from apps.case_service.tool import my_auto_check
 from setting import TIPS
 from sqlalchemy.orm import Session
 
@@ -35,21 +35,6 @@ class GenerateCase:
         """
         response = [x.response for x in template_data]
 
-        conf = await conf_crud.get_info(db=db)
-        auto_check = {}
-        for x in conf.unify_res:
-            try:
-                if x['type'] == 'string':
-                    auto_check[x['key']] = str(x['value'])
-                if x['type'] == 'number':
-                    auto_check[x['key']] = int(x['value'])
-                if x['type'] == 'boolean':
-                    auto_check[x['key']] = x['value']
-                if x['type'] == 'null':
-                    auto_check[x['key']] = None
-            except ValueError:
-                auto_check[x['key']] = x['value']
-
         case_data_list = []
         temp_id = None
         for num in range(len(template_data)):
@@ -60,6 +45,7 @@ class GenerateCase:
                 params = await self._extract_params_keys(param=template_data[num].params, response=response[:num])
                 data = await self._extract_params_keys(param=template_data[num].data, response=response[:num])
 
+            auto_check = await my_auto_check(db=db)
             case_data = {
                 'number': template_data[num].number,
                 'path': template_data[num].path,

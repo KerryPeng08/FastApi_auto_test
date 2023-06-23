@@ -18,7 +18,7 @@ def check(check: schemas.CheckInfo):
     """
 
     if check.type == 'string':
-        if check.s in ['==', '!=', 'in', 'not in', 'notin', '!not in', '!notin']:
+        if check.s in ['==', '!=', 'in', '!in', 'not in', 'notin', '!not in', '!notin']:
             if isinstance(check.value, (str, int, float)):
                 return True
 
