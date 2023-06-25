@@ -121,6 +121,7 @@ async def ui_temp(
         temp_id: int,
         remote: bool = False,
         remote_id: int = None,
+        headless: bool = False,
         db: Session = Depends(get_db)
 ):
     """
@@ -132,7 +133,8 @@ async def ui_temp(
             playwright_text=ui_temp_info[0].text,
             temp_name=ui_temp_info[0].temp_name,
             remote=remote,
-            remote_id=remote_id
+            remote_id=remote_id,
+            headless=headless
         )
         if not playwright:
             return await response_code.resp_400(message='由于连接方在一段时间后没有正确答复或连接的主机没有反应，连接尝试失败')

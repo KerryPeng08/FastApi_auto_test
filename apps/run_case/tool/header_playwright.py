@@ -22,14 +22,16 @@ async def replace_playwright(
         playwright_text: str,
         temp_name: str,
         remote: bool,
-        remote_id: int
+        remote_id: int,
+        headless: bool
 ):
     """
     替换文本内容
     :param playwright_text:
     :param temp_name:
     :param remote: 是否使用远程浏览器
-    :param remote_id:
+    :param remote_id: 浏览器配置列表id
+    :param headless: 无头模式运行
     :return:
     """
 
@@ -40,6 +42,20 @@ async def replace_playwright(
     ).replace(
         '}}', ''
     )
+
+    # 无头模式
+    if headless:
+        new_text = new_text.replace(
+            'browser = playwright.chromium.launch(headless=False)',
+            'browser = playwright.chromium.launch(headless=True)'
+        )
+    else:
+        new_text = new_text.replace(
+            'browser = playwright.chromium.launch(headless=True)',
+            'browser = playwright.chromium.launch(headless=False)'
+        )
+
+    # 远程运行
     if remote and remote_id:
         se = SELENOID['browsers'][remote_id - 1]
         try:
@@ -47,8 +63,11 @@ async def replace_playwright(
         except exceptions.MaxRetryError:
             return ''
         browser_temp = BROWSER_TEMP.replace('driver.session_id', str(session_id))
-        new_text = playwright_text.replace(
+        new_text = new_text.replace(
             'browser = playwright.chromium.launch(headless=False)',
+            browser_temp
+        ).replace(
+            'browser = playwright.chromium.launch(headless=True)',
             browser_temp
         )
 
