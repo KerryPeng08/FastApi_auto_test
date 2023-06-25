@@ -59,7 +59,7 @@ async def put_playwright(pd: schemas.PlaywrightIn, db: Session = Depends(get_db)
 
 @case_ui.get(
     '/get/playwright/data',
-    name='获取UT数据详情',
+    name='获取UI数据详情',
     response_model=schemas.PlaywrightOut,
     response_class=response_code.MyJSONResponse,
 )

@@ -9,7 +9,7 @@
 
 import uvicorn
 from fastapi import FastAPI
-from setting import ALLURE_PATH, TIPS, HOST
+from setting import ALLURE_PATH, ALLURE_PATH_UI, TIPS, HOST
 from apps.template.router import template
 from apps.case_service.router import case_service
 from apps.case_ddt.router import case_ddt
@@ -68,6 +68,7 @@ async def allure():
 app.mount('/index.html', StaticFiles(directory='static', html=True))
 
 load_allure_reports(app=app, allure_dir=ALLURE_PATH)
+load_allure_reports(app=app, allure_dir=ALLURE_PATH_UI, ui=True)
 
 if __name__ == '__main__':
-    uvicorn.run('main:app', host='0.0.0.0', port=8000, reload=True)
+    uvicorn.run('main:app', host='0.0.0.0', port=8000, reload=False)

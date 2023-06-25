@@ -11,7 +11,9 @@
 LOGGER_LEVEL: str = 'INFO'
 
 # allure总目录
-ALLURE_PATH: str = 'D:\\Works\\auto_report'
+ALLURE_PATH: str = 'D:\\Works\\auto_test\\auto_report'
+ALLURE_PATH_UI: str = 'D:\\Works\\auto_test\\ui\\auto_report'
+# ALLURE_PATH: str = 'D:\\Works\\liweijia\\auto_report'
 
 # log日志目录
 LOG_PATH: str = "D:/logs/"

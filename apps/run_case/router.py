@@ -7,11 +7,13 @@
 @Time: 2022/8/23-13:45
 """
 
+import os
 import asyncio
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
 from depends import get_db
+from starlette.background import BackgroundTask
 from apps import response_code
 from apps.template import crud
 from apps.case_service import crud as case_crud
@@ -113,7 +115,7 @@ async def run_case_gather(rcs: schemas.RunCaseGather, db: Session = Depends(get_
 
 @run_case.post(
     '/ui/temp',
-    name='执行ui脚本用例'
+    name='执行ui脚本用例',
 )
 async def ui_temp(temp_id: int, db: Session = Depends(get_db)):
     """
@@ -121,8 +123,18 @@ async def ui_temp(temp_id: int, db: Session = Depends(get_db)):
     """
     ui_temp_info = await ui_crud.get_playwright(db=db, temp_id=temp_id)
     if ui_temp_info:
-        playwright = ui_temp_info[0].text.replace('{{', '').replace('}}', '')
-        await run_ui_case(db=db, playwright_text=playwright)
+        playwright = ui_temp_info[0].text.replace(
+            '{{case_name}}', ui_temp_info[0].temp_name
+        ).replace(
+            '{{', ''
+        ).replace(
+            '}}', ''
+        )
+        report = await run_ui_case(db=db, playwright_text=playwright, temp_id=temp_id)
+        return await response_code.resp_200(
+            data=report,
+            background=BackgroundTask(lambda: os.remove(report['tmp_file']))
+        )
     else:
         return await response_code.resp_404()
 

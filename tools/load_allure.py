@@ -13,11 +13,12 @@ from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI
 
 
-def load_allure_reports(app: FastAPI, allure_dir: str):
+def load_allure_reports(app: FastAPI, allure_dir: str, ui: bool = False):
     """
     加载所有的allures测试报告
     :param app:
     :param allure_dir: 测试报告目录
+    :param ui
     :return:
     """
     try:
@@ -32,22 +33,29 @@ def load_allure_reports(app: FastAPI, allure_dir: str):
         for run_order in run_orders:
             if run_order == 'history.json':
                 continue
-            allure_url = f"/allure/{case_id}/{run_order}"
+            if ui:
+                allure_url = f"/ui/allure/{case_id}/{run_order}"
+            else:
+                allure_url = f"/allure/{case_id}/{run_order}"
             allure_path = f'{allure_dir}/{case_id}/allure_plus/{run_order}'
             app.mount(allure_url, StaticFiles(directory=allure_path, html=True))
             logger.debug(f"加载allure静态报告, url:{allure_url}, path:{allure_path}")
 
 
-async def load_allure_report(allure_dir: str, case_id: int, run_order: int):
+async def load_allure_report(allure_dir: str, case_id: int, run_order: int, ui: bool = False):
     """
     加载单个allure测试报告
     :param allure_dir: 测试报告目录
     :param case_id: 测试用例id
     :param run_order: 测试用例执行序号
+    :param ui:
     :return:
     """
     from main import app
-    allure_url = f"/allure/{case_id}/{run_order}"
+    if ui:
+        allure_url = f"/ui/allure/{case_id}/{run_order}"
+    else:
+        allure_url = f"/allure/{case_id}/{run_order}"
     allure_path = f'{allure_dir}/{case_id}/allure_plus/{run_order}'
     app.mount(allure_url, StaticFiles(directory=allure_path, html=True))
     logger.debug(f"加载allure静态报告, url:{allure_url}, path:{allure_path}")

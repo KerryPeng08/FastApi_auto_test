@@ -131,3 +131,17 @@ async def del_play_case_data(db: Session, case_id: int = None, temp_id: int = No
         ).delete()
         db.commit()
         return
+
+
+async def update_ui_temp_order(db: Session, temp_id: int):
+    """
+    更新用例次数
+    :param db:
+    :param temp_id:
+    :return:
+    """
+    db_case = db.query(models.PlaywrightTemp).filter(models.PlaywrightTemp.id == temp_id).first()
+    db_case.run_order = db_case.run_order + 1
+    db.commit()
+    db.refresh(db_case)
+    return db_case
