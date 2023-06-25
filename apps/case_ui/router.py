@@ -22,6 +22,7 @@ from tools.excel import CreateExcelToUi
 from apps.case_ui import schemas, crud
 from apps.case_ui.tool import case_data
 from tools import ReadUiExcel
+from setting import SELENOID
 
 case_ui = APIRouter()
 
@@ -192,6 +193,24 @@ async def del_playwright_data(temp_id: int, db: Session = Depends(get_db)):
     """
     await crud.del_template_data(db=db, temp_id=temp_id)
     return await response_code.resp_200()
+
+
+@case_ui.get(
+    '/get/remote/browsers',
+    name='获取配置好的远程浏览器'
+)
+async def get_remote_browsers():
+    """
+    获取配置好的远程浏览器
+    """
+    data = [
+        {
+            "key": i + 1,
+            "value": f"{data['browser_name']}:{data['browser_version']}"
+        } for i, data in enumerate(SELENOID['browsers'])
+    ]
+
+    return await response_code.resp_200(data=data)
 
 
 add_pagination(case_ui)

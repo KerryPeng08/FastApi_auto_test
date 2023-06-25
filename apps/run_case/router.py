@@ -20,7 +20,7 @@ from apps.case_service import crud as case_crud
 from apps.case_ddt import crud as gather_crud
 from apps.case_ui import crud as ui_crud
 from apps.run_case import schemas, CASE_STATUS
-from .tool import run_service_case, run_ddt_case, run_ui_case, header
+from .tool import run_service_case, run_ddt_case, run_ui_case, header, replace_playwright
 
 run_case = APIRouter()
 
@@ -117,19 +117,26 @@ async def run_case_gather(rcs: schemas.RunCaseGather, db: Session = Depends(get_
     '/ui/temp',
     name='执行ui脚本用例',
 )
-async def ui_temp(temp_id: int, db: Session = Depends(get_db)):
+async def ui_temp(
+        temp_id: int,
+        remote: bool = False,
+        remote_id: int = None,
+        db: Session = Depends(get_db)
+):
     """
     执行ui脚本用例
     """
     ui_temp_info = await ui_crud.get_playwright(db=db, temp_id=temp_id)
     if ui_temp_info:
-        playwright = ui_temp_info[0].text.replace(
-            '{{case_name}}', ui_temp_info[0].temp_name
-        ).replace(
-            '{{', ''
-        ).replace(
-            '}}', ''
+        playwright = await replace_playwright(
+            playwright_text=ui_temp_info[0].text,
+            temp_name=ui_temp_info[0].temp_name,
+            remote=remote,
+            remote_id=remote_id
         )
+        if not playwright:
+            return await response_code.resp_400(message='由于连接方在一段时间后没有正确答复或连接的主机没有反应，连接尝试失败')
+
         report = await run_ui_case(db=db, playwright_text=playwright, temp_id=temp_id)
         return await response_code.resp_200(
             data=report,

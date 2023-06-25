@@ -15,6 +15,7 @@ from .aiohttp_get_cookie import get_cookie
 from .my_sql import AsyncMySql
 from .get_value_path import ExtractParamsPath, RepData
 from .rep_case_data_value import rep_value, rep_url
+from .my_selenoid import get_session_id
 from setting import ALLURE_PATH
 
 

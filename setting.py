@@ -13,7 +13,6 @@ LOGGER_LEVEL: str = 'INFO'
 # allure总目录
 ALLURE_PATH: str = 'D:\\Works\\auto_test\\auto_report'
 ALLURE_PATH_UI: str = 'D:\\Works\\auto_test\\ui\\auto_report'
-# ALLURE_PATH: str = 'D:\\Works\\liweijia\\auto_report'
 
 # log日志目录
 LOG_PATH: str = "D:/logs/"
@@ -30,6 +29,17 @@ YAPI_INFO: dict = {
 
 # 失败即刻停止执行
 GLOBAL_FAIL_STOP: bool = True
+
+# 远程浏览器配置
+SELENOID: dict = {
+    'host': '192.168.43.49:5555',
+    'browsers': [
+        {
+            'browser_name': 'chrome',
+            'browser_version': 'chrome_104'
+        }
+    ]
+}
 
 # 自动匹配参数的模式
 # all： 按key和value比较，不区分大小写 [推荐]
