@@ -34,13 +34,13 @@ async def get_setting(db: Session = Depends(get_db)):
                 {'key': '', 'value': ''}
             ],
             'unify_res': [
-                {'key': 'code', 'value': 0, 'type': 'string'}
+                {'key': 'code', 'value': 0, 'type': 'int'}
             ],
             'db_conf': {
-                'host': '',
-                'user': '',
-                'password': '',
-                'database': '',
+                'host': '127.0.0.1',
+                'user': 'root',
+                'password': '123456',
+                'database': 'test',
                 'port': 3306,
                 'charset': 'utf8',
             }
