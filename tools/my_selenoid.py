@@ -24,7 +24,7 @@ async def get_session_id(browser_name: str, browser_version: str):
     chrome_options.set_capability("selenoid:options", {"enableVNC": True, "enableVideo": True})
 
     driver = webdriver.Remote(
-        command_executor=f"http://{SELENOID['host']}/wd/hub",
+        command_executor=f"http://{SELENOID['selenoid_hub_host']}/wd/hub",
         options=chrome_options
     )
 

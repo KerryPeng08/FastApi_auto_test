@@ -32,7 +32,8 @@ GLOBAL_FAIL_STOP: bool = True
 
 # 远程浏览器配置
 SELENOID: dict = {
-    'host': '192.168.43.49:5555',
+    'selenoid_hub_host': '192.168.43.49:5555',
+    'selenoid_ui_host': '192.168.43.49:8080',
     'browsers': [
         {
             'browser_name': 'chrome',

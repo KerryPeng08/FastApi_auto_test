@@ -10,10 +10,11 @@
 from setting import SELENOID
 from tools import get_session_id
 from urllib3 import exceptions
+from tools import logger
 
 BROWSER_TEMP: str = f"""
     browser = playwright.chromium.connect_over_cdp(
-        endpoint_url='ws://{SELENOID['host']}/ws/devtools/driver.session_id'
+        endpoint_url='ws://{SELENOID['selenoid_ui_host']}/ws/devtools/driver.session_id'
     )
 """
 
@@ -60,9 +61,11 @@ async def replace_playwright(
         se = SELENOID['browsers'][remote_id - 1]
         try:
             session_id = await get_session_id(browser_name=se['browser_name'], browser_version=se['browser_name'])
+            logger.info(f'session_id: {session_id}')
         except exceptions.MaxRetryError:
             return ''
         browser_temp = BROWSER_TEMP.replace('driver.session_id', str(session_id))
+        logger.info(f'browser_temp: {browser_temp}')
         new_text = new_text.replace(
             'browser = playwright.chromium.launch(headless=False)',
             browser_temp
