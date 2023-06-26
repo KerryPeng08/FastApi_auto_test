@@ -176,7 +176,7 @@ async def run_ui_case(db: Session, playwright_text: str, temp_id: int):
 
     return {
         'temp_id': case_info.id,
-        'report': f'ui/allure/{case_info.id}/{case_info.run_order}',
+        'report': f'/ui/allure/{case_info.id}/{case_info.run_order}',
         'is_fail': True,
         'run_order': case_info.run_order,
         'tmp_file': path
