@@ -24,7 +24,8 @@ async def replace_playwright(
         temp_name: str,
         remote: bool,
         remote_id: int,
-        headless: bool
+        headless: bool,
+        file_name: str
 ):
     """
     替换文本内容
@@ -33,6 +34,7 @@ async def replace_playwright(
     :param remote: 是否使用远程浏览器
     :param remote_id: 浏览器配置列表id
     :param headless: 无头模式运行
+    :param file_name: 用例名称
     :return:
     """
 
@@ -60,7 +62,11 @@ async def replace_playwright(
     if remote and remote_id:
         se = SELENOID['browsers'][remote_id - 1]
         try:
-            session_id = await get_session_id(browser_name=se['browser_name'], browser_version=se['browser_name'])
+            session_id = await get_session_id(
+                browser_name=se['browser_name'],
+                browser_version=se['browser_name'],
+                file_name=file_name
+            )
             logger.info(f'session_id: {session_id}')
         except exceptions.MaxRetryError:
             return ''

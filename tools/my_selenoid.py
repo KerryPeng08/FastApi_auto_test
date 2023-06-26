@@ -11,17 +11,24 @@ from setting import SELENOID
 from selenium import webdriver
 
 
-async def get_session_id(browser_name: str, browser_version: str):
+async def get_session_id(browser_name: str, browser_version: str, file_name: str):
     """
     获取远程浏览器的session_id
     :param browser_name: 浏览器名称
     :param browser_version: 浏览器版本
+    :param file_name: 用例名称，用来生成视频文件
     :return:
     """
     chrome_options = webdriver.ChromeOptions()
     chrome_options.set_capability("browserName", browser_name)
     chrome_options.set_capability("browserVersion", browser_version)
-    chrome_options.set_capability("selenoid:options", {"enableVNC": True, "enableVideo": True})
+    chrome_options.set_capability("selenoid:options", {
+        "enableVNC": True,
+        "enableVideo": True,
+        "videoName": f"{file_name}.mp4",
+        "enableLog": True,
+        "logName": f'{file_name}.log'
+    })
 
     driver = webdriver.Remote(
         command_executor=f"http://{SELENOID['selenoid_hub_host']}/wd/hub",

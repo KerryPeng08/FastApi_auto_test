@@ -13,4 +13,6 @@ ujson~=5.4.0
 ddddocr~=1.4.7
 aiomysql~=0.0.21
 fastapi-pagination~=0.12.1
-SQLAlchemy~=2.0.9
+SQLAlchemy~=1.4.0
+urllib3~=2.0.3
+selenium~=4.10.0

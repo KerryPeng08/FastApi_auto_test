@@ -8,6 +8,7 @@
 """
 
 import os
+import time
 import asyncio
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
@@ -21,6 +22,7 @@ from apps.case_ddt import crud as gather_crud
 from apps.case_ui import crud as ui_crud
 from apps.run_case import schemas, CASE_STATUS
 from .tool import run_service_case, run_ddt_case, run_ui_case, header, replace_playwright
+from setting import SELENOID
 
 run_case = APIRouter()
 
@@ -129,17 +131,20 @@ async def ui_temp(
     """
     ui_temp_info = await ui_crud.get_playwright(db=db, temp_id=temp_id)
     if ui_temp_info:
+        file_name = f"temp_id_{time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))}"
         playwright = await replace_playwright(
             playwright_text=ui_temp_info[0].text,
             temp_name=ui_temp_info[0].temp_name,
             remote=remote,
             remote_id=remote_id,
-            headless=headless
+            headless=headless,
+            file_name=file_name
         )
         if not playwright:
             return await response_code.resp_400(message='由于连接方在一段时间后没有正确答复或连接的主机没有反应，连接尝试失败')
 
         report = await run_ui_case(db=db, playwright_text=playwright, temp_id=temp_id)
+        report['video'] = f"http://{SELENOID['selenoid_ui_host']}/video/{file_name}.mp4"
         return await response_code.resp_200(
             data=report,
             background=BackgroundTask(lambda: os.remove(report['tmp_file']))
