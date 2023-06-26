@@ -22,6 +22,6 @@ async def get_row_data(playwright_text: str):
     for i, data in enumerate(data_list):
         if '{{' in data and "}}" in data:
             for x in re.findall(r"{{(.*?)}}", data):
-                result.append({'row': i, 'data': x})
+                result.append({'row': i + 1, 'data': x})
 
     return result
