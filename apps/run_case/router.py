@@ -131,7 +131,7 @@ async def ui_temp(
     """
     ui_temp_info = await ui_crud.get_playwright(db=db, temp_id=temp_id)
     if ui_temp_info:
-        file_name = f"temp_id_{time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))}"
+        file_name = f"temp_id_{ui_temp_info[0].id}_{time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))}"
         playwright = await replace_playwright(
             playwright_text=ui_temp_info[0].text,
             temp_name=ui_temp_info[0].temp_name,
