@@ -105,3 +105,10 @@ class SwapDataMany(BaseModel):
 class UpdateName(BaseModel):
     new_name: str
     temp_id: int = None
+
+
+class PaginationTempTestCase(BaseModel):
+    total: int
+    page: int
+    size: int
+    items: List[TempTestCase]

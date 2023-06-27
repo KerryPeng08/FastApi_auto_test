@@ -7,6 +7,7 @@
 @Time: 2023/6/9-16:30
 """
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from apps.case_ui import models, schemas
 
@@ -26,12 +27,20 @@ async def create_playwright(db: Session, data: schemas.PlaywrightIn, rows: int):
     return db_temp
 
 
-async def get_playwright(db: Session, temp_id: int = None, temp_name: str = None):
+async def get_playwright(
+        db: Session,
+        temp_id: int = None,
+        temp_name: str = None,
+        page: int = 1,
+        size: int = 10
+):
     """
     查询内容
     :param db:
     :param temp_id:
     :param temp_name:
+    :param page:
+    :param size:
     :return:
     """
     if temp_id:
@@ -44,7 +53,9 @@ async def get_playwright(db: Session, temp_id: int = None, temp_name: str = None
             models.PlaywrightTemp.temp_name == temp_name
         ).all()
 
-    return db.query(models.PlaywrightTemp).order_by(models.PlaywrightTemp.id.desc()).all()
+    return db.query(models.PlaywrightTemp).order_by(
+        models.PlaywrightTemp.id.desc()
+    ).offset(size * (page - 1)).limit(size)
 
 
 async def update_playwright(db: Session, temp_id: int, project_name: str, temp_name: str, rows: int, text: str):
@@ -145,3 +156,12 @@ async def update_ui_temp_order(db: Session, temp_id: int):
     db.commit()
     db.refresh(db_case)
     return db_case
+
+
+async def get_count(db: Session):
+    """
+    记数查询
+    :param db:
+    :return:
+    """
+    return db.query(func.count(models.PlaywrightTemp.id)).scalar()

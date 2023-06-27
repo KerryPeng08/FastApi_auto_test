@@ -43,3 +43,10 @@ class PlaywrightDataOut(PlaywrightDataIn):
     id: int
     created_at: datetime = None
     updated_at: datetime = None
+
+
+class PaginationPlaywright(BaseModel):
+    total: int
+    page: int
+    size: int
+    items: List[PlaywrightOut]

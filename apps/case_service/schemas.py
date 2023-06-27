@@ -209,3 +209,10 @@ class SetApiConfig(BaseModel):
 class UpdateName(BaseModel):
     new_name: str
     case_id: int = None
+
+
+class PaginationTestCaseInfo(BaseModel):
+    total: int
+    page: int
+    size: int
+    items: List[TestCaseInfoOut]

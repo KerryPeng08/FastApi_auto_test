@@ -12,10 +12,8 @@ import time
 from fastapi import APIRouter, Depends, UploadFile
 from depends import get_db
 from sqlalchemy.orm import Session
-from apps.my_pagination import Page
 from starlette.responses import FileResponse
 from starlette.background import BackgroundTask
-from fastapi_pagination import add_pagination, paginate
 
 from apps import response_code
 from tools.excel import CreateExcelToUi
@@ -75,16 +73,21 @@ async def get_playwright_data(temp_id: int, db: Session = Depends(get_db)):
 @case_ui.get(
     '/get/playwright/list',
     name='获取UI数据列表',
-    response_model=Page[schemas.PlaywrightOut],
+    response_model=schemas.PaginationPlaywright,
     response_class=response_code.MyJSONResponse,
     response_model_exclude=['text']
 )
-async def get_playwright_list(db: Session = Depends(get_db)):
+async def get_playwright_list(page: int = 1, size: int = 10, db: Session = Depends(get_db)):
     """
     获取playwright列表
     """
-    temp_info = await crud.get_playwright(db=db)
-    return paginate(temp_info) or await response_code.resp_404()
+    temp_info = await crud.get_playwright(db=db, page=page, size=size)
+    return {
+               'items': list(temp_info),
+               'total': await crud.get_count(db=db),
+               'page': page,
+               'size': size
+           } or await response_code.resp_404()
 
 
 @case_ui.get(
@@ -211,6 +214,3 @@ async def get_remote_browsers():
     ]
 
     return await response_code.resp_200(data=data)
-
-
-add_pagination(case_ui)

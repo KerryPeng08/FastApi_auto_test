@@ -7,6 +7,7 @@
 @Time: 2022/8/8-10:19
 """
 
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from apps.template import models, schemas
 from apps.case_service import models as case_models
@@ -100,13 +101,22 @@ async def update_template_data(db: Session, temp_id: int, id_: int, new_number: 
         return db_temp
 
 
-async def get_temp_name(db: Session, temp_name: str = None, temp_id: int = None, like: bool = False):
+async def get_temp_name(
+        db: Session,
+        temp_name: str = None,
+        temp_id: int = None,
+        like: bool = False,
+        page: int = 1,
+        size: int = 10
+):
     """
     按模板名称查询数据
     :param db:
     :param temp_name:
     :param temp_id:
     :param like:
+    :param page:
+    :param size:
     :return:
     """
     if temp_id:
@@ -122,7 +132,7 @@ async def get_temp_name(db: Session, temp_name: str = None, temp_id: int = None,
                 models.Template.id.desc()
             ).all()
 
-    return db.query(models.Template).order_by(models.Template.id.desc()).all()
+    return db.query(models.Template).order_by(models.Template.id.desc()).offset(size * (page - 1)).limit(size)
 
 
 async def get_temp_case_info(db: Session, temp_id: int, outline: bool):
@@ -329,3 +339,12 @@ async def get_temp_numbers(db: Session, temp_id: int, number: int):
     ).order_by(
         models.TemplateData.number
     ).all()
+
+
+async def get_count(db: Session):
+    """
+    记数查询
+    :param db:
+    :return:
+    """
+    return db.query(func.count(models.Template.id)).scalar()

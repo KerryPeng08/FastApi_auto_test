@@ -8,6 +8,7 @@
 """
 
 from tools import rep_value, rep_url
+from sqlalchemy import func
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.orm import Session
 from apps.case_service import models, schemas
@@ -94,13 +95,22 @@ async def del_test_case_data(db: Session, case_id: int, number: int = None):
     db.commit()
 
 
-async def get_case_info(db: Session, case_name: str = None, case_id: int = None, all_: bool = False):
+async def get_case_info(
+        db: Session,
+        case_name: str = None,
+        case_id: int = None,
+        all_: bool = False,
+        page: int = 1,
+        size: int = 10
+):
     """
     按用例名称查询数据
     :param db:
     :param case_name:
     :param case_id:
     :param all_:
+    :param page:
+    :param size::
     :return:
     """
     if case_id:
@@ -112,6 +122,9 @@ async def get_case_info(db: Session, case_name: str = None, case_id: int = None,
         ).all()
     if all_:
         return db.query(models.TestCase).order_by(models.TestCase.id.desc()).all()
+
+    if page and size:
+        return db.query(models.TestCase).order_by(models.TestCase.id.desc()).offset(size * (page - 1)).limit(size)
 
 
 async def get_case_data(db: Session, case_id: int, number: int = None):
@@ -403,3 +416,12 @@ async def get_case_numbers(db: Session, case_id: int, number: int):
     ).order_by(
         models.TestCaseData.number
     ).all()
+
+
+async def get_count(db: Session):
+    """
+    记数查询
+    :param db:
+    :return:
+    """
+    return db.query(func.count(models.TestCase.id)).scalar()
