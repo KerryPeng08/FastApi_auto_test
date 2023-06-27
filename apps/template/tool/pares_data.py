@@ -100,6 +100,9 @@ class ParseData:
         :param post_data:
         :return:
         """
+        if post_data['mimeType'] is None:
+            return ['other', {}]
+
         if 'application/x-www-form-urlencoded' in post_data['mimeType']:
             return ['body', {params['name']: params['value'] for params in post_data['params']}]
 
