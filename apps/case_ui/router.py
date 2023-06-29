@@ -9,6 +9,7 @@
 
 import os
 import time
+import shutil
 from fastapi import APIRouter, Depends, UploadFile
 from depends import get_db
 from sqlalchemy.orm import Session
@@ -20,7 +21,7 @@ from tools.excel import CreateExcelToUi
 from apps.case_ui import schemas, crud
 from apps.case_ui.tool import case_data
 from tools import ReadUiExcel
-from setting import SELENOID
+from setting import SELENOID, ALLURE_PATH_UI
 
 case_ui = APIRouter()
 
@@ -195,6 +196,7 @@ async def del_playwright_data(temp_id: int, db: Session = Depends(get_db)):
     删除UI数据列表
     """
     await crud.del_template_data(db=db, temp_id=temp_id)
+    shutil.rmtree(f"{ALLURE_PATH_UI}/{temp_id}", ignore_errors=True)
     return await response_code.resp_200()
 
 
