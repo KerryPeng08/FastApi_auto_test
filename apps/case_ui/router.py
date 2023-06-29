@@ -201,6 +201,26 @@ async def del_playwright_data(temp_id: int, db: Session = Depends(get_db)):
 
 
 @case_ui.get(
+    '/get/playwright/gather/{temp_id}',
+    name='获取UI数据集详情',
+    response_class=response_code.MyJSONResponse,
+)
+async def get_playwright_gather(temp_id: int, db: Session = Depends(get_db)):
+    """
+    获取UI数据集详情:
+    """
+    temp_info = await crud.get_playwright(db=db, temp_id=temp_id)
+    if temp_info:
+        case_info = await crud.get_play_case_data(db=db, temp_id=temp_id)
+        if case_info:
+            return case_info
+        else:
+            return await response_code.resp_404(message='没有提取到内容')
+    else:
+        return await response_code.resp_404()
+
+
+@case_ui.get(
     '/get/remote/browsers',
     name='获取配置好的远程浏览器'
 )
