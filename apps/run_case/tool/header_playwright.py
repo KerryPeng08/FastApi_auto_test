@@ -39,7 +39,7 @@ async def replace_playwright(
     """
 
     new_text = playwright_text.replace(
-        '{{case_name}}', temp_name
+        'case_name', temp_name
     ).replace(
         '{{', ''
     ).replace(

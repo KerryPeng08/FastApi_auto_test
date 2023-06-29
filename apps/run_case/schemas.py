@@ -27,3 +27,11 @@ class RunCaseGather(BaseModel):
     suite: List[int]
     async_: Optional[bool] = False
     temp_hosts: List[TempHosts]
+
+
+class RunUiTemp(BaseModel):
+    temp_id: int
+    remote: bool
+    remote_id: int = None
+    headless: bool
+    gather_id: int = None

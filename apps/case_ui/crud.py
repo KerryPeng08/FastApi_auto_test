@@ -108,9 +108,10 @@ async def get_play_case_data(db: Session, case_id: int = None, temp_id: int = No
     :param temp_id:
     :return:
     """
-    if case_id:
+    if case_id and temp_id:
         return db.query(models.PlaywrightCaseDate).filter(
-            models.PlaywrightCaseDate.id == case_id
+            models.PlaywrightCaseDate.id == case_id,
+            models.PlaywrightCaseDate.temp_id == temp_id
         ).all()
 
     if temp_id:
