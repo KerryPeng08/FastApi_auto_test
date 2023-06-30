@@ -269,3 +269,26 @@ class RepData:
             data['number'] = int(number)
 
         return json_data
+
+
+async def filter_number(json_data: dict) -> dict:
+    """
+    过滤
+    :param json_data:
+    :return:
+    """
+
+    new_extract_contents = []
+    for i, data in enumerate(json_data['extract_contents']):
+        new_data = data['new_data']
+        if '{{' in new_data and '$' in new_data and '}}' in new_data:
+            aa = re.sub('}}', '', re.sub('{{', '', new_data))
+            number, json_path = aa.split('.', 1)
+            if data['number'] > int(number):
+                new_extract_contents.append(data)
+        else:
+            new_extract_contents.append(data)
+    else:
+        json_data['extract_contents'] = new_extract_contents
+
+    return json_data

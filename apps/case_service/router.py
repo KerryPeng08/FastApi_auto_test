@@ -19,7 +19,7 @@ from starlette.background import BackgroundTask
 from depends import get_db
 from apps import response_code
 from tools.check_case_json import CheckJson
-from tools import OperationJson, ExtractParamsPath, RepData
+from tools import OperationJson, ExtractParamsPath, RepData, filter_number
 from setting import ALLURE_PATH
 from .tool import GetCaseDataInfo, check
 
@@ -649,6 +649,11 @@ async def get_case_data_json_path(
     RepData.rep_json(json_data=params_list, case_data=case_data, new_str=new_str, type_='params')
     # 对比数据================================#
     RepData.rep_json(json_data=data_list, case_data=case_data, new_str=new_str, type_='data')
+
+    # 过滤下number小于等于查询number的数据
+    await filter_number(url_list)
+    await filter_number(params_list)
+    await filter_number(data_list)
 
     if not url_list['extract_contents'] and not params_list['extract_contents'] and not data_list['extract_contents']:
         return await response_code.resp_404()
