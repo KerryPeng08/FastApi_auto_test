@@ -213,6 +213,8 @@ async def get_playwright_gather(temp_id: int, db: Session = Depends(get_db)):
     if temp_info:
         case_info = await crud.get_play_case_data(db=db, temp_id=temp_id)
         if case_info:
+            for x in case_info:
+                x.rows_data = [{y['row']: y['data']} for y in x.rows_data]
             return case_info
         else:
             return await response_code.resp_404(message='没有提取到内容')
