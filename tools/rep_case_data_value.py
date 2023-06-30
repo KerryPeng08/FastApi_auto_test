@@ -17,9 +17,15 @@ def rep_value(json_data: dict, old_str: str, new_str: str) -> dict:
     :return:
     """
 
-    def handle_value(data_json):
+    def handle_value(data):
         target = {}
-        for k, v in data_json.items():
+        if isinstance(data, str):
+            if old_str == data:
+                return old_str.replace(old_str, new_str)
+            else:
+                return data
+
+        for k, v in data.items():
 
             if not isinstance(v, (list, dict)):
                 if v == old_str:
