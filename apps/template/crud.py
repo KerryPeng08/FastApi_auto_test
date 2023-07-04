@@ -119,7 +119,7 @@ async def get_temp_name(
     :param size:
     :return:
     """
-    if temp_id:
+    if temp_id is not None:
         return db.query(models.Template).filter(models.Template.id == temp_id).order_by(models.Template.id.desc()).all()
 
     if temp_name:

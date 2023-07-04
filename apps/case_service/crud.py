@@ -113,7 +113,7 @@ async def get_case_info(
     :param size::
     :return:
     """
-    if case_id:
+    if case_id is not None:
         return db.query(models.TestCase).filter(models.TestCase.id == case_id).order_by(models.TestCase.id.desc()).all()
 
     if case_name:

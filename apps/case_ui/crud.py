@@ -43,7 +43,7 @@ async def get_playwright(
     :param size:
     :return:
     """
-    if temp_id:
+    if temp_id is not None:
         return db.query(models.PlaywrightTemp).filter(
             models.PlaywrightTemp.id == temp_id
         ).all()
