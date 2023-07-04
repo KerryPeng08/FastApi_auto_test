@@ -17,7 +17,7 @@ from .auto_check import my_auto_check
 
 async def refresh(db: Session, case_id: int, start_number: int, type_: str):
     """
-    刷新用例的number序号好jsonPath中的number
+    刷新用例的number序号和jsonPath中的number
     :param db:
     :param case_id:
     :param start_number:
@@ -29,8 +29,6 @@ async def refresh(db: Session, case_id: int, start_number: int, type_: str):
 
     if type_ == 'add':
         for i, x in enumerate(number_info):
-            if i == 1:
-                continue
             await crud.update_api_number(db=db, case_id=case_id, id_=x.id, new_number=x.number + 1)
 
         for i, x in enumerate(number_info):
@@ -122,6 +120,24 @@ async def _rep_dict(case_data: dict, start_number: int, type_: str):
 
     def inter(data: dict):
         target = {}
+
+        if isinstance(data, str):
+            if "{{" in data and "$" in data and "}}" in data:
+                replace_values: List[str] = re.compile(r'{{(.*?)}}', re.S).findall(data)
+                v = ''
+                for replace in replace_values:
+                    number, json_path = replace.split('.', 1)
+                    if int(number) >= start_number:
+                        if type_ == 'add':
+                            v = re.sub("{{(.*?)}}", "{{" + f"{int(number) + 1}.{json_path}" + "}}", data, count=1)
+                        if type_ == 'del':
+                            v = re.sub("{{(.*?)}}", "{{" + f"{int(number) - 1}.{json_path}" + "}}", data, count=1)
+                    else:
+                        v = re.sub("{{(.*?)}}", "{{" + f"{int(number)}.{json_path}" + "}}", data, count=1)
+                return v
+            else:
+                return data
+
         for k, v in data.items():
             if isinstance(v, dict):
                 inter(v)

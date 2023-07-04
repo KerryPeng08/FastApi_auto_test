@@ -337,7 +337,7 @@ async def get_temp_numbers(db: Session, temp_id: int, number: int):
         models.TemplateData.temp_id == temp_id,
         models.TemplateData.number >= number
     ).order_by(
-        models.TemplateData.number
+        models.TemplateData.number.desc()
     ).all()
 
 

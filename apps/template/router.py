@@ -553,35 +553,38 @@ async def add_api(api_info: schemas.TemplateDataInTwo, db: Session = Depends(get
     """
     temp_info = await crud.get_template_data(db=db, temp_id=api_info.temp_id)
     # 校验下数据
-    max_number = max([x.number for x in temp_info]) if temp_info else 0
+    max_number = max([x.number for x in temp_info]) if temp_info else -1
     if api_info.number > max_number + 1:
         return await response_code.resp_400(message=f'number值超过当前最大序号: {max_number} + 1')
 
-    # 插入数据
-    await crud.create_template_data_add(db=db, data=api_info)
-    await crud.update_template(db=db, temp_id=api_info.temp_id, api_count=len(temp_info) + 1)
-
     if api_info.number == max_number + 1:
-        pass
+        # 插入数据
+        await crud.create_template_data_add(db=db, data=api_info)
+        await crud.update_template(db=db, temp_id=api_info.temp_id, api_count=len(temp_info) + 1)
     else:
         # 重新对number进行编号
         number_info = await crud.get_temp_numbers(db=db, temp_id=api_info.temp_id, number=api_info.number)
         for i, x in enumerate(number_info):
-            if i == 1:
-                continue
             await crud.update_template_data(db=db, temp_id=api_info.temp_id, id_=x.id, new_number=x.number + 1)
+
+        # 插入数据
+        await crud.create_template_data_add(db=db, data=api_info)
+        await crud.update_template(db=db, temp_id=api_info.temp_id, api_count=len(temp_info) + 1)
 
     # 对用例进行操作
     for case in await case_crud.get_case(db=db, temp_id=api_info.temp_id):
-        # 插入数据
-        case_info = await temp_to_case(db=db, api_info=api_info, case_id=case.id)
-        await case_crud.create_test_case_data_add(db=db, data=case_schemas.TestCaseDataInTwo(**case_info))
-        await case_crud.update_test_case(db=db, case_id=case.id, case_count=len(temp_info) + 1)
-
         if api_info.number == max_number + 1:
-            pass
+            # 插入数据
+            case_info = await temp_to_case(db=db, api_info=api_info, case_id=case.id)
+            await case_crud.create_test_case_data_add(db=db, data=case_schemas.TestCaseDataInTwo(**case_info))
+            await case_crud.update_test_case(db=db, case_id=case.id, case_count=len(temp_info) + 1)
         else:
+            # 刷新用例的number
             await refresh(db=db, case_id=case.id, start_number=api_info.number, type_='add')
+
+            case_info = await temp_to_case(db=db, api_info=api_info, case_id=case.id)
+            await case_crud.create_test_case_data_add(db=db, data=case_schemas.TestCaseDataInTwo(**case_info))
+            await case_crud.update_test_case(db=db, case_id=case.id, case_count=len(temp_info) + 1)
 
     return await response_code.resp_200()
 

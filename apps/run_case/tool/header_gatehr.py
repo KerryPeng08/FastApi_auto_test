@@ -44,6 +44,9 @@ async def _rep_dict(case_data: dict, gather_data: dict):
     """
 
     def inter(data: dict):
+        if isinstance(data, str):
+            return data
+
         target = {}
         for k, v in data.items():
             if isinstance(v, dict):

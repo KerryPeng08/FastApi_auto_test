@@ -415,6 +415,8 @@ async def get_case_numbers(db: Session, case_id: int, number: int):
         models.TestCaseData.number >= number
     ).order_by(
         models.TestCaseData.number
+    ).order_by(
+        models.TestCaseData.id.desc()
     ).all()
 
 
