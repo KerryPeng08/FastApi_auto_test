@@ -58,7 +58,7 @@ class TemplateDataIn(BaseModel):
     method: str
     params: Optional[dict] = {}
     json_body: str
-    data: Optional[dict] = {}
+    data: Union[dict, list] = {}
     file: bool
     file_data: Optional[list] = []
     headers: Optional[dict] = {}

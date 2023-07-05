@@ -490,7 +490,7 @@ class RunApi:
 
     @staticmethod
     async def _replace_params_data(
-            data: dict,
+            data: [dict, list],
             response: list,
             faker: FakerData,
             code: str = None,
@@ -506,6 +506,19 @@ class RunApi:
         """
 
         async def handle_value(data_json):
+
+            if isinstance(data_json, list):
+                return [await handle_value(x) for x in data_json]
+
+            if isinstance(data_json, str):
+                return await header_srt(
+                    x=data_json,
+                    response=response,
+                    faker=faker,
+                    code=code,
+                    extract=extract
+                )
+
             target = {}
             if not data_json:
                 return target

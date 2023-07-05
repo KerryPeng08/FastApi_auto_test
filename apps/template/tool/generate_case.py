@@ -80,7 +80,7 @@ class GenerateCase:
         }
 
     @staticmethod
-    async def _extract_params_keys(param: dict, response: list) -> dict:
+    async def _extract_params_keys(param: [dict, list], response: list) -> dict:
         """
         提取字典中的key
         :param param:
@@ -88,7 +88,14 @@ class GenerateCase:
         :return:
         """
 
-        def header_key(data: dict) -> dict:
+        def header_key(data: [dict, list, str]) -> [dict, list, str]:
+
+            if isinstance(data, list):
+                return [header_key(x) for x in data]
+
+            if isinstance(data, str):
+                return data
+
             target = {}
             for key in data.keys():
                 for x in range(len(response)):

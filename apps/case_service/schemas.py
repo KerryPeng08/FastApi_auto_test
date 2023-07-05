@@ -76,7 +76,7 @@ class SedParamsData(BaseModel):
     case_id: int
     number: int
     type: str
-    data_info: dict
+    data_info: Union[dict, list]
 
 
 # 用例名称的请求/响应数据模型
@@ -114,7 +114,7 @@ class TestCaseDataIn(BaseModel):
     path: str
     headers: Optional[dict] = {}
     params: Optional[dict] = {}
-    data: Optional[dict] = {}
+    data: Union[dict, list] = {}
     file: bool
     check: Optional[dict] = {}
     description: str
@@ -133,7 +133,7 @@ class TestCaseData(BaseModel):
     path: str
     headers: Optional[dict] = {}
     params: Optional[dict] = {}
-    data: Optional[dict] = {}
+    data: Union[dict, list] = {}
     file: bool
     check: Optional[dict] = {}
     description: str
@@ -160,7 +160,7 @@ class TestCaseDataOut1(BaseModel):
     path: str
     headers: Optional[dict] = {}
     params: Optional[dict] = {}
-    data: Optional[dict] = {}
+    data: Union[dict, list] = {}
     file: bool
     check: Optional[dict] = {}
     description: str

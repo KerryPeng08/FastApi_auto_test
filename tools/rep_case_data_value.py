@@ -25,6 +25,9 @@ def rep_value(json_data: dict, old_str: str, new_str: str) -> dict:
             else:
                 return data
 
+        if isinstance(data, list):
+            return [handle_value(x) for x in data]
+
         for k, v in data.items():
 
             if not isinstance(v, (list, dict)):
