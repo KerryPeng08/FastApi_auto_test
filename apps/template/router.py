@@ -400,7 +400,7 @@ async def get_templates(
 
     return {
                'items': out_info,
-               'total': await crud.get_count(db=db),
+               'total': await crud.get_count(db=db, temp_name=temp_name),
                'page': page,
                'size': size
            } or await response_code.resp_404()

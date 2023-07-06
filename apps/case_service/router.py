@@ -291,7 +291,7 @@ async def case_data_list(
         )
     return {
                'items': case_info,
-               'total': await crud.get_count(db=db),
+               'total': await crud.get_count(db=db, case_name=case_name),
                'page': page,
                'size': size
            } or await response_code.resp_404()

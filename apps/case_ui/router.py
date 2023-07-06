@@ -90,7 +90,7 @@ async def get_playwright_list(
     temp_info = await crud.get_playwright(db=db, temp_name=temp_name, like=True, page=page, size=size)
     return {
                'items': list(temp_info),
-               'total': await crud.get_count(db=db),
+               'total': await crud.get_count(db=db, temp_name=temp_name),
                'page': page,
                'size': size
            } or await response_code.resp_404()

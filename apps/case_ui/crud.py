@@ -168,10 +168,16 @@ async def update_ui_temp_order(db: Session, temp_id: int):
     return db_case
 
 
-async def get_count(db: Session):
+async def get_count(db: Session,temp_name:str):
     """
     记数查询
     :param db:
+    :param temp_name:
     :return:
     """
+    if temp_name:
+        return db.query(func.count(models.PlaywrightTemp.id)).filter(
+            models.PlaywrightTemp.temp_name.like(f"%{temp_name}%")
+        ).scalar()
+
     return db.query(func.count(models.PlaywrightTemp.id)).scalar()

@@ -343,10 +343,15 @@ async def get_temp_numbers(db: Session, temp_id: int, number: int):
     ).all()
 
 
-async def get_count(db: Session):
+async def get_count(db: Session, temp_name: str):
     """
     记数查询
     :param db:
     :return:
     """
+    if temp_name:
+        return db.query(func.count(models.Template.id)).filter(
+            models.Template.temp_name.like(f"%{temp_name}%")
+        ).scalar()
+
     return db.query(func.count(models.Template.id)).scalar()

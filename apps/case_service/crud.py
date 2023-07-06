@@ -422,10 +422,16 @@ async def get_case_numbers(db: Session, case_id: int, number: int):
     ).all()
 
 
-async def get_count(db: Session):
+async def get_count(db: Session, case_name: str):
     """
     记数查询
     :param db:
+    :param case_name:
     :return:
     """
+    if case_name:
+        return db.query(func.count(models.TestCase.id)).filter(
+            models.TestCase.case_name.like(f"%{case_name}%")
+        ).scalar()
+
     return db.query(func.count(models.TestCase.id)).scalar()
