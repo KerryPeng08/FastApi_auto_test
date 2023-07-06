@@ -377,7 +377,7 @@ async def get_templates(
     if temp_id:
         templates = await crud.get_temp_name(db=db, temp_id=temp_id)
     elif temp_name:
-        templates = await crud.get_temp_name(db=db, temp_name=temp_name, like=True)
+        templates = await crud.get_temp_name(db=db, temp_name=temp_name, like=True, page=page, size=size)
     else:
         templates = await crud.get_temp_name(db=db, page=page, size=size)
 

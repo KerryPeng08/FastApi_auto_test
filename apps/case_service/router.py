@@ -257,11 +257,17 @@ async def download_case_data_info(case_id: int, db: Session = Depends(get_db)):
     response_model_exclude_unset=True,
     name='查看测试用例列表'
 )
-async def case_data_list(page: int, size: int, outline: bool = True, db: Session = Depends(get_db)):
+async def case_data_list(
+        case_name: str = None,
+        page: int = 1,
+        size: int = 10,
+        outline: bool = True,
+        db: Session = Depends(get_db)
+):
     """
     查看测试用例列表
     """
-    test_case = await crud.get_case_info(db=db, page=page, size=size)
+    test_case = await crud.get_case_info(db=db, case_name=case_name, page=page, size=size)
 
     case_info = []
     for case in test_case:

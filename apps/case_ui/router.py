@@ -78,11 +78,16 @@ async def get_playwright_data(temp_id: int, db: Session = Depends(get_db)):
     response_class=response_code.MyJSONResponse,
     response_model_exclude=['text']
 )
-async def get_playwright_list(page: int = 1, size: int = 10, db: Session = Depends(get_db)):
+async def get_playwright_list(
+        temp_name: str = None,
+        page: int = 1,
+        size: int = 10,
+        db: Session = Depends(get_db)
+):
     """
     获取playwright列表
     """
-    temp_info = await crud.get_playwright(db=db, page=page, size=size)
+    temp_info = await crud.get_playwright(db=db, temp_name=temp_name, like=True, page=page, size=size)
     return {
                'items': list(temp_info),
                'total': await crud.get_count(db=db),

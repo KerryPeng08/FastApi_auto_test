@@ -31,6 +31,7 @@ async def get_playwright(
         db: Session,
         temp_id: int = None,
         temp_name: str = None,
+        like: bool = False,
         page: int = 1,
         size: int = 10
 ):
@@ -39,6 +40,7 @@ async def get_playwright(
     :param db:
     :param temp_id:
     :param temp_name:
+    :param like:
     :param page:
     :param size:
     :return:
@@ -49,6 +51,13 @@ async def get_playwright(
         ).all()
 
     if temp_name:
+        if like:
+            return db.query(models.PlaywrightTemp).filter(
+                models.PlaywrightTemp.temp_name.like(f"%{temp_name}%"),
+            ).order_by(
+                models.PlaywrightTemp.id.desc()
+            ).offset(size * (page - 1)).limit(size)
+
         return db.query(models.PlaywrightTemp).filter(
             models.PlaywrightTemp.temp_name == temp_name
         ).all()

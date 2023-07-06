@@ -117,9 +117,11 @@ async def get_case_info(
         return db.query(models.TestCase).filter(models.TestCase.id == case_id).order_by(models.TestCase.id.desc()).all()
 
     if case_name:
-        return db.query(models.TestCase).filter(models.TestCase.case_name == case_name).order_by(
+        return db.query(models.TestCase).filter(
+            models.TestCase.case_name.like(f"%{case_name}%"),
+        ).order_by(
             models.TestCase.id.desc()
-        ).all()
+        ).offset(size * (page - 1)).limit(size)
     if all_:
         return db.query(models.TestCase).order_by(models.TestCase.id.desc()).all()
 

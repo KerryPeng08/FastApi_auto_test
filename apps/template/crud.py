@@ -124,9 +124,11 @@ async def get_temp_name(
 
     if temp_name:
         if like:
-            return db.query(models.Template).filter(models.Template.temp_name.like(f"%{temp_name}%")).order_by(
+            return db.query(models.Template).filter(
+                models.Template.temp_name.like(f"%{temp_name}%"),
+            ).order_by(
                 models.Template.id.desc()
-            ).all()
+            ).offset(size * (page - 1)).limit(size)
         else:
             return db.query(models.Template).filter(models.Template.temp_name == temp_name).order_by(
                 models.Template.id.desc()
