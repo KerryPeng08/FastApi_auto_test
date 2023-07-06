@@ -8,12 +8,11 @@ __pycache__/
 
 # Distribution / packaging
 test.py
-alembic.ini
 auto_test.sqlite3
 /static
 /dist
 /build
-/alembic
+#/alembic
 /.idea
 *.json
 files/

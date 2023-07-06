@@ -117,7 +117,7 @@ class TestCaseDataIn(BaseModel):
     data: Union[dict, list] = {}
     file: bool
     check: Optional[dict] = {}
-    description: str
+    description: Union[str, None] = None
     config: TestCaseConfig
 
     class Config:
@@ -136,7 +136,7 @@ class TestCaseData(BaseModel):
     data: Union[dict, list] = {}
     file: bool
     check: Optional[dict] = {}
-    description: str
+    description: Union[str, None] = None
     config: TestCaseConfig
 
     class Config:

@@ -58,7 +58,7 @@ class GenerateCase:
                     **{k: v for k, v in auto_check.items() if
                        isinstance(template_data[num].response, dict) and template_data[num].response.get(k) == v}
                 },
-                'description': '',
+                'description': template_data[num].description,
                 'config': {
                     'is_login': True if num == 0 else None,
                     'sleep': 0.3,

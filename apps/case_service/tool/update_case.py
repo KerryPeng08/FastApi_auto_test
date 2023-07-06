@@ -97,7 +97,7 @@ async def temp_to_case(db: Session, case_id: int, api_info: temp_schemas.Templat
             **{k: v for k, v in auto_check.items() if
                isinstance(api_info.response, dict) and api_info.response.get(k) == v}
         },
-        'description': '',
+        'description': api_info.description,
         'config': {
             'is_login': None,
             'sleep': 0.3,
